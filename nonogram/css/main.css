@@ -1,0 +1,269 @@
+/* ==========================================================================
+   main.css — Zen Nonogram Global Design System & Tokens
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+:root {
+  /* Slate & Dark Zen Palette */
+  --slate-950: #020617;
+  --slate-900: #0f172a;
+  --slate-850: #131d36;
+  --slate-800: #1e293b;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+  --slate-300: #cbd5e1;
+  --slate-100: #f1f5f9;
+
+  /* Jade & Bamboo Accents */
+  --jade-500: #10b981;
+  --jade-400: #34d399;
+  --jade-300: #6ee7b7;
+  --jade-600: #059669;
+  --jade-900: #064e3b;
+  --jade-glow: rgba(16, 185, 129, 0.35);
+
+  /* Gold / Amber Highlights */
+  --gold-500: #f59e0b;
+  --gold-400: #fbbf24;
+  --gold-600: #d97706;
+  --gold-glow: rgba(245, 158, 11, 0.3);
+
+  /* Coral / Crimson for Errors/Lives */
+  --coral-500: #ef4444;
+  --coral-400: #f87171;
+
+  /* Nonogram Board Specifics */
+  --grid-bg: #1e293b;
+  --grid-border-thin: rgba(148, 163, 184, 0.2);
+  --grid-border-thick: rgba(16, 185, 129, 0.55);
+  --cell-empty: #172133;
+  --cell-empty-hover: #1e2e47;
+  --cell-filled: #10b981;
+  --cell-filled-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --cell-marked: #0f172a;
+
+  /* Typography */
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Transitions */
+  --anim-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --anim-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--slate-950);
+  color: var(--slate-100);
+  line-height: 1.5;
+  overflow-x: hidden;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* Button Component Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  padding: 0.75rem 1.25rem;
+  transition: all var(--anim-fast);
+  text-decoration: none;
+  outline: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn--primary {
+  background: linear-gradient(135deg, var(--jade-400) 0%, var(--jade-600) 100%);
+  color: #022c22;
+  box-shadow: 0 4px 14px var(--jade-glow);
+}
+
+.btn--primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 20px var(--jade-glow);
+}
+
+.btn--gold {
+  background: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-600) 100%);
+  color: #451a03;
+  box-shadow: 0 4px 14px var(--gold-glow);
+}
+
+.btn--gold:hover {
+  filter: brightness(1.08);
+}
+
+.btn--secondary {
+  background: var(--slate-800);
+  color: var(--slate-100);
+  border: 1px solid var(--slate-700);
+}
+
+.btn--secondary:hover {
+  background: var(--slate-700);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--slate-400);
+  border: 1px solid transparent;
+}
+
+.btn--ghost:hover {
+  color: var(--slate-100);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn--sm {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  border-radius: 10px;
+}
+
+.btn--full {
+  width: 100%;
+}
+
+/* Modal Framework */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-card {
+  background: var(--slate-900);
+  border: 1px solid var(--slate-700);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 360px;
+  padding: 1.5rem;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transform: translateY(20px) scale(0.96);
+  transition: transform 0.25s var(--anim-bounce);
+}
+
+.modal-backdrop.active .modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--slate-100);
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--slate-400);
+  font-size: 1.4rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.2rem;
+}
+
+.modal-close-btn:hover {
+  color: var(--slate-100);
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+  width: 90%;
+  max-width: 340px;
+}
+
+.toast {
+  background: var(--slate-800);
+  color: var(--slate-100);
+  border: 1px solid var(--slate-700);
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  animation: toastIn 0.3s var(--anim-bounce) forwards;
+}
+
+.toast--success {
+  border-color: var(--jade-500);
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--jade-300);
+}
+
+.toast--warning {
+  border-color: var(--gold-500);
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--gold-300);
+}
+
+.toast--error {
+  border-color: var(--coral-500);
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--coral-400);
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-10px) scale(0.95); }
+}

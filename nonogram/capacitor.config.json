@@ -1,0 +1,13 @@
+{
+  "appId": "com.gamingempire.zennonogram",
+  "appName": "Zen Nonogram",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0f172a",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "appId": "com.gamingempire.celestialjade",
+  "appName": "Celestial Jade",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0a130e",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

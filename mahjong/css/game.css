@@ -1,0 +1,277 @@
+/* ==========================================================================
+   CELESTIAL JADE: MAHJONG SOLITAIRE — Game Board & 3D Layered Tile Styles
+   ========================================================================== */
+
+.game-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   Top Sanctuary Command HUD
+   -------------------------------------------------------------------------- */
+.hud-bar {
+  background: var(--bg-surface);
+  border-bottom: 2px solid var(--border-gold);
+  padding: var(--space-2) var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.75);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.hud-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.hud-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #fff;
+}
+
+.hud-sub {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  color: var(--color-gold-leaf);
+}
+
+.hud-counter {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  color: var(--color-text-main);
+  background: #09130d;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border-jade);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hud-counter-val {
+  color: var(--color-gold-bright);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Mahjong Board Viewport
+   -------------------------------------------------------------------------- */
+.board-viewport {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: var(--space-4);
+  position: relative;
+  background: 
+    radial-gradient(ellipse at 50% 30%, rgba(21, 94, 67, 0.15) 0%, transparent 70%),
+    linear-gradient(#0b1610, #060e0a);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Board Coordinate Container */
+.board-stage {
+  position: relative;
+  transform-origin: center center;
+  transition: transform 0.2s ease;
+  margin: auto;
+}
+
+/* --------------------------------------------------------------------------
+   3D Layered Mahjong Tiles
+   -------------------------------------------------------------------------- */
+.mj-tile {
+  position: absolute;
+  width: var(--tile-w);
+  height: var(--tile-h);
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  z-index: 1;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 3D Tile Slab Composition */
+.mj-tile__body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--tile-face-bg);
+  border-radius: 4px;
+  border: 1px solid #d4c8b8;
+  /* Multi-layer 3D bevel & rich jade backing edge */
+  box-shadow: 
+    -1px 1px 0 #0f5139,
+    -2px 2px 0 #0b3d2b,
+    -3px 3px 0 #07291d,
+    -4px 4px 6px rgba(0, 0, 0, 0.7),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.mj-tile__face {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.mj-tile__face svg {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Free vs Blocked States */
+.mj-tile--free {
+  cursor: pointer;
+}
+
+.mj-tile--free:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.mj-tile--blocked {
+  cursor: default;
+  filter: brightness(0.68) contrast(0.92);
+}
+
+.mj-tile--selected {
+  transform: translateY(-4px) scale(1.03);
+  filter: brightness(1.12);
+}
+
+.mj-tile--selected .mj-tile__body {
+  border-color: var(--color-gold-bright);
+  box-shadow: 
+    -1px 1px 0 #0f5139,
+    -2px 2px 0 #0b3d2b,
+    -3px 3px 0 #07291d,
+    0 0 16px rgba(245, 158, 11, 0.95),
+    inset 0 0 6px rgba(245, 158, 11, 0.6);
+}
+
+.mj-tile--hint {
+  animation: tileHintPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes tileHintPulse {
+  0%, 100% {
+    filter: brightness(1);
+    transform: translateY(0);
+  }
+  50% {
+    filter: brightness(1.2);
+    transform: translateY(-3px);
+    box-shadow: 0 0 18px rgba(52, 211, 153, 0.95);
+  }
+}
+
+.mj-tile--matched {
+  animation: tileVanish 0.35s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+
+@keyframes tileVanish {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.18) translateY(-8px);
+    filter: brightness(1.5) drop-shadow(0 0 12px var(--color-gold-leaf));
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.4) translateY(12px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Bottom Tactical Quickbar & Helpers
+   -------------------------------------------------------------------------- */
+.tray-bar {
+  background: var(--bg-surface);
+  border-top: 2px solid var(--border-gold);
+  padding: var(--space-2) var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.quickbar-btn {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-jade);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-main);
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: all 0.12s ease;
+}
+
+.quickbar-btn:hover:not(:disabled) {
+  border-color: var(--border-gold);
+  color: var(--color-gold-leaf);
+  transform: translateY(-1px);
+}
+
+.quickbar-badge {
+  background: #059669;
+  color: #fff;
+  font-size: 0.72rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 2px;
+  font-weight: 700;
+}
+
+.quickbar-btn--empty .quickbar-badge {
+  background: #27382f;
+  color: #728a7d;
+}
+
+/* Mobile responsive sizing */
+@media (max-width: 600px) {
+  :root {
+    --tile-w: 36px;
+    --tile-h: 48px;
+  }
+  .hud-title {
+    font-size: 0.95rem;
+  }
+  .quickbar-btn {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}

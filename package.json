@@ -1,0 +1,12 @@
+{
+  "name": "games-workspace",
+  "version": "1.0.0",
+  "description": "Collection of web and capacitor casual games",
+  "scripts": {
+    "start": "npx serve -l 3000 .",
+    "serve": "npx serve -l 3000 ."
+  },
+  "keywords": ["games", "html5", "capacitor"],
+  "author": "",
+  "license": "ISC"
+}

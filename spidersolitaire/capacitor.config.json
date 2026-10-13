@@ -1,0 +1,13 @@
+{
+  "appId": "com.gamingempire.spidersolitaire",
+  "appName": "Spider Solitaire",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0d0b14",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

@@ -1,0 +1,306 @@
+/* ==========================================================================
+   menu.css — Main menu, mode selection, paginated deal picker (1-1,000)
+   Curious Solitaire (Wonderland Theme)
+   ========================================================================== */
+
+.menu-container {
+  max-width: 440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem 0.85rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   Logo & Banner
+   -------------------------------------------------------------------------- */
+.menu-logo-wrap {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.menu-brand-icon {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 10px rgba(212, 175, 55, 0.4));
+  margin-bottom: 0.5rem;
+}
+
+.menu-title {
+  font-family: var(--font-serif);
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: var(--gold-400);
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+
+.menu-subtitle {
+  font-size: 1rem;
+  color: #cbd5e1;
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   Menu Card & Buttons
+   -------------------------------------------------------------------------- */
+.menu-card {
+  background: radial-gradient(circle at 50% 20%, #162b42 0%, #0d1a29 100%);
+  border: 2px solid var(--gold-500);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), var(--shadow-gold);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.menu-btn-primary {
+  padding: 1rem;
+  font-size: 1.2rem;
+  border-radius: var(--radius-lg);
+}
+
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Draw Mode Selector
+   -------------------------------------------------------------------------- */
+.mode-selector {
+  display: flex;
+  background: rgba(8, 16, 26, 0.8);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: var(--radius-lg);
+  padding: 0.3rem;
+  gap: 0.3rem;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 0.65rem 0.5rem;
+  border: none;
+  background: none;
+  color: #94a3b8;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mode-btn--active {
+  background: linear-gradient(180deg, var(--gold-400) 0%, var(--gold-600) 100%);
+  color: var(--midnight-900);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Stats Strip
+   -------------------------------------------------------------------------- */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  background: rgba(10, 22, 34, 0.7);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.stats-strip__val {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--gold-300);
+}
+
+.stats-strip__lbl {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --------------------------------------------------------------------------
+   Deal Selector Modal & Grid
+   -------------------------------------------------------------------------- */
+.deal-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.deal-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  background: rgba(10, 22, 34, 0.7);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.pager-btn {
+  background: none;
+  border: 1px solid var(--gold-500);
+  color: var(--gold-400);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+.pager-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: #64748b;
+  color: #64748b;
+}
+
+.deal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  gap: 0.5rem;
+  max-height: 48vh;
+  overflow-y: auto;
+  padding: 0.5rem 0.25rem;
+}
+
+.deal-cell {
+  background: rgba(14, 28, 44, 0.8);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.deal-cell:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--gold-400);
+  transform: translateY(-2px);
+}
+
+.deal-cell__num {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #f1f5f9;
+}
+
+.deal-cell__badge {
+  font-size: 0.75rem;
+  color: var(--gold-400);
+  min-height: 16px;
+}
+
+.deal-cell--completed {
+  border-color: var(--gold-500);
+  background: rgba(212, 175, 55, 0.12);
+}
+
+/* --------------------------------------------------------------------------
+   Store Page & Shop Grid
+   -------------------------------------------------------------------------- */
+.store-packages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.store-card {
+  background: radial-gradient(circle at 50% 20%, #19314c 0%, #0d1e30 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  transition: transform var(--transition-fast);
+}
+
+.store-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--gold-400);
+}
+
+.store-card--featured {
+  border: 2px solid var(--gold-500);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.5), var(--shadow-gold);
+}
+
+.store-badge-tag {
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  background: linear-gradient(180deg, var(--gold-400) 0%, var(--gold-600) 100%);
+  color: var(--midnight-900);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+.store-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.store-card-icon {
+  font-size: 2rem;
+}
+
+.store-card-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  color: var(--gold-400);
+}
+
+.store-card-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.store-card-rewards {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.reward-pill {
+  background: rgba(10, 24, 38, 0.7);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.btn--purchased {
+  background: #059669 !important;
+  color: #fff !important;
+}

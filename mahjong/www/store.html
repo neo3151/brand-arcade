@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>CELESTIAL JADE — Pavilion Emporium</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/store.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+</head>
+<body>
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+      <div class="store-page">
+
+    <!-- Store Header -->
+    <header class="store-header">
+      <div style="display: flex; align-items: center; gap: var(--space-3);">
+        <a href="index.html" class="btn btn--secondary" style="padding: 0.35rem 0.65rem; font-size: 0.85rem;" title="Return to Sanctuary">← SANCTUARY</a>
+        <div>
+          <h1 style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: 0.05em;">PAVILION EMPORIUM</h1>
+          <div style="font-family: var(--font-serif); font-size: 0.75rem; color: var(--color-gold-leaf);">SACRED TACTICAL TREASURY</div>
+        </div>
+      </div>
+
+      <!-- Current Inventory Strip -->
+      <div class="emporium-inventory-strip">
+        <div class="inv-item" title="Compass Hints">
+          <span>🧭</span>
+          <span class="inv-val" id="inv-hints">0</span>
+        </div>
+        <div class="inv-item" title="Dragon Shuffles">
+          <span>🐉</span>
+          <span class="inv-val" id="inv-shuffles">0</span>
+        </div>
+        <div class="inv-item" title="Time Rewinds">
+          <span>⏳</span>
+          <span class="inv-val" id="inv-undos">0</span>
+        </div>
+        <div class="inv-item" title="Celestial Lotuses">
+          <span>🪷</span>
+          <span class="inv-val" id="inv-lotuses">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Emporium Hero -->
+    <section class="emporium-hero">
+      <h2 class="emporium-hero__title">SACRED AID OFFERINGS</h2>
+      <p class="emporium-hero__desc">
+        Zero advertisements. Pure contemplative puzzle-solving. Requisition sacred tactical artifacts to assist with intricate, high-density 
+        layouts and preserve your unbroken harmony streaks. All offerings integrate immediately into your offline pouch.
+      </p>
+    </section>
+
+    <!-- Supply Cards Grid -->
+    <main class="supply-grid">
+
+      <!-- Compass Hint Pack -->
+      <div class="supply-card">
+        <div class="supply-header">
+          <span class="supply-icon">🧭</span>
+          <div>
+            <h3 class="supply-title">Compass Hint Pack</h3>
+            <span class="supply-qty">Offering: 5 Uses</span>
+          </div>
+        </div>
+        <p class="supply-desc">
+          Imperial jade divining needle. Instantly locates and pulses an open, matching pair of tiles with a bright jade aura.
+        </p>
+        <div class="supply-meta">
+          <span class="supply-price">$0.99</span>
+          <button type="button" class="btn btn--primary" data-pack="hint">ACQUIRE</button>
+        </div>
+      </div>
+
+      <!-- Dragon Shuffle Pack -->
+      <div class="supply-card">
+        <div class="supply-header">
+          <span class="supply-icon">🐉</span>
+          <div>
+            <h3 class="supply-title">Dragon Shuffle Pack</h3>
+            <span class="supply-qty">Offering: 3 Uses</span>
+          </div>
+        </div>
+        <p class="supply-desc">
+          Celestial wind of renewal. Rearranges remaining tiles to open matching paths when moves are locked.
+        </p>
+        <div class="supply-meta">
+          <span class="supply-price">$0.99</span>
+          <button type="button" class="btn btn--primary" data-pack="shuffle">ACQUIRE</button>
+        </div>
+      </div>
+
+      <!-- Time Rewind Pack -->
+      <div class="supply-card">
+        <div class="supply-header">
+          <span class="supply-icon">⏳</span>
+          <div>
+            <h3 class="supply-title">Time Rewind Pack</h3>
+            <span class="supply-qty">Offering: 5 Uses</span>
+          </div>
+        </div>
+        <p class="supply-desc">
+          Spools back the threads of time. Restores your last matched pair of tiles back onto the tiered board.
+        </p>
+        <div class="supply-meta">
+          <span class="supply-price">$0.99</span>
+          <button type="button" class="btn btn--primary" data-pack="undo">ACQUIRE</button>
+        </div>
+      </div>
+
+      <!-- Celestial Lotus Pack -->
+      <div class="supply-card">
+        <div class="supply-header">
+          <span class="supply-icon">🪷</span>
+          <div>
+            <h3 class="supply-title">Celestial Lotus Pack</h3>
+            <span class="supply-qty">Offering: 3 Uses</span>
+          </div>
+        </div>
+        <p class="supply-desc">
+          Sacred flower of banishment. Banishes any chosen free tile and its open matching twin (or any currently open pair).
+        </p>
+        <div class="supply-meta">
+          <span class="supply-price">$0.99</span>
+          <button type="button" class="btn btn--primary" data-pack="lotus">ACQUIRE</button>
+        </div>
+      </div>
+
+      <!-- Grand Imperial Treasury Crate (Featured) -->
+      <div class="supply-card supply-card--featured" style="grid-column: 1 / -1;">
+        <div class="supply-badge">MOST POPULAR // IMPERIAL CHEST</div>
+        <div class="supply-header">
+          <span class="supply-icon">🏯</span>
+          <div>
+            <h3 class="supply-title">Grand Imperial Treasury</h3>
+            <span class="supply-qty" style="color: var(--color-gold-bright);">+10 Hints, +6 Shuffles, +10 Rewinds, +6 Lotuses</span>
+          </div>
+        </div>
+        <p class="supply-desc">
+          The ultimate sanctuary treasure chest. Fully replenishes your sacred inventory with generous quantities of every tactical helper for limitless contemplative play.
+        </p>
+        <div class="supply-meta">
+          <div>
+            <span style="text-decoration: line-through; color: var(--color-text-dark); margin-right: 8px; font-size: 0.95rem;">$4.96</span>
+            <span class="supply-price" style="color: var(--color-gold-bright);">$2.99</span>
+          </div>
+          <button type="button" class="btn btn--primary" data-pack="grand" style="background: linear-gradient(180deg, #d4af37 0%, #a88439 100%);">REQUISITION TREASURY</button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Legal & Info -->
+    <footer class="store-legal">
+      Demo store — no real charges. Items stored on this device. // 100% AD-FREE ENGINE
+    </footer>
+
+  </div>
+
+  <div id="toast-container"></div>
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <script src="js/utils.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/mobile-shell.js"></script>
+</body>
+</html>

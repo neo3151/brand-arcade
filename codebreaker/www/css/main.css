@@ -1,0 +1,319 @@
+/* ==========================================================================
+   BLACK VAULT — Cold War Codebreaker Theme & Base Styles
+   ========================================================================== */
+
+:root {
+  /* 1970s Espionage Bunker Color Tokens */
+  --bg-primary: #121513;
+  --bg-surface: #1a1e1b;
+  --bg-panel: #242925;
+  --bg-panel-light: #323934;
+  --bg-manila: #e6dfcf;
+  --bg-manila-dark: #ccbe9f;
+
+  /* Classified Ink & Phosphor Accents */
+  --color-classified-red: #c53030;
+  --color-amber-crt: #f59e0b;
+  --color-amber-glow: #fbbf24;
+  --color-green-crt: #10b981;
+  --color-tape-cyan: #06b6d4;
+  --color-stamp-black: #171717;
+
+  /* Code Pin Enamel Colors */
+  --pin-crimson: #e11d48;
+  --pin-amber: #f59e0b;
+  --pin-emerald: #10b981;
+  --pin-cobalt: #2563eb;
+  --pin-amethyst: #9333ea;
+  --pin-cyan: #06b6d4;
+  --pin-silver: #e2e8f0;
+  --pin-onyx: #18181b;
+
+  /* Clue Peg Colors */
+  --peg-exact: #dc2626;   /* Red / Black exact match */
+  --peg-partial: #f59e0b; /* Amber / White partial match */
+  --peg-empty: #333d36;   /* Unmatched hollow */
+
+  /* Typography & Borders */
+  --color-text-main: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-text-dark: #64748b;
+  --color-ink: #1f2937;
+  --border-steel: #3e4842;
+  --border-steel-dark: #1e2420;
+
+  /* Fonts */
+  --font-typewriter: 'Courier New', 'Courier', monospace;
+  --font-stamp: 'Impact', 'Arial Black', sans-serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* Radii */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Shadows */
+  --shadow-bunker: 0 6px 18px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-socket: inset 2px 2px 5px rgba(0, 0, 0, 0.85), inset -1px -1px 2px rgba(255, 255, 255, 0.05);
+  --shadow-glow-amber: 0 0 14px rgba(245, 158, 11, 0.45);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(ellipse at 50% 10%, rgba(245, 158, 11, 0.04) 0%, transparent 70%),
+    linear-gradient(#121513, #121513),
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.25) 2px, rgba(0, 0, 0, 0.25) 4px);
+  color: var(--color-text-main);
+  font-family: var(--font-ui);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Classified Stamp Watermark */
+.classified-stamp {
+  display: inline-block;
+  font-family: var(--font-stamp);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-classified-red);
+  border: 2px solid var(--color-classified-red);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  transform: rotate(-3deg);
+  opacity: 0.9;
+}
+
+/* --------------------------------------------------------------------------
+   Tactical Buttons
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-typewriter);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border-steel);
+  background: linear-gradient(180deg, var(--bg-panel-light), var(--bg-panel));
+  color: var(--color-text-main);
+  cursor: pointer;
+  box-shadow: var(--shadow-bunker);
+  transition: transform 0.08s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--color-amber-crt);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.85);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: var(--shadow-socket);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+}
+
+.btn--primary {
+  background: linear-gradient(180deg, #b45309, #78350f);
+  border-color: var(--color-amber-crt);
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.btn--primary:hover:not(:disabled) {
+  border-color: var(--color-amber-glow);
+  box-shadow: var(--shadow-glow-amber);
+}
+
+.btn--red {
+  background: linear-gradient(180deg, #991b1b, #5b1010);
+  border-color: #ef4444;
+  color: #fff;
+}
+
+.btn--sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.btn--icon {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  font-size: 1.2rem;
+}
+
+/* --------------------------------------------------------------------------
+   CRT Amber Digital Readout
+   -------------------------------------------------------------------------- */
+.crt-readout {
+  background: #0d0a04;
+  border: 2px solid #362208;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-family: var(--font-typewriter);
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--color-amber-crt);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.7), 0 0 2px rgba(245, 158, 11, 0.9);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  height: 40px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.95);
+}
+
+/* --------------------------------------------------------------------------
+   Toasts & Teleprinter Wire Alerts
+   -------------------------------------------------------------------------- */
+#toast-container {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: center;
+  pointer-events: none;
+  width: min(92vw, 440px);
+}
+
+.toast {
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: all;
+  text-align: center;
+  width: 100%;
+  border: 1px solid var(--border-steel);
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast--info    { background: #1c2621; color: #38bdf8; border-color: #0284c7; }
+.toast--success { background: #1b2e1e; color: #34d399; border-color: #059669; }
+.toast--error   { background: #3a1515; color: #f87171; border-color: #dc2626; }
+.toast--warning { background: #38240f; color: #fbbf24; border-color: #d97706; }
+.toast a        { color: #fbbf24; font-weight: 800; text-decoration: underline; }
+
+/* --------------------------------------------------------------------------
+   Modal Backdrop & Dialogues
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 10, 9, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-backdrop.is-active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-dialog {
+  background: var(--bg-surface);
+  border: 3px solid var(--border-steel);
+  border-radius: var(--radius-md);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  max-width: 500px;
+  width: 100%;
+  overflow: hidden;
+  animation: modalPop 0.2s ease-out;
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  background: var(--bg-panel);
+  padding: var(--space-4);
+  border-bottom: 2px solid var(--border-steel);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-family: var(--font-typewriter);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.modal-body {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  font-family: var(--font-ui);
+}
+
+.modal-footer {
+  background: var(--bg-panel);
+  padding: var(--space-4);
+  border-top: 2px solid var(--border-steel);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

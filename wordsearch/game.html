@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Word Search — Playing</title>
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/game.css"/>
+  <link rel="stylesheet" href="css/mobile-simulator.css"/>
+</head>
+<body class="game-page">
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+
+  <!-- Header -->
+  <header class="game-header">
+    <div class="game-header__left">
+      <button class="btn" id="back-btn" aria-label="Back to main menu">← Menu</button>
+    </div>
+    <div class="game-header__center">
+      <div id="category-badge" style="font-size:var(--font-size-sm);font-weight:700;">🐾 Animals</div>
+      <div id="difficulty-badge" class="badge badge--beginner">Beginner</div>
+      <div id="level-num" style="font-size:var(--font-size-xs);color:var(--color-text-muted);font-weight:600;">Level 1</div>
+    </div>
+    <div class="game-header__right">
+      <div id="timer" aria-live="off">00:00</div>
+    </div>
+  </header>
+
+  <!-- Game body: grid + word list -->
+  <div class="game-body">
+
+    <div class="grid-wrap">
+      <!-- Found counter above grid -->
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 2px;">
+        <span style="font-size:var(--font-size-xs);color:var(--color-text-muted);font-weight:600;">
+          Tap/drag to select words
+        </span>
+        <span id="found-counter" style="font-size:var(--font-size-sm);font-weight:800;color:var(--color-primary);">
+          0 / 0
+        </span>
+      </div>
+      <!-- The grid -->
+      <div id="ws-grid" role="grid" aria-label="Word search grid"></div>
+    </div>
+
+    <!-- Word list panel -->
+    <aside class="word-panel" aria-label="Words to find">
+      <div class="word-panel__header">
+        <span class="word-panel__title">Find These</span>
+        <span id="found-counter-panel" style="font-size:var(--font-size-xs);font-weight:700;color:var(--color-primary);"></span>
+      </div>
+      <div id="word-list" role="list" aria-label="Word list"></div>
+    </aside>
+
+  </div>
+
+  <!-- Toolbar: Hint button -->
+  <div class="game-toolbar">
+    <button class="ctrl-btn" id="hint-btn" aria-label="Get a hint">
+      <span class="ctrl-btn__icon" aria-hidden="true">💡</span>
+      <span class="btn-label">Hint</span>
+      <span class="hint-count" id="hint-count" aria-label="hints remaining">0</span>
+    </button>
+  </div>
+
+  <!-- Victory Modal -->
+  <div class="modal-overlay" id="victory-modal" role="dialog" aria-modal="true" aria-labelledby="victory-title">
+    <div class="modal">
+      <div class="victory-emoji" aria-hidden="true">🎉</div>
+      <h2 class="modal__title" id="victory-title">All Words Found!</h2>
+      <p class="modal__subtitle victory-level"></p>
+
+      <div class="modal__stats">
+        <div class="modal__stat">
+          <div class="modal__stat-value victory-time">00:00</div>
+          <div class="modal__stat-label">Time</div>
+        </div>
+        <div class="modal__stat">
+          <div class="modal__stat-value victory-words">0</div>
+          <div class="modal__stat-label">Words</div>
+        </div>
+        <div class="modal__stat">
+          <div class="modal__stat-value victory-hints">0</div>
+          <div class="modal__stat-label">Hints</div>
+        </div>
+      </div>
+
+      <p class="victory-best text-center text-sm" style="margin-bottom:1rem;color:var(--color-success);font-weight:600;"></p>
+
+      <div class="modal__actions">
+        <button class="btn btn--primary btn--full" id="next-btn">Next Puzzle →</button>
+        <button class="btn btn--secondary btn--full" id="home-btn">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <!-- Scripts: order matters — words.js and ws-gen.js before game.js -->
+  <script src="js/words.js"></script>
+  <script src="js/ws-gen.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/mobile-shell.js"></script>
+
+  <!-- Sync found-counter-panel with main counter -->
+  <script>
+    // Keep the panel counter in sync (game.js updates #found-counter)
+    document.addEventListener('DOMContentLoaded', () => {
+      const main  = document.getElementById('found-counter');
+      const panel = document.getElementById('found-counter-panel');
+      if (!main || !panel) return;
+      const obs = new MutationObserver(() => { panel.textContent = main.textContent; });
+      obs.observe(main, { childList: true, characterData: true, subtree: true });
+    });
+  </script>
+
+</body>
+</html>

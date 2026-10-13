@@ -1,0 +1,13 @@
+{
+  "appId": "com.gamingempire.curioussolitaire",
+  "appName": "Curious Solitaire",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#061a12",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

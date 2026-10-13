@@ -1,0 +1,9 @@
+{
+  "appId": "com.gamingempire.blockblast",
+  "appName": "Timber Block Blast",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

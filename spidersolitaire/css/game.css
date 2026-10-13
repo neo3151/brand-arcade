@@ -1,0 +1,411 @@
+/* ==========================================================================
+   game.css — Spider Solitaire: Cobweb Manor
+   Tableau Grid, Cascades, Cards, Stock, Foundation & Drag Mechanics
+   ========================================================================== */
+
+.game-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-card-table);
+}
+
+/* Header */
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.85rem;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--silver-border);
+  flex-shrink: 0;
+}
+
+.level-badge {
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.mode-tag {
+  color: #c084fc;
+  margin-right: 0.35rem;
+}
+
+.game-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+/* Top Area: Stock Pile & 8 Foundation Slots */
+.top-deck-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.85rem 0.4rem;
+  background: rgba(13, 11, 20, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+}
+
+/* Stock Pile */
+.stock-pile-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.stock-card-slot {
+  width: 38px;
+  height: 54px;
+  border-radius: 6px;
+  border: 1px dashed rgba(167, 139, 250, 0.4);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  background: var(--card-back-grad);
+  border: 1px solid var(--card-back-border);
+  transition: transform 0.15s ease;
+}
+
+.stock-card-slot:active {
+  transform: scale(0.95);
+}
+
+.stock-card-slot.empty {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  box-shadow: none;
+  cursor: default;
+}
+
+.stock-deals-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  background: rgba(124, 58, 237, 0.6);
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+}
+
+/* 8 Foundation Slots */
+.foundation-container {
+  display: flex;
+  gap: 3px;
+}
+
+.foundation-slot {
+  width: 32px;
+  height: 46px;
+  border-radius: 5px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(26, 21, 40, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #64748b;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.foundation-slot.completed {
+  border-color: var(--gold-candle);
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  color: #381a00;
+  box-shadow: 0 0 10px var(--gold-glow);
+  font-weight: 900;
+  animation: runCompletePop 0.4s var(--anim-bounce);
+}
+
+@keyframes runCompletePop {
+  0% { transform: scale(0.7); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Tableau 10 Columns Board */
+.tableau-viewport {
+  flex: 1;
+  display: flex;
+  padding: 0.4rem 0.25rem 0.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  touch-action: none;
+}
+
+.tableau-container {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+}
+
+.tableau-column {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 100%;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease;
+  touch-action: none;
+  user-select: none;
+}
+
+.tableau-column.empty-slot {
+  border: 1px dashed rgba(167, 139, 250, 0.25);
+  background: rgba(124, 58, 237, 0.03);
+}
+
+.tableau-column.highlight-target {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--emerald-seal);
+}
+
+/* Card Visual Element */
+.card {
+  width: 100%;
+  aspect-ratio: 0.68;
+  position: absolute;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  cursor: pointer;
+  box-sizing: border-box;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Face Down Card */
+.card.face-down {
+  background: var(--card-back-grad);
+  border: 1px solid var(--card-back-border);
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.05) 5px,
+    transparent 5px,
+    transparent 10px
+  );
+}
+
+/* Lantern Peeking Effect for Face Down Card */
+.card.face-down.lantern-peek {
+  animation: lanternGlow 1.5s ease-in-out infinite alternate;
+  filter: brightness(1.2);
+}
+
+.card.face-down.lantern-peek::after {
+  content: attr(data-peek-rank);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--gold-candle);
+  text-shadow: 0 0 6px var(--gold-glow);
+}
+
+@keyframes lanternGlow {
+  0% { box-shadow: 0 0 5px var(--gold-glow); }
+  100% { box-shadow: 0 0 15px var(--gold-candle); }
+}
+
+/* Face Up Card */
+.card.face-up {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2px 3px;
+  color: #0f172a;
+}
+
+.card.suit-hearts,
+.card.suit-diamonds {
+  color: #dc2626;
+}
+
+.card-corner-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.9;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.65rem;
+}
+
+.card-corner-suit {
+  font-size: 0.65rem;
+}
+
+.card-center-suit {
+  align-self: center;
+  font-size: 0.8rem;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+/* Selected or Dragging Stack */
+.card.selected-card {
+  box-shadow: 0 0 0 2px var(--gold-candle), 0 4px 14px var(--gold-glow) !important;
+  filter: brightness(1.08);
+  z-index: 80 !important;
+}
+
+.tableau-column.selected-source {
+  background: rgba(245, 158, 11, 0.08) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+.tableau-column.col-legal-target {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px dashed var(--emerald-seal) !important;
+  cursor: pointer;
+}
+
+.tableau-column.col-legal-target:hover {
+  background: rgba(16, 185, 129, 0.22) !important;
+}
+
+.card.dragging {
+  opacity: 0.92;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(167, 139, 250, 0.6);
+  z-index: 1000 !important;
+  pointer-events: none;
+}
+
+.card.hint-glow {
+  box-shadow: 0 0 0 2px var(--gold-candle), 0 0 15px var(--gold-glow);
+  animation: hintPulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes hintPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.04); }
+}
+
+/* Bottom Toolbar */
+.game-bottom-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--silver-border);
+  padding: 0.55rem 0.85rem;
+  flex-shrink: 0;
+  gap: 0.5rem;
+}
+
+.powerups-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.powerup-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--silver-border);
+  border-radius: 12px;
+  padding: 0.4rem 0.2rem;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all var(--anim-fast);
+  position: relative;
+}
+
+.powerup-btn:hover {
+  background: var(--bg-surface-hover);
+  border-color: #a855f7;
+}
+
+.powerup-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.powerup-name {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.powerup-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--gold-candle);
+  color: #381a00;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.6rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 9999px;
+  border: 1px solid #381a00;
+}
+
+/* Victory Modal */
+.victory-card {
+  text-align: center;
+  background: var(--bg-surface-elevated);
+}
+
+.victory-manor-icon {
+  font-size: 2.8rem;
+  margin-bottom: 0.5rem;
+  animation: bounce 0.6s ease infinite alternate;
+}
+
+.victory-title {
+  font-family: var(--font-title);
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #e9d5ff;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.25rem;
+}
+
+.victory-subtitle {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: 1.25rem;
+}
+
+.victory-stats {
+  display: flex;
+  justify-content: space-around;
+  background: var(--bg-surface);
+  border: 1px solid var(--silver-border);
+  border-radius: 14px;
+  padding: 0.75rem;
+  margin-bottom: 1.25rem;
+}

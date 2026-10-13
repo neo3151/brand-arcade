@@ -1,0 +1,13 @@
+{
+  "appId": "com.gamingempire.wordsearch",
+  "appName": "Word Search Classic",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#f8fafc",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

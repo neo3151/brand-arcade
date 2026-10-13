@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="Play Sudoku — solve puzzles with undo, notes, and smart hints that explain every move." />
+  <title>Sudoku — Playing</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="stylesheet" href="css/mobile-simulator.css" />
+</head>
+<body class="game-page">
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+
+  <!-- ======================================================
+       Header
+       ====================================================== -->
+  <header class="game-header">
+    <div class="game-header__left">
+      <button class="btn" id="back-btn" aria-label="Back to main menu">← Menu</button>
+    </div>
+
+    <div class="game-header__center">
+      <div id="difficulty-badge" class="badge">—</div>
+      <div id="level-num">Level 1</div>
+    </div>
+
+    <div class="game-header__right">
+      <div id="timer" aria-label="Timer" aria-live="off">00:00</div>
+      <div id="mistakes-display" aria-label="Mistakes" aria-live="polite"></div>
+    </div>
+  </header>
+
+  <!-- ======================================================
+       Sudoku Board
+       ====================================================== -->
+  <div class="board-wrap">
+    <div id="sudoku-board" role="grid" aria-label="Sudoku board">
+      <!-- 81 cells injected by game.js -->
+    </div>
+  </div>
+
+  <!-- ======================================================
+       Control buttons (Undo / Erase / Notes / Hint)
+       ====================================================== -->
+  <div class="game-controls" role="toolbar" aria-label="Game controls">
+
+    <button class="ctrl-btn" id="undo-btn" aria-label="Undo last move" disabled>
+      <span class="ctrl-btn__icon" aria-hidden="true">↩</span>
+      <span class="btn-label">Undo</span>
+    </button>
+
+    <button class="ctrl-btn" id="erase-btn" aria-label="Erase selected cell">
+      <span class="ctrl-btn__icon" aria-hidden="true">⌫</span>
+      <span class="btn-label">Erase</span>
+    </button>
+
+    <button class="ctrl-btn" id="notes-btn" aria-label="Toggle notes mode" aria-pressed="false">
+      <span class="ctrl-btn__icon" aria-hidden="true">✏️</span>
+      <span class="btn-label">Notes</span>
+    </button>
+
+    <button class="ctrl-btn" id="hint-btn" aria-label="Get a hint">
+      <span class="ctrl-btn__icon" aria-hidden="true">💡</span>
+      <span class="btn-label">Hint</span>
+      <span class="hint-count" aria-label="hints remaining">0</span>
+    </button>
+
+  </div>
+
+  <!-- ======================================================
+       Number Pad
+       ====================================================== -->
+  <div class="num-pad" role="group" aria-label="Number input">
+    <button class="num-btn" data-num="1" aria-label="Enter 1">1</button>
+    <button class="num-btn" data-num="2" aria-label="Enter 2">2</button>
+    <button class="num-btn" data-num="3" aria-label="Enter 3">3</button>
+    <button class="num-btn" data-num="4" aria-label="Enter 4">4</button>
+    <button class="num-btn" data-num="5" aria-label="Enter 5">5</button>
+    <button class="num-btn" data-num="6" aria-label="Enter 6">6</button>
+    <button class="num-btn" data-num="7" aria-label="Enter 7">7</button>
+    <button class="num-btn" data-num="8" aria-label="Enter 8">8</button>
+    <button class="num-btn" data-num="9" aria-label="Enter 9">9</button>
+  </div>
+
+  <!-- ======================================================
+       Hint Panel (slides up)
+       ====================================================== -->
+  <aside class="hint-panel" id="hint-panel" role="complementary" aria-label="Hint panel" aria-live="polite">
+    <div class="hint-panel__handle"></div>
+    <div class="hint-panel__header">
+      <span class="hint-technique" id="hint-technique-label">Technique</span>
+      <button id="close-hint-btn" aria-label="Dismiss hint">✕</button>
+    </div>
+    <p class="hint-explanation" id="hint-explanation-text"></p>
+    <button id="reveal-btn">Reveal the Move</button>
+  </aside>
+
+  <!-- ======================================================
+       Victory Modal
+       ====================================================== -->
+  <div class="modal-overlay" id="victory-modal" role="dialog" aria-modal="true" aria-labelledby="victory-title">
+    <div class="modal">
+      <div class="victory-emoji" aria-hidden="true">🎉</div>
+      <h2 class="modal__title" id="victory-title">Puzzle Solved!</h2>
+      <p class="modal__subtitle victory-level"></p>
+
+      <div class="modal__stats">
+        <div class="modal__stat">
+          <div class="modal__stat-value victory-time">00:00</div>
+          <div class="modal__stat-label">Time</div>
+        </div>
+        <div class="modal__stat">
+          <div class="modal__stat-value victory-mistakes">0</div>
+          <div class="modal__stat-label">Mistakes</div>
+        </div>
+        <div class="modal__stat">
+          <div class="modal__stat-value victory-hints">0</div>
+          <div class="modal__stat-label">Hints</div>
+        </div>
+      </div>
+
+      <p class="victory-best text-center text-sm" style="margin-bottom:1rem;color:var(--color-success);font-weight:600;"></p>
+
+      <div class="modal__actions">
+        <button class="btn btn--primary btn--full" id="next-btn">Next Puzzle →</button>
+        <button class="btn btn--secondary btn--full" id="home-btn">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       Game Over Modal
+       ====================================================== -->
+  <div class="modal-overlay" id="gameover-modal" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
+    <div class="modal">
+      <div class="gameover-emoji" aria-hidden="true">💔</div>
+      <h2 class="modal__title" id="gameover-title">Too Many Mistakes</h2>
+      <p class="modal__subtitle modal__level">Beginner — Level 1</p>
+      <p class="text-muted text-sm" style="margin-bottom:1.5rem;line-height:1.6;">
+        Don't give up! Each puzzle is a new chance to improve. Try again or pick a different difficulty.
+      </p>
+      <div class="modal__actions">
+        <button class="btn btn--secondary btn--full" id="gameover-undo-btn">↩ Undo Mistake</button>
+        <button class="btn btn--primary btn--full" id="gameover-retry-btn">Try Again</button>
+        <button class="btn btn--ghost btn--full" id="gameover-home-btn">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <!-- ======================================================
+       Scripts
+       ====================================================== -->
+  <script src="js/sudoku-gen.js"></script>
+  <script src="js/hint-engine.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/mobile-shell.js"></script>
+
+  <!-- Difficulty badge color applied from URL param -->
+  <script>
+    (function () {
+      const p = new URLSearchParams(window.location.search);
+      const diff = p.get('difficulty') || 'beginner';
+      document.body.dataset.diff = diff;
+      // Apply badge class
+      document.addEventListener('DOMContentLoaded', () => {
+        const badge = document.getElementById('difficulty-badge');
+        if (badge) badge.classList.add(`badge--${diff}`);
+      });
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,211 @@
+/* ==========================================================================
+   mobile-simulator.css — Commercial Smartphone Shell & Desktop Mobile Preview
+   Zen Nonogram: Pixel Tapestry (Google Play Mobile App Ready)
+   ========================================================================== */
+
+/* Outer Desktop Stage */
+@media (min-width: 521px) {
+  body {
+    background: radial-gradient(circle at 50% 30%, #064e3b 0%, #020617 100%) !important;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 0;
+    overflow-y: auto !important;
+  }
+
+  .device-shell {
+    width: 420px;
+    height: 870px;
+    max-height: 94vh;
+    background: #0f172a;
+    border: 12px solid #1e293b;
+    border-radius: 52px;
+    box-shadow: 
+      0 0 0 2px rgba(16, 185, 129, 0.25),
+      0 25px 65px -10px rgba(0, 0, 0, 0.9),
+      0 0 70px rgba(16, 185, 129, 0.15);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+    transform: translateZ(0);
+  }
+
+  /* Desktop Control Floating Switcher */
+  .simulator-controls {
+    position: fixed;
+    top: 1rem;
+    left: 1.5rem;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 0.5rem 0.85rem;
+    border-radius: 9999px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  }
+
+  .simulator-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.15);
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .simulator-toggle-btn {
+    background: #1e293b;
+    color: #f1f5f9;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .simulator-toggle-btn:hover {
+    background: #334155;
+    border-color: #34d399;
+  }
+}
+
+/* Fullscreen toggle override for Desktop */
+body.sim-fullwindow {
+  padding: 0 !important;
+  background: #0f172a !important;
+}
+
+body.sim-fullwindow .device-shell {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body.sim-fullwindow .device-status-bar,
+body.sim-fullwindow .device-home-indicator {
+  display: none !important;
+}
+
+/* Native Mobile Devices */
+@media (max-width: 520px) {
+  body {
+    display: block !important;
+    padding: 0 !important;
+    background: #0f172a !important;
+  }
+
+  .simulator-controls {
+    display: none !important;
+  }
+
+  .device-shell {
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .device-status-bar {
+    display: none !important;
+  }
+
+  .device-home-indicator {
+    display: none !important;
+  }
+}
+
+/* Internal Device Components */
+.device-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.device-status-bar {
+  height: 38px;
+  background: #0f172a;
+  color: #94a3b8;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  user-select: none;
+  z-index: 100;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.device-island {
+  width: 90px;
+  height: 20px;
+  background: #020617;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+
+.device-camera-lens {
+  width: 8px;
+  height: 8px;
+  background: #0f172a;
+  border-radius: 50%;
+  border: 1px solid #1e293b;
+}
+
+.device-status-icons {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 0.7rem;
+}
+
+.device-screen {
+  flex: 1;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #0f172a;
+  display: flex;
+  flex-direction: column;
+}
+
+.device-home-indicator {
+  height: 24px;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.device-home-pill {
+  width: 130px;
+  height: 4px;
+  background: #334155;
+  border-radius: 4px;
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Celestial Jade</string>
+    <string name="title_activity_main">Celestial Jade</string>
+    <string name="package_name">com.gamingempire.celestialjade</string>
+    <string name="custom_url_scheme">com.gamingempire.celestialjade</string>
+</resources>

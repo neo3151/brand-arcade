@@ -1,0 +1,176 @@
+/* ==========================================================================
+   BLACK VAULT — Dead Drop Armory Store Styles
+   ========================================================================== */
+
+.store-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.store-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface);
+  border: 2px solid var(--border-steel);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-bunker);
+}
+
+.armory-inventory-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-family: var(--font-typewriter);
+  font-size: 0.85rem;
+  background: #101311;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border-steel);
+  border-radius: var(--radius-sm);
+}
+
+.armory-inv-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.armory-inv-val {
+  color: var(--color-amber-crt);
+  font-weight: 700;
+}
+
+/* Hero */
+.armory-hero {
+  background: linear-gradient(135deg, #242b26 0%, #171d18 100%);
+  border: 2px solid #b45309;
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-bunker);
+}
+
+.armory-hero__title {
+  font-family: var(--font-typewriter);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.armory-hero__desc {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  max-width: 620px;
+  line-height: 1.5;
+}
+
+/* Store Cards Grid */
+.armory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+.supply-card {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-steel);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+  transition: all 0.15s ease;
+  box-shadow: var(--shadow-bunker);
+}
+
+.supply-card:hover {
+  border-color: var(--color-amber-crt);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.95);
+}
+
+.supply-card--featured {
+  border-color: #f59e0b;
+  background: linear-gradient(180deg, #2a2e26, #1c221e);
+}
+
+.supply-badge {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  background: #b45309;
+  color: #fff;
+  font-family: var(--font-typewriter);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+}
+
+.supply-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.supply-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4));
+}
+
+.supply-title {
+  font-family: var(--font-typewriter);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.supply-desc {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+  flex: 1;
+}
+
+.supply-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.supply-qty {
+  font-family: var(--font-typewriter);
+  font-size: 0.85rem;
+  color: var(--color-amber-crt);
+  font-weight: 700;
+}
+
+.supply-price {
+  font-family: var(--font-typewriter);
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.store-legal {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-text-dark);
+  font-family: var(--font-typewriter);
+  padding: var(--space-4) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}

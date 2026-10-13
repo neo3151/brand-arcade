@@ -1,0 +1,13 @@
+{
+  "appId": "com.gamingempire.infernosweeper",
+  "appName": "Inferno Sweeper",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0f1218",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

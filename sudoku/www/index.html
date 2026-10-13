@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="Play Sudoku free — 5 difficulty levels, 1000+ unique puzzles each. Beginner to Master. No ads, ever." />
+  <title>Sudoku — Free Puzzle Game</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/menu.css" />
+  <link rel="stylesheet" href="css/mobile-simulator.css" />
+</head>
+<body class="menu-page">
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+
+  <!-- ======================================================
+       Top nav: hint balance
+       ====================================================== -->
+  <nav class="menu-nav">
+    <a href="store.html" class="hint-balance-pill" id="hint-balance-nav" aria-label="View hint store">
+      <span class="hint-icon">💡</span>
+      <span class="hint-count-nav" id="nav-hint-count">0</span>
+      <span>Hints</span>
+    </a>
+  </nav>
+
+  <!-- ======================================================
+       Hero
+       ====================================================== -->
+  <main class="menu-hero">
+
+    <!-- Logo -->
+    <div class="menu-logo-wrap">
+      <!-- SWAP: Replace src with your real logo path once you have it -->
+      <img
+        src="assets/logo-placeholder.svg"
+        alt="Company Logo"
+        id="company-logo"
+        class="menu-logo-img"
+        width="200" height="72"
+      />
+    </div>
+
+    <!-- Title -->
+    <div class="menu-brand">
+      <h1 class="menu-title">Sudoku</h1>
+      <p class="menu-tagline">Challenge your mind. No ads, ever.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="menu-stats" aria-label="Your stats">
+      <div class="stat-chip">
+        <div class="stat-chip__value" id="stat-streak">0</div>
+        <div class="stat-chip__label">🔥 Streak</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-chip__value" id="stat-solved">0</div>
+        <div class="stat-chip__label">✅ Solved</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-chip__value" id="stat-hints">0</div>
+        <div class="stat-chip__label">💡 Hints</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="menu-actions">
+      <button
+        class="btn btn--primary btn--play btn--full"
+        id="continue-btn"
+        style="display: none;"
+      >
+        ▶ Continue
+      </button>
+      <button
+        class="btn btn--secondary btn--full"
+        id="play-btn"
+        aria-haspopup="dialog"
+        aria-controls="difficulty-modal"
+      >
+        Play
+      </button>
+      <a href="store.html" class="btn btn--buy-hints btn--full" id="store-btn">
+        💡 Get Hints
+      </a>
+    </div>
+
+  </main>
+
+  <!-- ======================================================
+       Footer
+       ====================================================== -->
+  <footer class="menu-footer">
+    <!-- SWAP: Replace href with your actual website URL -->
+    <a href="https://www.yourwebsite.com" target="_blank" rel="noopener noreferrer" id="website-link">
+      www.yourwebsite.com
+    </a>
+    <span class="menu-footer__copy">© 2026 Puzzle Labs. Free to play.</span>
+  </footer>
+
+  <!-- ======================================================
+       Difficulty Modal
+       ====================================================== -->
+  <div class="modal-overlay" id="difficulty-modal" role="dialog" aria-modal="true" aria-labelledby="diff-modal-title">
+    <div class="modal">
+      <h2 class="modal__title" id="diff-modal-title">Choose Difficulty</h2>
+      <p class="modal__subtitle">Select a level to begin</p>
+
+      <!-- Difficulty list -->
+      <div class="difficulty-grid" id="difficulty-grid">
+
+        <button class="diff-btn diff-btn--beginner" data-difficulty="beginner" aria-label="Beginner difficulty">
+          <div class="diff-btn__left">
+            <span class="diff-btn__icon">🌱</span>
+            <div>
+              <div class="diff-btn__name">Beginner</div>
+              <div class="diff-btn__sub">7 mistakes allowed · More clues</div>
+            </div>
+          </div>
+          <span class="badge badge--green diff-btn__badge">Easy</span>
+        </button>
+
+        <button class="diff-btn diff-btn--easy" data-difficulty="easy" aria-label="Easy difficulty">
+          <div class="diff-btn__left">
+            <span class="diff-btn__icon">☀️</span>
+            <div>
+              <div class="diff-btn__name">Easy</div>
+              <div class="diff-btn__sub">5 mistakes allowed</div>
+            </div>
+          </div>
+          <span class="badge badge--blue diff-btn__badge">Relaxed</span>
+        </button>
+
+        <button class="diff-btn diff-btn--medium" data-difficulty="medium" aria-label="Medium difficulty">
+          <div class="diff-btn__left">
+            <span class="diff-btn__icon">🧩</span>
+            <div>
+              <div class="diff-btn__name">Medium</div>
+              <div class="diff-btn__sub">4 mistakes allowed</div>
+            </div>
+          </div>
+          <span class="badge badge--gold diff-btn__badge">Balanced</span>
+        </button>
+
+        <button class="diff-btn diff-btn--hard" data-difficulty="hard" aria-label="Hard difficulty">
+          <div class="diff-btn__left">
+            <span class="diff-btn__icon">🔥</span>
+            <div>
+              <div class="diff-btn__name">Hard</div>
+              <div class="diff-btn__sub">3 mistakes allowed</div>
+            </div>
+          </div>
+          <span class="badge badge--purple diff-btn__badge">Tough</span>
+        </button>
+
+        <button class="diff-btn diff-btn--master" data-difficulty="master" aria-label="Master difficulty">
+          <div class="diff-btn__left">
+            <span class="diff-btn__icon">👑</span>
+            <div>
+              <div class="diff-btn__name">Master</div>
+              <div class="diff-btn__sub">1 mistake allowed · Fewest clues</div>
+            </div>
+          </div>
+          <span class="badge diff-btn__badge" style="background:#f3e8ff;color:#7e22ce;">Expert</span>
+        </button>
+
+      </div>
+
+      <!-- Level picker (shown after difficulty is selected) -->
+      <div class="level-picker" id="level-picker">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span class="level-picker__title" id="level-picker-title">Select Level</span>
+          <span class="level-picker__back" id="back-to-diff" role="button" tabindex="0">← Back</span>
+        </div>
+        <div class="level-pagination" id="level-pagination">
+          <button class="level-page-btn" id="prev-page-btn" aria-label="Previous page">◀ Prev</button>
+          <span id="page-label">Levels 1 – 50</span>
+          <button class="level-page-btn" id="next-page-btn" aria-label="Next page">Next ▶</button>
+        </div>
+        <div class="level-grid" id="level-grid" role="list" aria-label="Level selection">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Cancel -->
+      <button class="btn btn--ghost btn--sm" id="close-diff-modal" style="margin-top:1rem;width:100%">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <!-- ======================================================
+       Scripts
+       ====================================================== -->
+  <script src="js/progress.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    /* --------------------------------------------------------
+       Menu page logic
+       -------------------------------------------------------- */
+    document.addEventListener('DOMContentLoaded', () => {
+      const { getStats, getUnlockedLevel, isLevelCompleted, getActiveGame, DIFFICULTIES } = window.Progress;
+
+      // ── Stats ──
+      const stats = getStats();
+      document.getElementById('stat-streak').textContent = stats.streak;
+      document.getElementById('stat-solved').textContent  = stats.totalSolved;
+      document.getElementById('stat-hints').textContent   = stats.hints;
+      document.getElementById('nav-hint-count').textContent = stats.hints;
+
+      // ── Continue Button check ──
+      const activeGame = getActiveGame();
+      const continueBtn = document.getElementById('continue-btn');
+      const playBtn = document.getElementById('play-btn');
+
+      if (activeGame && activeGame.difficulty && activeGame.level) {
+        const diffName = window.Utils.formatDifficulty(activeGame.difficulty);
+        continueBtn.textContent = `▶ Continue (${diffName} - Lvl ${activeGame.level})`;
+        continueBtn.style.display = 'block';
+        continueBtn.addEventListener('click', () => {
+          window.location.href = `game.html?difficulty=${activeGame.difficulty}&level=${activeGame.level}&continue=1`;
+        });
+        playBtn.className = 'btn btn--secondary btn--full';
+        playBtn.textContent = 'New Game';
+      } else {
+        continueBtn.style.display = 'none';
+        playBtn.className = 'btn btn--primary btn--play btn--full';
+        playBtn.textContent = '▶ Play';
+      }
+
+      // ── Difficulty modal ──
+      const modal        = document.getElementById('difficulty-modal');
+      const diffGrid     = document.getElementById('difficulty-grid');
+      const levelPicker  = document.getElementById('level-picker');
+      const levelGrid    = document.getElementById('level-grid');
+      const backToDiff   = document.getElementById('back-to-diff');
+      const closeModal   = document.getElementById('close-diff-modal');
+      const pickerTitle  = document.getElementById('level-picker-title');
+      const prevPageBtn  = document.getElementById('prev-page-btn');
+      const nextPageBtn  = document.getElementById('next-page-btn');
+      const pageLabel    = document.getElementById('page-label');
+
+      let selectedDiff = null;
+      let currentPage = 1;
+      const LEVELS_PER_PAGE = 50;
+      const MAX_LEVELS = 1000;
+
+      // Open modal
+      playBtn.addEventListener('click', () => {
+        modal.classList.add('modal--visible');
+        showDifficultyList();
+      });
+
+      // Close modal
+      closeModal.addEventListener('click', closeModalFn);
+      modal.addEventListener('click', e => { if (e.target === modal) closeModalFn(); });
+
+      // Escape closes modal
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && modal.classList.contains('modal--visible')) {
+          closeModalFn();
+        }
+      });
+
+      function closeModalFn() {
+        modal.classList.remove('modal--visible');
+        showDifficultyList();
+      }
+
+      function showDifficultyList() {
+        diffGrid.style.display   = 'flex';
+        levelPicker.classList.remove('visible');
+        selectedDiff = null;
+      }
+
+      // Difficulty buttons
+      diffGrid.querySelectorAll('.diff-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedDiff = btn.dataset.difficulty;
+          showLevelPicker(selectedDiff);
+        });
+      });
+
+      // Back to difficulties
+      backToDiff.addEventListener('click', showDifficultyList);
+      backToDiff.addEventListener('keydown', e => e.key === 'Enter' && showDifficultyList());
+
+      function renderLevelPage(difficulty) {
+        const unlocked = getUnlockedLevel(difficulty);
+        const startLevel = (currentPage - 1) * LEVELS_PER_PAGE + 1;
+        const endLevel = Math.min(MAX_LEVELS, currentPage * LEVELS_PER_PAGE);
+
+        pageLabel.textContent = `Levels ${startLevel} – ${endLevel}`;
+        prevPageBtn.disabled = currentPage <= 1;
+        nextPageBtn.disabled = endLevel >= MAX_LEVELS;
+
+        levelGrid.innerHTML = '';
+
+        for (let i = startLevel; i <= endLevel; i++) {
+          const cell = document.createElement('div');
+          cell.className = 'level-cell';
+          cell.setAttribute('role', 'listitem');
+          cell.textContent = i;
+
+          const completed = isLevelCompleted(difficulty, i);
+          const locked    = i > unlocked;
+
+          if (completed)   cell.classList.add('level-cell--completed');
+          if (locked)      cell.classList.add('level-cell--locked');
+
+          if (!locked) {
+            cell.setAttribute('tabindex', '0');
+            cell.setAttribute('aria-label', `Level ${i}${completed ? ' (completed)' : ''}`);
+            cell.addEventListener('click',   () => startGame(difficulty, i));
+            cell.addEventListener('keydown', e => e.key === 'Enter' && startGame(difficulty, i));
+          } else {
+            cell.setAttribute('aria-label', `Level ${i} (locked)`);
+            cell.title = 'Complete previous levels to unlock';
+          }
+
+          levelGrid.appendChild(cell);
+        }
+      }
+
+      function showLevelPicker(difficulty) {
+        const unlocked = getUnlockedLevel(difficulty);
+        // Default to page containing player's current unlocked level
+        currentPage = Math.max(1, Math.min(20, Math.ceil(unlocked / LEVELS_PER_PAGE)));
+        const diffLabel = window.Utils.formatDifficulty(difficulty);
+        pickerTitle.textContent = `${diffLabel} — Choose Level`;
+
+        diffGrid.style.display = 'none';
+        levelPicker.classList.add('visible');
+
+        renderLevelPage(difficulty);
+      }
+
+      prevPageBtn.addEventListener('click', () => {
+        if (currentPage > 1 && selectedDiff) {
+          currentPage--;
+          renderLevelPage(selectedDiff);
+        }
+      });
+
+      nextPageBtn.addEventListener('click', () => {
+        if (currentPage * LEVELS_PER_PAGE < MAX_LEVELS && selectedDiff) {
+          currentPage++;
+          renderLevelPage(selectedDiff);
+        }
+      });
+
+      function startGame(difficulty, level) {
+        if (activeGame) {
+          const diffName = window.Utils.formatDifficulty(activeGame.difficulty);
+          const confirmMsg = `You have an in-progress game (${diffName} Level ${activeGame.level}). Start a new game and discard previous progress?`;
+          if (!window.confirm(confirmMsg)) {
+            return;
+          }
+          window.Progress.clearActiveGame();
+        }
+        window.location.href = `game.html?difficulty=${difficulty}&level=${level}`;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Inferno Sweeper: Tactical 90s demonic sci-fi Minesweeper with zero ads. Clear quarantine sectors, neutralize plasma mines, and deploy tactical power-ups." />
+  <title>INFERNO SWEEPER — Quarantine Command</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/menu.css" />
+  <link rel="stylesheet" href="css/mobile-simulator.css" />
+</head>
+<body class="menu-page">
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">10:30</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+
+  <!-- ======================================================
+       Header & Status
+       ====================================================== -->
+  <header class="menu-header">
+    <div class="menu-brand">
+      <span class="menu-brand__icon" aria-hidden="true">🔥</span>
+      <div>
+        <h1 class="menu-brand__title">INFERNO SWEEPER</h1>
+        <div class="menu-brand__subtitle">UAC Quarantine Sector // Demonic Containment</div>
+      </div>
+    </div>
+    <a href="store.html" class="armory-badge" aria-label="Visit Tactical Armory">
+      <span>🛡️</span>
+      <span>Armory</span>
+    </a>
+  </header>
+
+  <!-- ======================================================
+       Hero Briefing Banner
+       ====================================================== -->
+  <section class="briefing-banner">
+    <div class="briefing-tag">Classified Operational Dispatch</div>
+    <h2 class="briefing-heading">Hell's Gate Containment</h2>
+    <p class="briefing-text">
+      Sub-surface installations have been compromised by subsurface plasma mines. Navigate the hazard grid, calculate threat vectors, and cleanse all uncorrupted sectors. Zero tolerance for detonation.
+    </p>
+  </section>
+
+  <!-- ======================================================
+       Active Mission Continue Banner
+       ====================================================== -->
+  <div id="continue-banner" style="display:none;background:linear-gradient(135deg,#0c4a6e 0%,#082f49 100%);border:2px solid var(--color-plasma-cyan);border-radius:var(--radius-md);padding:var(--space-4);box-shadow:var(--shadow-steel);align-items:center;justify-content:space-between;gap:var(--space-4);">
+    <div>
+      <div style="font-family:var(--font-mono);font-size:0.75rem;color:var(--color-plasma-cyan);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">Active Mission In Progress</div>
+      <div style="font-family:var(--font-display);font-size:1.4rem;color:#fff;" id="continue-title">Phobos Outpost</div>
+      <div style="font-family:var(--font-mono);font-size:0.85rem;color:var(--color-text-muted);" id="continue-meta">Elapsed: 0s</div>
+    </div>
+    <a href="#" id="continue-btn" class="btn btn--cyan">
+      Resume Mission →
+    </a>
+  </div>
+
+  <!-- ======================================================
+       Mission Difficulty Selection
+       ====================================================== -->
+  <main class="mission-grid" aria-label="Select Mission Difficulty">
+
+    <!-- Recruit -->
+    <div class="mission-card" data-diff="recruit" role="button" tabindex="0">
+      <div class="mission-card__header">
+        <span class="mission-card__badge badge--recruit">Phobos Outpost</span>
+        <span>🟢</span>
+      </div>
+      <div class="mission-card__title">Recruit Sector</div>
+      <div class="mission-card__stats">
+        <div>Grid: <span class="mission-card__stat-val">9 × 9</span></div>
+        <div>Mines: <span class="mission-card__stat-val">10</span></div>
+      </div>
+      <div class="mission-card__record" id="record-recruit">
+        Best Record: <strong>--:--</strong>
+      </div>
+      <button class="btn btn--primary btn--sm" style="margin-top:auto;">
+        Deploy Scout →
+      </button>
+    </div>
+
+    <!-- Marine -->
+    <div class="mission-card" data-diff="marine" role="button" tabindex="0">
+      <div class="mission-card__header">
+        <span class="mission-card__badge badge--marine">Deimos Lab</span>
+        <span>🔷</span>
+      </div>
+      <div class="mission-card__title">Marine Sector</div>
+      <div class="mission-card__stats">
+        <div>Grid: <span class="mission-card__stat-val">16 × 16</span></div>
+        <div>Mines: <span class="mission-card__stat-val">40</span></div>
+      </div>
+      <div class="mission-card__record" id="record-marine">
+        Best Record: <strong>--:--</strong>
+      </div>
+      <button class="btn btn--primary btn--sm" style="margin-top:auto;">
+        Deploy Marine →
+      </button>
+    </div>
+
+    <!-- Nightmare -->
+    <div class="mission-card" data-diff="nightmare" role="button" tabindex="0">
+      <div class="mission-card__header">
+        <span class="mission-card__badge badge--hell">Hell's Gate</span>
+        <span>💀</span>
+      </div>
+      <div class="mission-card__title">Nightmare Sector</div>
+      <div class="mission-card__stats">
+        <div>Grid: <span class="mission-card__stat-val">30 × 16</span></div>
+        <div>Mines: <span class="mission-card__stat-val">99</span></div>
+      </div>
+      <div class="mission-card__record" id="record-nightmare">
+        Best Record: <strong>--:--</strong>
+      </div>
+      <button class="btn btn--primary btn--sm" style="margin-top:auto;">
+        Engage Nightmare →
+      </button>
+    </div>
+
+    <!-- Custom Sector -->
+    <div class="mission-card" data-diff="custom" style="cursor:default;">
+      <div class="mission-card__header">
+        <span class="mission-card__badge badge--custom">Custom Quarantine</span>
+        <span>⚙️</span>
+      </div>
+      <div class="mission-card__title">Custom Parameters</div>
+      <form class="custom-form" id="custom-form" onsubmit="return false;">
+        <div class="form-row">
+          <label class="form-label" for="custom-w">Width (9–36):</label>
+          <input type="number" id="custom-w" class="form-input" min="9" max="36" value="12" />
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="custom-h">Height (9–24):</label>
+          <input type="number" id="custom-h" class="form-input" min="9" max="24" value="12" />
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="custom-m">Mines:</label>
+          <input type="number" id="custom-m" class="form-input" min="1" max="150" value="20" />
+        </div>
+        <button class="btn btn--hazard btn--sm" id="custom-launch-btn" style="margin-top:var(--space-2);">
+          Deploy Custom Sector →
+        </button>
+      </form>
+    </div>
+
+  </main>
+
+  <!-- ======================================================
+       Combat Statistics Strip
+       ====================================================== -->
+  <section class="stats-ribbon" aria-label="Combat Record">
+    <div class="stat-item">
+      <div class="stat-val stat-val--cyan" id="stat-cleared">0</div>
+      <div class="stat-label">Sectors Cleansed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val stat-val--yellow" id="stat-winrate">0%</div>
+      <div class="stat-label">Survival Rate</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val stat-val--blood" id="stat-streak">0</div>
+      <div class="stat-label">Current Streak</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-best-streak">0</div>
+      <div class="stat-label">Best Streak</div>
+    </div>
+  </section>
+
+  <!-- Intel & Controls Strip -->
+  <footer class="intel-strip">
+    <div>100% Ad-Free // Pure Tactical Gameplay</div>
+    <button class="btn btn--sm" id="rules-btn">Intel & Rules</button>
+  </footer>
+
+  <!-- ======================================================
+       Rules Modal
+       ====================================================== -->
+  <div class="modal-backdrop" id="rules-modal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title"><span>📜</span> Tactical Field Intel</div>
+        <button class="btn btn--sm" id="close-rules-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Primary Directive:</strong> Uncover every safe sector without detonating a plasma mine. Numbers indicate how many mines reside in the 8 adjacent sectors.</p>
+        <p><strong>Guaranteed First Strike:</strong> Your initial breach is 100% guaranteed safe and opens up a clear perimeter.</p>
+        <p><strong>Tactical Controls:</strong>
+          <br>• <em>Desktop:</em> Left-click to clear, Right-click to flag, click an uncovered number whose flags match to chord.
+          <br>• <em>Mobile:</em> Tap the DIG / FLAG toggle bar, or long-press on any cell to place a warning beacon.
+        </p>
+        <p><strong>Armory Supplies:</strong> Equip Bio-Shields to absorb blast damage, call down Sonar Scans to reveal 3x3 perimeters, or consult Tactical AI Clairvoyance for logical deductions.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--primary btn--sm" id="ack-rules-btn">Acknowledged</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/progress.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/minesweeper-gen.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const stats = window.Progress.getStats();
+
+      // Check for active resumable game
+      const active = window.Progress.getActiveGame();
+      const continueBanner = document.getElementById('continue-banner');
+      if (active && active.firstClickDone && !active.gameOver) {
+        if (continueBanner) {
+          continueBanner.style.display = 'flex';
+          const preset = window.MineGen ? window.MineGen.PRESETS[active.difficulty] : null;
+          const name = preset ? preset.label : `Custom Sector (${active.width}x${active.height})`;
+          document.getElementById('continue-title').textContent = name;
+          document.getElementById('continue-meta').textContent = `Elapsed: ${active.elapsed || 0}s | Cleared: ${active.revealedCount || 0} cells`;
+          const contBtn = document.getElementById('continue-btn');
+          contBtn.href = `game.html?diff=${active.difficulty}&continue=1`;
+          contBtn.addEventListener('click', () => {
+            window.Utils.sound.play('click');
+          });
+        }
+      }
+
+      function confirmAbandonActive() {
+        const currentActive = window.Progress.getActiveGame();
+        if (currentActive && currentActive.firstClickDone && !currentActive.gameOver) {
+          return confirm('A mission is currently in progress. Start new mission and abandon saved progress?');
+        }
+        return true;
+      }
+
+      // Render stats
+      const clearedEl = document.getElementById('stat-cleared');
+      const winrateEl = document.getElementById('stat-winrate');
+      const streakEl  = document.getElementById('stat-streak');
+      const bestEl    = document.getElementById('stat-best-streak');
+
+      if (clearedEl) clearedEl.textContent = stats.gamesWon;
+      if (streakEl)  streakEl.textContent  = stats.currentStreak;
+      if (bestEl)    bestEl.textContent    = stats.bestStreak;
+
+      const rate = stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 0;
+      if (winrateEl) winrateEl.textContent = `${rate}%`;
+
+      // Best times
+      ['recruit', 'marine', 'nightmare'].forEach(diff => {
+        const recEl = document.getElementById(`record-${diff}`);
+        if (recEl && stats.bestTimes[diff] !== null) {
+          recEl.innerHTML = `Best Record: <strong>${stats.bestTimes[diff]}s</strong>`;
+        }
+      });
+
+      // Launch standard missions
+      document.querySelectorAll('.mission-card[data-diff]').forEach(card => {
+        const diff = card.dataset.diff;
+        if (diff === 'custom') return;
+
+        card.addEventListener('click', () => {
+          if (!confirmAbandonActive()) return;
+          window.Progress.clearActiveGame();
+          window.Utils.sound.play('click');
+          window.location.href = `game.html?diff=${diff}`;
+        });
+      });
+
+      // Launch custom mission
+      const customBtn = document.getElementById('custom-launch-btn');
+      if (customBtn) {
+        customBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!confirmAbandonActive()) return;
+          window.Progress.clearActiveGame();
+          const w = Math.max(9, Math.min(36, parseInt(document.getElementById('custom-w').value, 10) || 12));
+          const h = Math.max(9, Math.min(24, parseInt(document.getElementById('custom-h').value, 10) || 12));
+          const maxM = (w * h) - 9;
+          const m = Math.max(1, Math.min(maxM, parseInt(document.getElementById('custom-m').value, 10) || 20));
+
+          window.Utils.sound.play('click');
+          window.location.href = `game.html?diff=custom&w=${w}&h=${h}&m=${m}`;
+        });
+      }
+
+      // Rules Modal
+      const rulesModal = document.getElementById('rules-modal');
+      const openRules  = document.getElementById('rules-btn');
+      const closeRules = document.getElementById('close-rules-btn');
+      const ackRules   = document.getElementById('ack-rules-btn');
+
+      if (openRules && rulesModal) {
+        openRules.addEventListener('click', () => {
+          window.Utils.sound.play('click');
+          rulesModal.classList.add('is-active');
+        });
+      }
+
+      const hideRules = () => {
+        window.Utils.sound.play('click');
+        rulesModal.classList.remove('is-active');
+      };
+
+        if (closeRules) closeRules.addEventListener('click', hideRules);
+        if (ackRules)   ackRules.addEventListener('click', hideRules);
+      });
+    </script>
+  </div><!-- /.device-screen -->
+
+  <!-- Virtual Home Indicator -->
+  <div class="device-home-indicator">
+    <div class="device-home-pill"></div>
+  </div>
+</div><!-- /.device-shell -->
+
+  <script src="js/mobile-shell.js"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+/* ==========================================================================
+   game.css — Word Search game board styles
+   ========================================================================== */
+
+.game-page {
+  min-height: 100dvh; display: flex; flex-direction: column;
+  background: var(--color-bg-subtle); max-width: 560px; margin: 0 auto;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.game-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg); border-bottom: 1.5px solid var(--color-border);
+  position: sticky; top: 0; z-index: 50; gap: var(--space-3);
+}
+
+.game-header__left { display: flex; align-items: center; gap: var(--space-2); }
+.game-header__center { flex: 1; text-align: center; }
+.game-header__right { display: flex; align-items: center; gap: var(--space-3); }
+
+#back-btn {
+  background: var(--color-bg-muted); border: 1.5px solid var(--color-border);
+  color: var(--color-text-muted); padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md); font-size: var(--font-size-sm); font-weight: 600;
+}
+#back-btn:hover { background: var(--color-border); color: var(--color-text); }
+
+#category-badge { font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text); }
+#difficulty-badge {
+  font-size: var(--font-size-xs); font-weight: 700; padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-full); text-transform: uppercase; letter-spacing: 0.04em;
+}
+#level-num { font-size: var(--font-size-xs); color: var(--color-text-muted); font-weight: 600; margin-top: 1px; }
+
+#timer {
+  font-size: var(--font-size-lg); font-weight: 700; font-variant-numeric: tabular-nums;
+  color: var(--color-text); letter-spacing: 0.02em;
+}
+
+/* Badge colors */
+.badge--beginner { background: #dcfce7; color: #15803d; }
+.badge--easy     { background: var(--blue-100); color: var(--blue-700); }
+.badge--medium   { background: #fef3c7; color: #92400e; }
+.badge--hard     { background: #fee2e2; color: #991b1b; }
+.badge--master   { background: #f3e8ff; color: #7e22ce; }
+
+/* ── Layout: board + word list side by side on wide, stacked on narrow ───── */
+.game-body {
+  flex: 1; display: flex; gap: var(--space-4);
+  padding: var(--space-4); align-items: flex-start;
+}
+
+/* ── Word Search Grid ────────────────────────────────────────────────────── */
+.grid-wrap {
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
+}
+
+#ws-grid {
+  display: grid;
+  gap: 0;
+  border: 2.5px solid var(--gray-700);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  background: var(--gray-700);
+  /* Size is set dynamically via JS gridTemplateColumns */
+  width: min(calc(100vw - 200px), 380px);
+  aspect-ratio: 1;
+  touch-action: none; /* prevent scroll during drag */
+  user-select: none;
+}
+
+/* Full-width stacked on small screens */
+@media (max-width: 500px) {
+  .game-body { flex-direction: column; align-items: center; padding: var(--space-3); gap: var(--space-3); }
+  #ws-grid   { width: min(calc(100vw - 32px), 360px); }
+  .word-panel { width: 100%; max-height: none; }
+}
+
+.ws-cell {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-bg);
+  font-size: clamp(10px, 2.5vw, 18px);
+  font-weight: 700; letter-spacing: 0;
+  cursor: pointer;
+  border-right: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-200);
+  transition: background var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+  color: var(--gray-800);
+  aspect-ratio: 1;
+  line-height: 1;
+}
+
+/* States */
+.ws-cell.selecting {
+  background: var(--blue-200) !important;
+  color: var(--blue-800);
+}
+
+.ws-cell.found {
+  background: #bbf7d0 !important;
+  color: #166534;
+  font-weight: 800;
+}
+
+.ws-cell.hint-highlight {
+  background: #fef08a !important;
+  color: #854d0e;
+  animation: pulse 0.6s ease infinite;
+}
+
+/* ── Word panel ──────────────────────────────────────────────────────────── */
+.word-panel {
+  flex: 1; min-width: 120px; max-width: 160px;
+  background: var(--color-bg); border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-xl); padding: var(--space-4);
+  box-shadow: var(--shadow-md); max-height: 420px; overflow-y: auto;
+}
+
+.word-panel__header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.word-panel__title { font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text); }
+#found-counter { font-size: var(--font-size-xs); font-weight: 700; color: var(--color-primary); }
+
+#word-list { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.word-item {
+  font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text);
+  padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm);
+  transition: all var(--transition-base); letter-spacing: 0.03em;
+}
+
+.word-item.found {
+  color: var(--color-success); text-decoration: line-through;
+  text-decoration-thickness: 2px; opacity: 0.7;
+}
+
+/* ── Bottom toolbar: Hint button ─────────────────────────────────────────── */
+.game-toolbar {
+  display: flex; justify-content: center; align-items: center;
+  padding: var(--space-3) var(--space-4) var(--space-5);
+  gap: var(--space-4);
+}
+
+.ctrl-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; background: var(--color-bg); border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg); padding: var(--space-3) var(--space-5);
+  cursor: pointer; font-family: inherit; transition: all var(--transition-base);
+  position: relative; -webkit-tap-highlight-color: transparent;
+}
+.ctrl-btn:hover { border-color: var(--color-primary); background: var(--color-primary-light); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.ctrl-btn:active { transform: translateY(0); }
+.ctrl-btn:disabled { opacity: 0.4; pointer-events: none; }
+
+.ctrl-btn__icon { font-size: 1.5rem; line-height: 1; }
+.btn-label      { font-size: var(--font-size-xs); font-weight: 600; color: var(--color-text-muted); }
+
+#hint-btn { background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #f59e0b; }
+#hint-btn:hover { background: linear-gradient(135deg, #fde68a, #fbbf24); border-color: #d97706; }
+
+.hint-count {
+  position: absolute; top: -6px; right: -6px;
+  background: var(--blue-600); color: white; font-size: var(--font-size-xs);
+  font-weight: 800; min-width: 20px; height: 20px; padding: 0 4px; border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--color-bg); box-sizing: border-box;
+}
+
+/* ── Victory Modal ───────────────────────────────────────────────────────── */
+.victory-emoji { font-size: 3rem; margin-bottom: var(--space-3); animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.victory-best  { font-size: var(--font-size-sm); color: var(--color-success); font-weight: 600; margin-bottom: var(--space-4); }
+
+/* ── Safe area ───────────────────────────────────────────────────────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .game-toolbar { padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom)); }
+}

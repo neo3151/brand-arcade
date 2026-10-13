@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>BLACK VAULT — Cold War Codebreaker</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/menu.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+</head>
+<body>
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+      <div class="menu-page">
+
+    <!-- Top Command Header -->
+    <header class="menu-header">
+      <div class="menu-brand">
+        <span class="menu-brand__icon">📻</span>
+        <div>
+          <h1 class="menu-brand__title">BLACK VAULT</h1>
+          <div class="menu-brand__sub">COLD WAR CIPHER BUREAU // EST. 1974</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: var(--space-3);">
+        <button id="btn-menu-mute" class="btn btn--secondary" style="padding: 0.35rem 0.6rem; font-size: 1.1rem;" title="Toggle Audio">🔊</button>
+        <a href="store.html" class="deaddrop-badge" id="armory-link" title="Dead Drop Armory">
+          <span>📦 DEAD DROP</span>
+          <span id="menu-supply-total" style="color: #fff; background: #b45309; padding: 0.1rem 0.4rem; border-radius: 2px; font-size: 0.75rem;">0</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Classified Dossier Hero -->
+    <section class="dossier-hero">
+      <div class="dossier-header-strip">
+        <div class="dossier-stamp">TOP SECRET // LEVEL 4</div>
+        <div class="dossier-ref">REF: BV-882-K // ARCHIVE BERLIN</div>
+      </div>
+      <h2 class="dossier-title">CRYPTOGRAPHIC TELEPRINTER</h2>
+      <p class="dossier-desc">
+        A high-frequency shortwave transmission has been intercepted from an underground bunker. 
+        Analyze telemetry clues, isolate frequency harmonics, and crack the classified pin sequence before 
+        your wiretap is detected and the station goes silent.
+      </p>
+    </section>
+
+    <!-- In-Progress Wiretap Banner (Hidden by default) -->
+    <section class="wiretap-banner" id="active-game-banner" style="display: none;">
+      <div>
+        <div class="wiretap-title">ACTIVE WIRETAP IN PROGRESS</div>
+        <div class="wiretap-sub" id="active-game-info">MISSION: FIELD OPERATIVE // ATTEMPT 3/10</div>
+      </div>
+      <div style="display: flex; gap: var(--space-2);">
+        <a href="#" id="btn-resume-mission" class="btn btn--primary">RESUME INTERCEPT</a>
+        <button id="btn-abort-mission" class="btn btn--danger" title="Scramble and discard active intercept">ABORT</button>
+      </div>
+    </section>
+
+    <!-- Security Clearance Selection -->
+    <div>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
+        <h3 style="font-family: var(--font-typewriter); font-size: 1.1rem; color: #fff; letter-spacing: 0.05em;">SELECT SECURITY CLEARANCE</h3>
+        <button id="btn-manual" class="btn btn--secondary" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">📜 FIELD MANUAL</button>
+      </div>
+
+      <div class="clearance-grid">
+        <!-- Operative (4 Pins) -->
+        <div class="clearance-card" data-diff="operative">
+          <div class="clearance-card__header">
+            <span class="clearance-badge badge--operative">CLEARANCE I</span>
+            <span style="font-size: 1.3rem;">🟢</span>
+          </div>
+          <div class="clearance-card__title">Field Operative</div>
+          <div class="clearance-card__specs">
+            <div>Code Length: <span class="spec-val">4 Pins</span></div>
+            <div>Frequency Pool: <span class="spec-val">6 Colors</span></div>
+            <div>Max Attempts: <span class="spec-val">10 Rows</span></div>
+          </div>
+          <div class="clearance-card__record" id="record-operative">
+            Record: <strong>--:--</strong> (<strong>--</strong> rows)
+          </div>
+          <a href="game.html?diff=operative" class="btn btn--primary start-btn" style="text-align: center; margin-top: auto;">DEPLOY OPERATIVE</a>
+        </div>
+
+        <!-- Officer (5 Pins) -->
+        <div class="clearance-card" data-diff="officer">
+          <div class="clearance-card__header">
+            <span class="clearance-badge badge--officer">CLEARANCE II</span>
+            <span style="font-size: 1.3rem;">🟠</span>
+          </div>
+          <div class="clearance-card__title">Intelligence Officer</div>
+          <div class="clearance-card__specs">
+            <div>Code Length: <span class="spec-val">5 Pins</span></div>
+            <div>Frequency Pool: <span class="spec-val">7 Colors</span></div>
+            <div>Max Attempts: <span class="spec-val">10 Rows</span></div>
+          </div>
+          <div class="clearance-card__record" id="record-officer">
+            Record: <strong>--:--</strong> (<strong>--</strong> rows)
+          </div>
+          <a href="game.html?diff=officer" class="btn btn--primary start-btn" style="text-align: center; margin-top: auto;">DEPLOY OFFICER</a>
+        </div>
+
+        <!-- Station Chief (6 Pins) -->
+        <div class="clearance-card" data-diff="chief">
+          <div class="clearance-card__header">
+            <span class="clearance-badge badge--chief">CLEARANCE III</span>
+            <span style="font-size: 1.3rem;">🔴</span>
+          </div>
+          <div class="clearance-card__title">Station Chief</div>
+          <div class="clearance-card__specs">
+            <div>Code Length: <span class="spec-val">6 Pins</span></div>
+            <div>Frequency Pool: <span class="spec-val">8 Colors</span></div>
+            <div>Max Attempts: <span class="spec-val">10 Rows</span></div>
+          </div>
+          <div class="clearance-card__record" id="record-chief">
+            Record: <strong>--:--</strong> (<strong>--</strong> rows)
+          </div>
+          <a href="game.html?diff=chief" class="btn btn--primary start-btn" style="text-align: center; margin-top: auto;">DEPLOY CHIEF</a>
+        </div>
+
+        <!-- Custom Wiretap -->
+        <div class="clearance-card">
+          <div class="clearance-card__header">
+            <span class="clearance-badge badge--custom">CUSTOM</span>
+            <span style="font-size: 1.3rem;">🔷</span>
+          </div>
+          <div class="clearance-card__title">Custom Wiretap</div>
+          <form id="custom-form" class="custom-form">
+            <div class="form-row">
+              <label class="form-label" for="custom-len">Pins (Length):</label>
+              <select id="custom-len" class="form-input">
+                <option value="3">3</option>
+                <option value="4" selected>4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="custom-pool">Color Pool:</label>
+              <select id="custom-pool" class="form-input">
+                <option value="4">4</option>
+                <option value="6" selected>6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="custom-dup">Duplicates:</label>
+              <select id="custom-dup" class="form-input">
+                <option value="1" selected>Allowed</option>
+                <option value="0">Forbidden</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="custom-att">Attempts:</label>
+              <select id="custom-att" class="form-input">
+                <option value="8">8</option>
+                <option value="10" selected>10</option>
+                <option value="12">12</option>
+                <option value="15">15</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn--primary" style="margin-top: var(--space-2); text-align: center;">LAUNCH CUSTOM</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dossier Clearance Records Ribbon -->
+    <section class="stats-ribbon">
+      <div class="stat-item">
+        <div class="stat-val stat-val--amber" id="stat-attempted">0</div>
+        <div class="stat-label">Transmissions Intercepted</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val stat-val--green" id="stat-cleared">0</div>
+        <div class="stat-label">Ciphers Cracked</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val stat-val--cyan" id="stat-streak">0</div>
+        <div class="stat-label">Active Streak</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="stat-best-streak">0</div>
+        <div class="stat-label">Bureau Best Streak</div>
+      </div>
+    </section>
+
+    <!-- Footer Intel -->
+    <footer class="intel-strip">
+      <div>BLACK VAULT v1.0 // 100% AD-FREE ESPIONAGE ENGINE</div>
+      <div>CLASSIFIED INTELLIGENCE DIVISION</div>
+    </footer>
+
+  </div>
+
+  <!-- Field Manual Protocol Modal -->
+  <div class="modal-backdrop" id="manual-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">TELEPRINTER FIELD PROTOCOL</h3>
+        <button class="modal-close-btn" id="btn-close-manual">✕</button>
+      </div>
+      <div class="modal-body" style="font-size: 0.9rem; line-height: 1.6; display: flex; flex-direction: column; gap: var(--space-3);">
+        <p><strong>1. OBJECTIVE:</strong> The teleprinter holds a hidden secret cipher sequence of colored pins. Your mission is to guess the exact combination before all transmission attempts are exhausted.</p>
+        
+        <p><strong>2. CLUE EVALUATION (FEEDBACK PEGS):</strong> After transmitting each guess row, the cipher unit stamps feedback pegs on the right:</p>
+        <ul style="padding-left: 1.2rem; display: flex; flex-direction: column; gap: 6px;">
+          <li><strong style="color: var(--peg-exact);">🔴 RED PEG:</strong> One of your pins is the <em>correct color in the correct position</em>.</li>
+          <li><strong style="color: var(--peg-partial);">🟠 AMBER PEG:</strong> One of your pins is the <em>correct color, but in the wrong position</em>.</li>
+          <li><strong style="color: #64748b;">⚫ EMPTY PEG:</strong> A pin color that does not match any remaining secret pins.</li>
+        </ul>
+        <p style="font-size: 0.82rem; color: var(--color-amber-crt);"><em>Note: The order of feedback pegs does not correspond to the pin order in your row. Duplicate pins in the secret code are accounted for strictly one-to-one.</em></p>
+
+        <p><strong>3. TACTICAL FIELD SUPPLIES:</strong></p>
+        <ul style="padding-left: 1.2rem; display: flex; flex-direction: column; gap: 6px;">
+          <li><strong>Signal Decryptor:</strong> Decodes and permanently locks 1 secret pin compartment.</li>
+          <li><strong>Frequency Filter:</strong> Identifies and disables 2 unused colors on your palette.</li>
+          <li><strong>Magnetic Tape Rewind:</strong> Spools back the tape to give you +2 extra guess attempts.</li>
+          <li><strong>Wiretap Logic Probe:</strong> Verifies if your pending test row mathematically conforms to all previous clues.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--primary" id="btn-ok-manual" style="width: 100%;">ACKNOWLEDGED // CLOSE PROTOCOL</button>
+      </div>
+    </div>
+  </div>
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <script src="js/utils.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/cipher-engine.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Audio Mute toggle
+      const muteBtn = document.getElementById('btn-menu-mute');
+      function syncMute() {
+        if (muteBtn) {
+          muteBtn.textContent = Utils.sound.isMuted() ? '🔇' : '🔊';
+        }
+      }
+      if (muteBtn) {
+        muteBtn.addEventListener('click', () => {
+          Utils.sound.toggleMute();
+          syncMute();
+        });
+        syncMute();
+      }
+
+      // Format Time helper
+      function formatTime(totalSeconds) {
+        if (totalSeconds === null || totalSeconds === undefined) return '--:--';
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }
+
+      // Armory supply total count
+      const inv = Progress.getInventory();
+      const totalSupplies = (inv.decryptors || 0) + (inv.filters || 0) + (inv.rewinds || 0) + (inv.probes || 0);
+      const supplyBadge = document.getElementById('menu-supply-total');
+      if (supplyBadge) supplyBadge.textContent = totalSupplies;
+
+      // Stats Ribbon
+      const stats = Progress.getStats();
+      const attEl = document.getElementById('stat-attempted');
+      const clrEl = document.getElementById('stat-cleared');
+      const stkEl = document.getElementById('stat-streak');
+      const bstEl = document.getElementById('stat-best-streak');
+
+      if (attEl) attEl.textContent = stats.missionsAttempted;
+      if (clrEl) clrEl.textContent = stats.missionsCleared;
+      if (stkEl) stkEl.textContent = stats.currentStreak;
+      if (bstEl) bstEl.textContent = stats.bestStreak;
+
+      // Clearance Records
+      ['operative', 'officer', 'chief'].forEach(diff => {
+        const recEl = document.getElementById(`record-${diff}`);
+        if (recEl) {
+          const t = formatTime(stats.bestTimes[diff]);
+          const r = stats.bestRows[diff] !== null ? stats.bestRows[diff] : '--';
+          recEl.innerHTML = `Record: <strong>${t}</strong> (<strong>${r}</strong> rows)`;
+        }
+      });
+
+      // Active Mission Banner Check
+      const active = Progress.getActiveGame();
+      const banner = document.getElementById('active-game-banner');
+      const resumeBtn = document.getElementById('btn-resume-mission');
+      const abortBtn = document.getElementById('btn-abort-mission');
+      const infoEl = document.getElementById('active-game-info');
+
+      if (active && !active.isGameOver && banner) {
+        banner.style.display = 'flex';
+        const label = CipherEngine.CLEARANCE_PRESETS[active.difficulty] ? 
+          CipherEngine.CLEARANCE_PRESETS[active.difficulty].label : 'Custom Wiretap';
+        const attemptNum = (active.history ? active.history.length : 0) + 1;
+        infoEl.textContent = `MISSION: ${label.toUpperCase()} // ATTEMPT ${attemptNum}/${active.maxAttempts}`;
+        resumeBtn.href = `game.html?diff=${active.difficulty}&continue=1`;
+
+        abortBtn.addEventListener('click', () => {
+          if (confirm('Are you sure you want to abort this active wiretap? Progress will be discarded.')) {
+            Progress.clearActiveGame();
+            banner.style.display = 'none';
+            Utils.showToast('ACTIVE INTERCEPT DISCARDED', 2500, 'warning');
+          }
+        });
+      }
+
+      // Check active game overwrite confirmation when clicking new mission
+      document.querySelectorAll('.start-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const savedGame = Progress.getActiveGame();
+          if (savedGame && !savedGame.isGameOver) {
+            if (!confirm('An active wiretap mission is currently open. Starting a new mission will overwrite it. Proceed?')) {
+              e.preventDefault();
+            }
+          }
+        });
+      });
+
+      // Custom form submission
+      const customForm = document.getElementById('custom-form');
+      if (customForm) {
+        customForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const savedGame = Progress.getActiveGame();
+          if (savedGame && !savedGame.isGameOver) {
+            if (!confirm('An active wiretap mission is currently open. Starting a new mission will overwrite it. Proceed?')) {
+              return;
+            }
+          }
+          let len = parseInt(document.getElementById('custom-len').value, 10) || 4;
+          const pool = parseInt(document.getElementById('custom-pool').value, 10) || 6;
+          const dup = document.getElementById('custom-dup').value;
+          const att = document.getElementById('custom-att').value;
+
+          if (dup === '0' && len > pool) {
+            len = pool;
+          }
+
+          window.location.href = `game.html?diff=custom&len=${len}&pool=${pool}&dup=${dup}&att=${att}`;
+        });
+      }
+
+      // Field manual modal
+      const manualModal = document.getElementById('manual-modal');
+      const btnManual = document.getElementById('btn-manual');
+      const btnCloseManual = document.getElementById('btn-close-manual');
+      const btnOkManual = document.getElementById('btn-ok-manual');
+
+      function openManual() {
+        if (manualModal) manualModal.classList.add('modal-backdrop--open');
+        Utils.sound.play('relay');
+      }
+      function closeManual() {
+        if (manualModal) manualModal.classList.remove('modal-backdrop--open');
+        Utils.sound.play('typewriter');
+      }
+
+      if (btnManual) btnManual.addEventListener('click', openManual);
+      if (btnCloseManual) btnCloseManual.addEventListener('click', closeManual);
+      if (btnOkManual) btnOkManual.addEventListener('click', closeManual);
+    });
+  </script>
+</body>
+</html>

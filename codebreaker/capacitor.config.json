@@ -1,0 +1,13 @@
+{
+  "appId": "com.gamingempire.blackvault",
+  "appName": "Black Vault",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#121513",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "spades-mobile",
+  "version": "1.0.0",
+  "description": "Royal Spades: Classic & 2's Wild Mobile App",
+  "main": "index.html",
+  "scripts": {
+    "sync": "node sync-www.js"
+  },
+  "keywords": ["spades", "card-game", "twos-wild", "partnership", "mobile-game"],
+  "author": "Gaming Empire",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}

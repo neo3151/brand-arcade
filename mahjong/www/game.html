@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>CELESTIAL JADE — Sanctuary Board</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/game.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+</head>
+<body>
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+      <div class="game-page" style="height: 100%; max-height: 100%; flex: 1;">
+
+    <!-- Top Command HUD -->
+    <header class="hud-bar">
+      <div class="hud-group">
+        <a href="index.html" class="btn btn--secondary" id="btn-back-sanctuary" style="padding: 0.35rem 0.65rem; font-size: 0.85rem;" title="Return to Sanctuary Menu">← SANCTUARY</a>
+        <div>
+          <div class="hud-title" id="layout-label">The Classic Turtle</div>
+          <div class="hud-sub">SACRED 3D FORMATION</div>
+        </div>
+      </div>
+
+      <div class="hud-group">
+        <div class="hud-counter">
+          <span>TILES:</span>
+          <span class="hud-counter-val" id="tile-count-display">144</span>
+          <span style="color: var(--color-text-dark); margin: 0 4px;">|</span>
+          <span>PAIRS:</span>
+          <span class="hud-counter-val" id="pairs-left-display">72</span>
+        </div>
+      </div>
+
+      <div class="hud-group">
+        <div style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 800; color: var(--color-gold-bright); background: #09130d; padding: 0.3rem 0.65rem; border: 1px solid var(--border-jade); border-radius: var(--radius-sm);" id="timer-display">
+          00:00
+        </div>
+        <button id="btn-mute" class="btn btn--secondary" style="padding: 0.35rem 0.6rem; font-size: 1.05rem;" title="Toggle Sound">🔊</button>
+        <a href="store.html" class="emporium-badge" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;" title="Pavilion Emporium">🏛️ EMPORIUM</a>
+      </div>
+    </header>
+
+    <!-- 3D Mahjong Board Viewport -->
+    <main class="board-viewport" id="board-viewport">
+      <div class="board-stage" id="board-stage">
+        <!-- Rendered dynamically by game.js -->
+      </div>
+    </main>
+
+    <!-- Bottom Tactical Quickbar & Helpers -->
+    <footer class="tray-bar">
+      <button type="button" class="quickbar-btn" id="btn-hint" title="Compass Hint: Illuminates an open matching pair">
+        <span>🧭 HINT</span>
+        <span class="quickbar-badge" id="badge-hint">0</span>
+      </button>
+      <button type="button" class="quickbar-btn" id="btn-shuffle" title="Dragon Shuffle: Rearranges remaining tiles to open matching paths">
+        <span>🐉 SHUFFLE</span>
+        <span class="quickbar-badge" id="badge-shuffle">0</span>
+      </button>
+      <button type="button" class="quickbar-btn" id="btn-undo" title="Time Rewind: Restores the last matched pair">
+        <span>⏳ UNDO</span>
+        <span class="quickbar-badge" id="badge-undo">0</span>
+      </button>
+      <button type="button" class="quickbar-btn" id="btn-lotus" title="Celestial Lotus: Banishes an open pair from the formation">
+        <span>🪷 LOTUS</span>
+        <span class="quickbar-badge" id="badge-lotus">0</span>
+      </button>
+    </footer>
+
+  </div>
+
+  <!-- Victory Harmony Decrypted Modal -->
+  <div class="modal-backdrop" id="victory-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: var(--color-gold-leaf);">★ FORMATION HARMONIZED // VICTORY ★</h3>
+      </div>
+      <div class="modal-body" style="text-align: center; display: flex; flex-direction: column; gap: var(--space-4);">
+        <div id="modal-record-badge" style="display: none; background: linear-gradient(180deg, #d4af37 0%, #9b7832 100%); color: #121c15; font-family: var(--font-serif); font-size: 0.85rem; font-weight: 800; padding: 0.3rem 0.8rem; border-radius: 2px; align-self: center;">
+          ★ NEW SANCTUARY RECORD ★
+        </div>
+
+        <p style="font-size: 0.95rem; color: var(--color-text-main); line-height: 1.6;">
+          All 144 sacred tiles have been cleared in perfect celestial order. Mindful focus has restored balance to the imperial pavilion.
+        </p>
+
+        <div style="background: #0d1a13; border: 1.5px solid var(--border-gold); border-radius: var(--radius-sm); padding: var(--space-4); display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2);">
+          <div>
+            <div style="font-family: var(--font-serif); font-size: 0.75rem; color: var(--color-text-muted);">TIME</div>
+            <div style="font-family: var(--font-serif); font-size: 1.4rem; font-weight: 900; color: var(--color-gold-bright);" id="modal-time">00:00</div>
+          </div>
+          <div>
+            <div style="font-family: var(--font-serif); font-size: 0.75rem; color: var(--color-text-muted);">FORMATION</div>
+            <div style="font-family: var(--font-serif); font-size: 1.1rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" id="modal-layout">Turtle</div>
+          </div>
+          <div>
+            <div style="font-family: var(--font-serif); font-size: 0.75rem; color: var(--color-text-muted);">STREAK</div>
+            <div style="font-family: var(--font-serif); font-size: 1.4rem; font-weight: 900; color: var(--color-jade-light);" id="modal-streak">1</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; gap: var(--space-3);">
+        <button type="button" class="btn btn--secondary" id="btn-victory-menu" style="flex: 1;">SANCTUARY MENU</button>
+        <button type="button" class="btn btn--primary" id="btn-victory-next" style="flex: 1;">PLAY AGAIN</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+</div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <script src="js/utils.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/mahjong-tiles.js"></script>
+  <script src="js/layouts.js"></script>
+  <script src="js/board-engine.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/mobile-shell.js"></script>
+</body>
+</html>

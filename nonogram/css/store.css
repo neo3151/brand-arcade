@@ -1,0 +1,158 @@
+/* ==========================================================================
+   store.css — In-Game Power-ups & Hints Store
+   Zen Nonogram: Pixel Tapestry
+   ========================================================================== */
+
+.store-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--slate-900);
+}
+
+.store-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: var(--slate-950);
+  border-bottom: 1px solid var(--slate-800);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.store-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--slate-100);
+}
+
+.store-balance-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-400);
+}
+
+.store-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.store-hero-banner {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 20px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.store-hero-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--slate-100);
+  margin-bottom: 0.35rem;
+}
+
+.store-hero-desc {
+  font-size: 0.85rem;
+  color: var(--slate-400);
+}
+
+.store-section-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate-400);
+  margin-bottom: 0.75rem;
+}
+
+.packs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.pack-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--slate-850);
+  border: 1px solid var(--slate-750);
+  border-radius: 18px;
+  padding: 1rem 1.25rem;
+  transition: all var(--anim-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.pack-card.popular {
+  border-color: var(--gold-500);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, var(--slate-850) 100%);
+}
+
+.popular-ribbon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--gold-500);
+  color: #451a03;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  border-bottom-left-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pack-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pack-icon {
+  font-size: 1.8rem;
+  background: var(--slate-800);
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pack-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.pack-name {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--slate-100);
+}
+
+.pack-contents {
+  font-size: 0.8rem;
+  color: var(--slate-400);
+}
+
+.pack-buy-btn {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.6rem 1rem;
+}

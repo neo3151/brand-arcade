@@ -1,0 +1,16 @@
+{
+  "name": "blockblast-mobile",
+  "version": "1.0.0",
+  "description": "Timber Block Blast: 8x8 Polyomino Puzzle Mobile App",
+  "main": "index.html",
+  "scripts": {
+    "sync": "node sync-www.js"
+  },
+  "keywords": ["blockblast", "block-puzzle", "woodoku", "polyomino", "mobile-game"],
+  "author": "Gaming Empire",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}

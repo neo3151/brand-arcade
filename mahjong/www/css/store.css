@@ -1,0 +1,176 @@
+/* ==========================================================================
+   CELESTIAL JADE: MAHJONG SOLITAIRE — Pavilion Emporium Store Styles
+   ========================================================================== */
+
+.store-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.store-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-5);
+  background: var(--bg-surface);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.emporium-inventory-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  background: #09130d;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border-jade);
+  border-radius: var(--radius-sm);
+}
+
+.inv-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.inv-val {
+  color: var(--color-gold-bright);
+  font-weight: 700;
+}
+
+/* Hero */
+.emporium-hero {
+  background: linear-gradient(135deg, #132a1f 0%, #0c1a13 100%);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75);
+}
+
+.emporium-hero__title {
+  font-family: var(--font-serif);
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.emporium-hero__desc {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  max-width: 620px;
+  line-height: 1.6;
+}
+
+/* Store Cards Grid */
+.supply-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+.supply-card {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-jade);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+  transition: all 0.15s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.supply-card:hover {
+  border-color: var(--border-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85);
+}
+
+.supply-card--featured {
+  border-color: var(--color-gold-leaf);
+  background: linear-gradient(180deg, #183325 0%, #10241a 100%);
+}
+
+.supply-badge {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  background: linear-gradient(180deg, #d4af37 0%, #9b7832 100%);
+  color: #121c15;
+  font-family: var(--font-serif);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+}
+
+.supply-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.supply-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.supply-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.supply-desc {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.supply-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.supply-qty {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: var(--color-gold-bright);
+  font-weight: 700;
+}
+
+.supply-price {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.store-legal {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-text-dark);
+  font-family: var(--font-serif);
+  padding: var(--space-4) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}

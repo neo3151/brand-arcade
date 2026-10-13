@@ -1,0 +1,160 @@
+/* ==========================================================================
+   menu.css — Main Menu Screen Styles
+   Timber Block Blast
+   ========================================================================== */
+
+.menu-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 1.25rem 1rem 1.25rem;
+  overflow-y: auto;
+}
+
+/* Header & Logo */
+.menu-header {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.menu-wood-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.75rem;
+  background: color-mix(in srgb, var(--amber-gold) 12%, transparent);
+  border: 1px solid var(--amber-gold);
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--amber-light);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.menu-title {
+  font-family: var(--font-title);
+  font-size: 2.1rem;
+  font-weight: 900;
+  line-height: 1.1;
+  background: linear-gradient(180deg, var(--text-main) 0%, var(--amber-gold) 60%, var(--text-dim) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+  letter-spacing: 0.04em;
+}
+
+.menu-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 0.35rem;
+}
+
+/* Best Score Card */
+.best-score-card {
+  background: var(--panel-bg);
+  border: 2px solid var(--amber-gold);
+  border-radius: 20px;
+  padding: 1.1rem;
+  margin: 1.25rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px var(--amber-glow);
+}
+
+.best-score-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.crown-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.5));
+}
+
+.best-score-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--amber-light);
+  font-weight: 800;
+}
+
+.best-score-val {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  margin-top: 0.2rem;
+}
+
+.coins-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.4rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--timber-border);
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--amber-light);
+}
+
+/* Menu Actions Stack */
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.btn-continue {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #022c22;
+  font-size: 1.05rem;
+  font-weight: 800;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+  animation: pulse-border 2s infinite ease-in-out;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+}
+
+.btn-play-new {
+  font-size: 1.1rem;
+  padding: 0.9rem 1.25rem;
+}
+
+/* Secondary Buttons Row */
+.menu-sub-row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.menu-sub-row .btn {
+  flex: 1;
+  font-size: 0.85rem;
+  padding: 0.65rem 0.5rem;
+}
+
+/* Footer Info */
+.menu-footer {
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  padding-bottom: 0.5rem;
+}

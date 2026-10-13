@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="Spider Solitaire: Cobweb Manor — Ad-free gothic Victorian 1, 2, and 4-suit Spider Solitaire with smart cascade hints." />
+  <title>Spider Solitaire: Cobweb Manor</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/menu.css" />
+  <link rel="stylesheet" href="css/mobile-simulator.css" />
+</head>
+<body>
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <button id="sound-toggle-btn" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:0.75rem;">🔊</button>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+      <div class="menu-page">
+        <!-- Header -->
+        <div class="menu-header">
+          <div class="brand-badge">
+            <span>🕸️</span> COBWEB MANOR
+          </div>
+          <a href="store.html" class="store-link-btn" aria-label="Open Power-ups Store">
+            <span>🪙</span>
+            <span id="nav-coins">150</span>
+            <span>+</span>
+          </a>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+          <div class="hero-spider-icon">
+            <span class="hero-spider-emoji">🕷️</span>
+          </div>
+          <h1 class="hero-title">Spider Solitaire</h1>
+          <p class="hero-subtitle">Gothic Victorian Card Cascades • 100% Ad-Free</p>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-summary">
+          <div class="stat-item">
+            <span class="stat-val stat-val--purple" id="stat-solved">0</span>
+            <span class="stat-lbl">Deals Won</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val stat-val--gold" id="stat-streak">1</span>
+            <span class="stat-lbl">Streak 🔥</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val" id="stat-hints">5</span>
+            <span class="stat-lbl">Hints 💡</span>
+          </div>
+        </div>
+
+        <!-- Continue Button -->
+        <button id="continue-btn" class="btn btn--continue btn--full" style="display:none;">
+          ▶ Continue Deal
+        </button>
+
+        <!-- Mode Selection Cards -->
+        <div class="mode-cards">
+          <div class="mode-card" data-diff="1suit">
+            <div class="mode-info">
+              <div class="mode-title">
+                <span>♠</span> 1 Suit (Beginner)
+              </div>
+              <div class="mode-desc">Pure Spades • Fluid sequencing & cascading</div>
+            </div>
+            <div class="mode-badge" id="badge-1suit">Deal 1</div>
+          </div>
+
+          <div class="mode-card" data-diff="2suit">
+            <div class="mode-info">
+              <div class="mode-title">
+                <span>♠ ♥</span> 2 Suits (Medium)
+              </div>
+              <div class="mode-desc">Spades & Hearts • Mixed builds, pure moves</div>
+            </div>
+            <div class="mode-badge" id="badge-2suit">Deal 1</div>
+          </div>
+
+          <div class="mode-card" data-diff="4suit">
+            <div class="mode-info">
+              <div class="mode-title">
+                <span>♠ ♥ ♦ ♣</span> 4 Suits (Master)
+              </div>
+              <div class="mode-desc">All 4 Suits • The ultimate strategic test</div>
+            </div>
+            <div class="mode-badge" id="badge-4suit">Deal 1</div>
+          </div>
+        </div>
+
+        <a href="store.html" class="btn btn--secondary btn--full">
+          ✨ Relic Store
+        </a>
+      </div>
+
+      <!-- Deal Selector Modal -->
+      <div id="deal-modal" class="modal-backdrop">
+        <div class="modal-card">
+          <div class="deal-picker-header">
+            <span id="deal-modal-title" style="font-family:var(--font-title);font-weight:700;font-size:1.05rem;color:#e9d5ff;">
+              Select Deal
+            </span>
+            <button class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">&times;</button>
+          </div>
+
+          <div class="deal-pagination">
+            <button id="prev-page-btn" class="page-arrow">‹</button>
+            <span id="page-indicator">Deals 1 – 50</span>
+            <button id="next-page-btn" class="page-arrow">›</button>
+          </div>
+
+          <div class="deal-grid" id="deal-grid-container">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const stats = window.Progress.getStats();
+      const inventory = window.Progress.getInventory();
+
+      document.getElementById('stat-solved').textContent = stats.totalSolved || 0;
+      document.getElementById('stat-streak').textContent = stats.streak || 1;
+      document.getElementById('stat-hints').textContent = inventory.hints || 0;
+      document.getElementById('nav-coins').textContent = inventory.coins || 150;
+
+      // Update mode deal badges
+      ['1suit', '2suit', '4suit'].forEach(diff => {
+        const el = document.getElementById(`badge-${diff}`);
+        if (el) el.textContent = `Deal ${window.Progress.getUnlockedLevel(diff)}`;
+      });
+
+      // Continue game check
+      const activeGame = window.Progress.getActiveGame();
+      const continueBtn = document.getElementById('continue-btn');
+      if (activeGame && activeGame.difficulty && activeGame.level) {
+        continueBtn.style.display = 'block';
+        const label = window.Utils.getDifficultyLabel(activeGame.difficulty);
+        continueBtn.textContent = `▶ Continue (${label.split(' ')[0]} Deal ${activeGame.level})`;
+        continueBtn.addEventListener('click', () => {
+          window.location.href = `game.html?difficulty=${activeGame.difficulty}&level=${activeGame.level}&continue=1`;
+        });
+      }
+
+      // Deal Picker Modal
+      const dealModal = document.getElementById('deal-modal');
+      const modalCloseBtn = document.getElementById('modal-close-btn');
+      const gridContainer = document.getElementById('deal-grid-container');
+      const prevPageBtn = document.getElementById('prev-page-btn');
+      const nextPageBtn = document.getElementById('next-page-btn');
+      const pageIndicator = document.getElementById('page-indicator');
+      const dealModalTitle = document.getElementById('deal-modal-title');
+
+      let currentDiff = '1suit';
+      let currentPage = 1;
+      const DEALS_PER_PAGE = 50;
+      const MAX_DEALS = 1000;
+
+      document.querySelectorAll('.mode-card').forEach(card => {
+        card.addEventListener('click', () => {
+          currentDiff = card.dataset.diff;
+          const unlocked = window.Progress.getUnlockedLevel(currentDiff);
+          currentPage = Math.max(1, Math.ceil(unlocked / DEALS_PER_PAGE));
+          dealModalTitle.textContent = `${window.Utils.getDifficultyLabel(currentDiff)} — Deals`;
+          renderDeals();
+          window.Utils.openModal('deal-modal');
+        });
+      });
+
+      modalCloseBtn.addEventListener('click', () => {
+        window.Utils.closeModal('deal-modal');
+      });
+
+      dealModal.addEventListener('click', (e) => {
+        if (e.target === dealModal) window.Utils.closeModal('deal-modal');
+      });
+
+      function renderDeals() {
+        const start = (currentPage - 1) * DEALS_PER_PAGE + 1;
+        const end = Math.min(MAX_DEALS, currentPage * DEALS_PER_PAGE);
+        const unlocked = window.Progress.getUnlockedLevel(currentDiff);
+
+        pageIndicator.textContent = `Deals ${start} – ${end}`;
+        prevPageBtn.disabled = currentPage <= 1;
+        nextPageBtn.disabled = end >= MAX_DEALS;
+
+        gridContainer.innerHTML = '';
+        for (let i = start; i <= end; i++) {
+          const cell = document.createElement('div');
+          cell.className = 'deal-cell';
+          cell.textContent = i;
+
+          const isComp = window.Progress.isLevelCompleted(currentDiff, i);
+          const isLocked = i > unlocked;
+
+          if (isComp) cell.classList.add('completed');
+          if (isLocked) cell.classList.add('locked');
+
+          if (!isLocked) {
+            cell.addEventListener('click', () => {
+              window.location.href = `game.html?difficulty=${currentDiff}&level=${i}`;
+            });
+          }
+          gridContainer.appendChild(cell);
+        }
+      }
+
+      prevPageBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderDeals();
+        }
+      });
+
+      nextPageBtn.addEventListener('click', () => {
+        if (currentPage * DEALS_PER_PAGE < MAX_DEALS) {
+          currentPage++;
+          renderDeals();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

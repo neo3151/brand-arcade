@@ -1,0 +1,13 @@
+{
+  "appId": "com.gamingempire.classicsudoku",
+  "appName": "Classic Sudoku",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#f8fafc",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}
