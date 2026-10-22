@@ -2,6 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+<script id="arcade-cosmetics-loader">
+(function () {
+  var parts = location.pathname.split('/').filter(Boolean);
+  if (parts.length && /\.[a-z0-9]+$/i.test(parts[parts.length - 1])) parts.pop();
+  if (parts.length < 1) return;
+  var prefix = '';
+  for (var i = 0; i < parts.length; i++) prefix += '../';
+  document.write(
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-cosmetics.css">' +
+    '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+  );
+})();
+</script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="description" content="Zen Nonogram Daily Supply — hints, radars, and bombs refill every morning. Play-earned coins stay on your profile. 100% ad-free." />
   <title>Daily Supply — Zen Nonogram</title>
@@ -78,7 +95,8 @@
             </div>
           </div>
 
-          <footer style="margin-top:1.5rem;text-align:center;">
+          <div id="paid-cosmetic-shelf"></div>
+<footer style="margin-top:1.5rem;text-align:center;">
             <p class="store-legal" style="font-size:0.75rem;color:var(--slate-500);line-height:1.5;">
               This game is 100% free and ad-free. All 1,000 levels in every difficulty are open. Coins you earn by playing stay on this device.
             </p>
