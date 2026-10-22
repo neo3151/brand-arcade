@@ -13,7 +13,9 @@ Gameplay hints, undos, and power-ups stay on the Fair Play daily refill. This ph
 
 The four original phosphors (Cyberpunk Neon, Game Boy DMG-01, Amber Phosphor CRT, Midnight Synthwave) have no entitlement and stay free. Locked themes can be previewed. `applyTheme` refuses them until the entitlement is active. XP and achievements are never products.
 
-Plugin: `@revenuecat/purchases-capacitor` **9.2.2**, which peers `@capacitor/core` `^6.0.0` (this hub is Capacitor 6.2.x). Releases 10 and newer require Capacitor 7+.
+Plugin pin: `@revenuecat/purchases-capacitor` **13.7.6** on Capacitor **8.5.3** (hub only). That plugin pins `PurchasesHybridCommon` **19.15.0**, which pins RevenueCat iOS **5.98.0**. Standalone game apps stay on their own Capacitor 6 projects and do not depend on this plugin.
+
+`purchases-capacitor` 9.2.2 (Capacitor 6) pulls `PurchasesHybridCommon` 13.26.0 / RevenueCat 5.20.0, which does not compile on Xcode 27.1 (`invalid redeclaration of synthesized memberwise init(stringRepresentation:)` in `PaywallColor.swift`, and the matching ambiguous init in `CustomerCenterConfigData.swift`). Plugin 10.0.2 does not fix that: it still depends on `PurchasesHybridCommon` 13.17.1. The newest Capacitor 7 plugin, 11.3.3, stops at RevenueCat 5.67.1, which still has the same synthesized-init bug. RevenueCat 5.89.0 moved the designated initializer into the struct body, and 5.98.0 is the version `PurchasesHybridCommon` 19.15.0 requires. Reaching that pod means Capacitor 8.
 
 ## Where API keys go
 
@@ -37,11 +39,19 @@ npm run bundle:store
 node sync-hub.js
 ```
 
-Register the native plugin with the iOS and Android projects (generated Capacitor files such as `android/capacitor.settings.gradle` stay gitignored):
+The hub iOS deployment target is already 15.0, which matches the plugin. Android Gradle is the Capacitor 8.5 template (AGP 8.13.0, Gradle 8.14.3, compileSdk 36, minSdk 24). `ios/App/Podfile` includes the `RevenuecatPurchasesCapacitor` pod.
+
+After pulling this branch, refresh native deps from the hub repo root. A stale `Pods/` directory from the Capacitor 6 plugin will keep compiling RevenueCat 5.20.0.
 
 ```bash
+npm install
+npm run bundle:store
 npm run cap:sync
 ```
+
+`cap sync` copies `www/` and runs `pod install` on macOS. If sync is not convenient, from `ios/App` run `pod install --repo-update`, then in Xcode use Product → Clean Build Folder and build again. `Podfile.lock` should show `RevenueCat` 5.98.0 and `PurchasesHybridCommon` 19.15.0.
+
+The Fair Play branch (`cursor/fair-play-economy-19bc`) does not reference RevenueCat in `package.json` or `ios/App/Podfile`.
 
 ## App Store Connect
 

@@ -9,32 +9,9 @@ var __export = (target, all) => {
 };
 
 // node_modules/@capacitor/core/dist/index.js
-var createCapacitorPlatforms, initPlatforms, CapacitorPlatforms, addPlatform, setPlatform, ExceptionCode, CapacitorException, getPlatformId, createCapacitor, initCapacitorGlobal, Capacitor, registerPlugin, Plugins, WebPlugin, encode, decode, CapacitorCookiesPluginWeb, CapacitorCookies, readBlobAsBase64, normalizeHttpHeaders, buildUrlParams, buildRequestInit, CapacitorHttpPluginWeb, CapacitorHttp;
+var ExceptionCode, CapacitorException, getPlatformId, createCapacitor, initCapacitorGlobal, Capacitor, registerPlugin, WebPlugin, encode, decode, CapacitorCookiesPluginWeb, CapacitorCookies, readBlobAsBase64, normalizeHttpHeaders, buildUrlParams, buildRequestInit, CapacitorHttpPluginWeb, CapacitorHttp, SystemBarsStyle, SystemBarType, SystemBarsPluginWeb, SystemBars;
 var init_dist = __esm({
   "node_modules/@capacitor/core/dist/index.js"() {
-    createCapacitorPlatforms = (win) => {
-      const defaultPlatformMap = /* @__PURE__ */ new Map();
-      defaultPlatformMap.set("web", { name: "web" });
-      const capPlatforms = win.CapacitorPlatforms || {
-        currentPlatform: { name: "web" },
-        platforms: defaultPlatformMap
-      };
-      const addPlatform2 = (name, platform) => {
-        capPlatforms.platforms.set(name, platform);
-      };
-      const setPlatform2 = (name) => {
-        if (capPlatforms.platforms.has(name)) {
-          capPlatforms.currentPlatform = capPlatforms.platforms.get(name);
-        }
-      };
-      capPlatforms.addPlatform = addPlatform2;
-      capPlatforms.setPlatform = setPlatform2;
-      return capPlatforms;
-    };
-    initPlatforms = (win) => win.CapacitorPlatforms = createCapacitorPlatforms(win);
-    CapacitorPlatforms = /* @__PURE__ */ initPlatforms(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : {});
-    addPlatform = CapacitorPlatforms.addPlatform;
-    setPlatform = CapacitorPlatforms.setPlatform;
     (function(ExceptionCode2) {
       ExceptionCode2["Unimplemented"] = "UNIMPLEMENTED";
       ExceptionCode2["Unavailable"] = "UNAVAILABLE";
@@ -58,18 +35,14 @@ var init_dist = __esm({
       }
     };
     createCapacitor = (win) => {
-      var _a, _b, _c, _d, _e;
       const capCustomPlatform = win.CapacitorCustomPlatform || null;
       const cap = win.Capacitor || {};
-      const Plugins2 = cap.Plugins = cap.Plugins || {};
-      const capPlatforms = win.CapacitorPlatforms;
-      const defaultGetPlatform = () => {
+      const Plugins = cap.Plugins = cap.Plugins || {};
+      const getPlatform = () => {
         return capCustomPlatform !== null ? capCustomPlatform.name : getPlatformId(win);
       };
-      const getPlatform = ((_a = capPlatforms === null || capPlatforms === void 0 ? void 0 : capPlatforms.currentPlatform) === null || _a === void 0 ? void 0 : _a.getPlatform) || defaultGetPlatform;
-      const defaultIsNativePlatform = () => getPlatform() !== "web";
-      const isNativePlatform = ((_b = capPlatforms === null || capPlatforms === void 0 ? void 0 : capPlatforms.currentPlatform) === null || _b === void 0 ? void 0 : _b.isNativePlatform) || defaultIsNativePlatform;
-      const defaultIsPluginAvailable = (pluginName) => {
+      const isNativePlatform = () => getPlatform() !== "web";
+      const isPluginAvailable = (pluginName) => {
         const plugin = registeredPlugins.get(pluginName);
         if (plugin === null || plugin === void 0 ? void 0 : plugin.platforms.has(getPlatform())) {
           return true;
@@ -79,18 +52,13 @@ var init_dist = __esm({
         }
         return false;
       };
-      const isPluginAvailable = ((_c = capPlatforms === null || capPlatforms === void 0 ? void 0 : capPlatforms.currentPlatform) === null || _c === void 0 ? void 0 : _c.isPluginAvailable) || defaultIsPluginAvailable;
-      const defaultGetPluginHeader = (pluginName) => {
-        var _a2;
-        return (_a2 = cap.PluginHeaders) === null || _a2 === void 0 ? void 0 : _a2.find((h) => h.name === pluginName);
+      const getPluginHeader = (pluginName) => {
+        var _a;
+        return (_a = cap.PluginHeaders) === null || _a === void 0 ? void 0 : _a.find((h) => h.name === pluginName);
       };
-      const getPluginHeader = ((_d = capPlatforms === null || capPlatforms === void 0 ? void 0 : capPlatforms.currentPlatform) === null || _d === void 0 ? void 0 : _d.getPluginHeader) || defaultGetPluginHeader;
       const handleError = (err) => win.console.error(err);
-      const pluginMethodNoop = (_target, prop, pluginName) => {
-        return Promise.reject(`${pluginName} does not have an implementation of "${prop}".`);
-      };
       const registeredPlugins = /* @__PURE__ */ new Map();
-      const defaultRegisterPlugin = (pluginName, jsImplementations = {}) => {
+      const registerPlugin2 = (pluginName, jsImplementations = {}) => {
         const registeredPlugin = registeredPlugins.get(pluginName);
         if (registeredPlugin) {
           console.warn(`Capacitor plugin "${pluginName}" already registered. Cannot register plugins twice.`);
@@ -108,7 +76,7 @@ var init_dist = __esm({
           return jsImplementation;
         };
         const createPluginMethod = (impl, prop) => {
-          var _a2, _b2;
+          var _a, _b;
           if (pluginHeader) {
             const methodHeader = pluginHeader === null || pluginHeader === void 0 ? void 0 : pluginHeader.methods.find((m) => prop === m.name);
             if (methodHeader) {
@@ -118,10 +86,10 @@ var init_dist = __esm({
                 return (options, callback) => cap.nativeCallback(pluginName, prop.toString(), options, callback);
               }
             } else if (impl) {
-              return (_a2 = impl[prop]) === null || _a2 === void 0 ? void 0 : _a2.bind(impl);
+              return (_a = impl[prop]) === null || _a === void 0 ? void 0 : _a.bind(impl);
             }
           } else if (impl) {
-            return (_b2 = impl[prop]) === null || _b2 === void 0 ? void 0 : _b2.bind(impl);
+            return (_b = impl[prop]) === null || _b === void 0 ? void 0 : _b.bind(impl);
           } else {
             throw new CapacitorException(`"${pluginName}" plugin is not implemented on ${platform}`, ExceptionCode.Unimplemented);
           }
@@ -187,18 +155,14 @@ var init_dist = __esm({
             }
           }
         });
-        Plugins2[pluginName] = proxy;
+        Plugins[pluginName] = proxy;
         registeredPlugins.set(pluginName, {
           name: pluginName,
           proxy,
-          platforms: /* @__PURE__ */ new Set([
-            ...Object.keys(jsImplementations),
-            ...pluginHeader ? [platform] : []
-          ])
+          platforms: /* @__PURE__ */ new Set([...Object.keys(jsImplementations), ...pluginHeader ? [platform] : []])
         });
         return proxy;
       };
-      const registerPlugin2 = ((_e = capPlatforms === null || capPlatforms === void 0 ? void 0 : capPlatforms.currentPlatform) === null || _e === void 0 ? void 0 : _e.registerPlugin) || defaultRegisterPlugin;
       if (!cap.convertFileSrc) {
         cap.convertFileSrc = (filePath) => filePath;
       }
@@ -206,28 +170,20 @@ var init_dist = __esm({
       cap.handleError = handleError;
       cap.isNativePlatform = isNativePlatform;
       cap.isPluginAvailable = isPluginAvailable;
-      cap.pluginMethodNoop = pluginMethodNoop;
       cap.registerPlugin = registerPlugin2;
       cap.Exception = CapacitorException;
       cap.DEBUG = !!cap.DEBUG;
       cap.isLoggingEnabled = !!cap.isLoggingEnabled;
-      cap.platform = cap.getPlatform();
-      cap.isNative = cap.isNativePlatform();
       return cap;
     };
     initCapacitorGlobal = (win) => win.Capacitor = createCapacitor(win);
     Capacitor = /* @__PURE__ */ initCapacitorGlobal(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : {});
     registerPlugin = Capacitor.registerPlugin;
-    Plugins = Capacitor.Plugins;
     WebPlugin = class {
-      constructor(config) {
+      constructor() {
         this.listeners = {};
         this.retainedEventArguments = {};
         this.windowListeners = {};
-        if (config) {
-          console.warn(`Capacitor WebPlugin "${config.name}" config object was deprecated in v3 and will be removed in v4.`);
-          this.config = config;
-        }
       }
       addListener(eventName, listenerFunc) {
         let firstListener = false;
@@ -271,7 +227,8 @@ var init_dist = __esm({
         listeners.forEach((listener) => listener(data));
       }
       hasListeners(eventName) {
-        return !!this.listeners[eventName].length;
+        var _a;
+        return !!((_a = this.listeners[eventName]) === null || _a === void 0 ? void 0 : _a.length);
       }
       registerWindowListener(windowEventName, pluginEventName) {
         this.windowListeners[pluginEventName] = {
@@ -295,7 +252,9 @@ var init_dist = __esm({
           return;
         }
         const index = listeners.indexOf(listenerFunc);
-        this.listeners[eventName].splice(index, 1);
+        if (index !== -1) {
+          this.listeners[eventName].splice(index, 1);
+        }
         if (!this.listeners[eventName].length) {
           this.removeWindowListener(this.windowListeners[eventName]);
         }
@@ -342,7 +301,7 @@ var init_dist = __esm({
         try {
           const encodedKey = encode(options.key);
           const encodedValue = encode(options.value);
-          const expires = `; expires=${(options.expires || "").replace("expires=", "")}`;
+          const expires = options.expires ? `; expires=${options.expires.replace("expires=", "")}` : "";
           const path = (options.path || "/").replace("path=", "");
           const domain = options.url != null && options.url.length > 0 ? `domain=${options.url}` : "";
           document.cookie = `${encodedKey}=${encodedValue || ""}${expires}; path=${path}; ${domain};`;
@@ -531,32 +490,39 @@ var init_dist = __esm({
     CapacitorHttp = registerPlugin("CapacitorHttp", {
       web: () => new CapacitorHttpPluginWeb()
     });
+    (function(SystemBarsStyle2) {
+      SystemBarsStyle2["Dark"] = "DARK";
+      SystemBarsStyle2["Light"] = "LIGHT";
+      SystemBarsStyle2["Default"] = "DEFAULT";
+    })(SystemBarsStyle || (SystemBarsStyle = {}));
+    (function(SystemBarType2) {
+      SystemBarType2["StatusBar"] = "StatusBar";
+      SystemBarType2["NavigationBar"] = "NavigationBar";
+    })(SystemBarType || (SystemBarType = {}));
+    SystemBarsPluginWeb = class extends WebPlugin {
+      async setStyle() {
+        this.unavailable("not available for web");
+      }
+      async setAnimation() {
+        this.unavailable("not available for web");
+      }
+      async show() {
+        this.unavailable("not available for web");
+      }
+      async hide() {
+        this.unavailable("not available for web");
+      }
+    };
+    SystemBars = registerPlugin("SystemBars", {
+      web: () => new SystemBarsPluginWeb()
+    });
   }
 });
 
-// node_modules/@revenuecat/purchases-typescript-internal-esm/dist/errors.js
-var __extends, PURCHASES_ERROR_CODE, UninitializedPurchasesError, UnsupportedPlatformError;
-var init_errors = __esm({
-  "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/errors.js"() {
-    __extends = /* @__PURE__ */ (function() {
-      var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
-          d2.__proto__ = b2;
-        } || function(d2, b2) {
-          for (var p in b2) if (Object.prototype.hasOwnProperty.call(b2, p)) d2[p] = b2[p];
-        };
-        return extendStatics(d, b);
-      };
-      return function(d, b) {
-        if (typeof b !== "function" && b !== null)
-          throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() {
-          this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-      };
-    })();
+// node_modules/@revenuecat/purchases-typescript-internal-esm/dist/generated/error-codes.js
+var PURCHASES_ERROR_CODE;
+var init_error_codes = __esm({
+  "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/generated/error-codes.js"() {
     (function(PURCHASES_ERROR_CODE2) {
       PURCHASES_ERROR_CODE2["UNKNOWN_ERROR"] = "0";
       PURCHASES_ERROR_CODE2["PURCHASE_CANCELLED_ERROR"] = "1";
@@ -593,7 +559,41 @@ var init_errors = __esm({
       PURCHASES_ERROR_CODE2["API_ENDPOINT_BLOCKED"] = "33";
       PURCHASES_ERROR_CODE2["INVALID_PROMOTIONAL_OFFER_ERROR"] = "34";
       PURCHASES_ERROR_CODE2["OFFLINE_CONNECTION_ERROR"] = "35";
+      PURCHASES_ERROR_CODE2["FEATURE_NOT_AVAILABLE_IN_CUSTOM_ENTITLEMENTS_COMPUTATION_MODE"] = "36";
+      PURCHASES_ERROR_CODE2["SIGNATURE_VERIFICATION_ERROR"] = "37";
+      PURCHASES_ERROR_CODE2["FEATURE_NOT_SUPPORTED_WITH_STORE_KIT_1"] = "38";
+      PURCHASES_ERROR_CODE2["INVALID_WEB_PURCHASE_TOKEN"] = "39";
+      PURCHASES_ERROR_CODE2["PURCHASE_BELONGS_TO_OTHER_USER"] = "40";
+      PURCHASES_ERROR_CODE2["EXPIRED_WEB_PURCHASE_TOKEN"] = "41";
+      PURCHASES_ERROR_CODE2["TEST_STORE_SIMULATED_PURCHASE_ERROR"] = "42";
     })(PURCHASES_ERROR_CODE || (PURCHASES_ERROR_CODE = {}));
+  }
+});
+
+// node_modules/@revenuecat/purchases-typescript-internal-esm/dist/errors.js
+var __extends, UninitializedPurchasesError, UnsupportedPlatformError;
+var init_errors = __esm({
+  "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/errors.js"() {
+    init_error_codes();
+    __extends = /* @__PURE__ */ (function() {
+      var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
+          d2.__proto__ = b2;
+        } || function(d2, b2) {
+          for (var p in b2) if (Object.prototype.hasOwnProperty.call(b2, p)) d2[p] = b2[p];
+        };
+        return extendStatics(d, b);
+      };
+      return function(d, b) {
+        if (typeof b !== "function" && b !== null)
+          throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+          this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+      };
+    })();
     UninitializedPurchasesError = /** @class */
     (function(_super) {
       __extends(UninitializedPurchasesError2, _super);
@@ -617,6 +617,85 @@ var init_errors = __esm({
   }
 });
 
+// node_modules/@revenuecat/purchases-typescript-internal-esm/dist/errorNormalizer.js
+function isRecord(value) {
+  return typeof value === "object" && value !== null;
+}
+function readPayload(error) {
+  for (var _i = 0, PAYLOAD_KEYS_1 = PAYLOAD_KEYS; _i < PAYLOAD_KEYS_1.length; _i++) {
+    var key = PAYLOAD_KEYS_1[_i];
+    var candidate = error[key];
+    if (isRecord(candidate)) {
+      return candidate;
+    }
+  }
+  return {};
+}
+function firstString() {
+  var values = [];
+  for (var _i = 0; _i < arguments.length; _i++) {
+    values[_i] = arguments[_i];
+  }
+  for (var _a = 0, values_1 = values; _a < values_1.length; _a++) {
+    var value = values_1[_a];
+    if (typeof value === "string") {
+      return value;
+    }
+  }
+  return "";
+}
+function readCode(error, payload) {
+  var _a;
+  var candidate = (_a = error.code) !== null && _a !== void 0 ? _a : payload.code;
+  var code = String(candidate);
+  return /^\d+$/.test(code) ? code : void 0;
+}
+function normalizePurchasesError(error) {
+  if (!isRecord(error)) {
+    return error;
+  }
+  var payload = readPayload(error);
+  var code = readCode(error, payload);
+  if (code === void 0) {
+    return error;
+  }
+  error.code = code;
+  var userInfo = __assign({}, payload);
+  if (typeof userInfo.readableErrorCode !== "string") {
+    userInfo.readableErrorCode = firstString(payload.readableErrorCode, error.readableErrorCode);
+  }
+  error.userInfo = userInfo;
+  if (typeof error.message !== "string" || error.message === "") {
+    error.message = firstString(payload.message);
+  }
+  if (typeof error.readableErrorCode !== "string") {
+    error.readableErrorCode = userInfo.readableErrorCode;
+  }
+  if (typeof error.underlyingErrorMessage !== "string") {
+    error.underlyingErrorMessage = firstString(payload.underlyingErrorMessage);
+  }
+  error.userCancelled = code === PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR;
+  return error;
+}
+var __assign, PAYLOAD_KEYS;
+var init_errorNormalizer = __esm({
+  "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/errorNormalizer.js"() {
+    init_error_codes();
+    __assign = function() {
+      __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+        }
+        return t;
+      };
+      return __assign.apply(this, arguments);
+    };
+    PAYLOAD_KEYS = ["userInfo", "data", "info"];
+  }
+});
+
 // node_modules/@revenuecat/purchases-typescript-internal-esm/dist/customerInfo.js
 var init_customerInfo = __esm({
   "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/customerInfo.js"() {
@@ -624,7 +703,7 @@ var init_customerInfo = __esm({
 });
 
 // node_modules/@revenuecat/purchases-typescript-internal-esm/dist/offerings.js
-var PACKAGE_TYPE, INTRO_ELIGIBILITY_STATUS, PRODUCT_CATEGORY, PRODUCT_TYPE, PRORATION_MODE, RECURRENCE_MODE, OFFER_PAYMENT_MODE, PERIOD_UNIT;
+var PACKAGE_TYPE, INTRO_ELIGIBILITY_STATUS, PRODUCT_CATEGORY, PRODUCT_TYPE, PRORATION_MODE, STORE_REPLACEMENT_MODE, BILLING_PLAN_TYPE, RECURRENCE_MODE, OFFER_PAYMENT_MODE, PERIOD_UNIT;
 var init_offerings = __esm({
   "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/offerings.js"() {
     (function(PACKAGE_TYPE2) {
@@ -665,6 +744,18 @@ var init_offerings = __esm({
       PRORATION_MODE2[PRORATION_MODE2["DEFERRED"] = 6] = "DEFERRED";
       PRORATION_MODE2[PRORATION_MODE2["IMMEDIATE_AND_CHARGE_FULL_PRICE"] = 5] = "IMMEDIATE_AND_CHARGE_FULL_PRICE";
     })(PRORATION_MODE || (PRORATION_MODE = {}));
+    (function(STORE_REPLACEMENT_MODE2) {
+      STORE_REPLACEMENT_MODE2["WITHOUT_PRORATION"] = "WITHOUT_PRORATION";
+      STORE_REPLACEMENT_MODE2["WITH_TIME_PRORATION"] = "WITH_TIME_PRORATION";
+      STORE_REPLACEMENT_MODE2["CHARGE_FULL_PRICE"] = "CHARGE_FULL_PRICE";
+      STORE_REPLACEMENT_MODE2["CHARGE_PRORATED_PRICE"] = "CHARGE_PRORATED_PRICE";
+      STORE_REPLACEMENT_MODE2["DEFERRED"] = "DEFERRED";
+    })(STORE_REPLACEMENT_MODE || (STORE_REPLACEMENT_MODE = {}));
+    (function(BILLING_PLAN_TYPE2) {
+      BILLING_PLAN_TYPE2["UP_FRONT"] = "UP_FRONT";
+      BILLING_PLAN_TYPE2["MONTHLY"] = "MONTHLY";
+      BILLING_PLAN_TYPE2["UNKNOWN"] = "UNKNOWN";
+    })(BILLING_PLAN_TYPE || (BILLING_PLAN_TYPE = {}));
     (function(RECURRENCE_MODE2) {
       RECURRENCE_MODE2[RECURRENCE_MODE2["INFINITE_RECURRING"] = 1] = "INFINITE_RECURRING";
       RECURRENCE_MODE2[RECURRENCE_MODE2["FINITE_RECURRING"] = 2] = "FINITE_RECURRING";
@@ -747,6 +838,12 @@ var init_enums = __esm({
   }
 });
 
+// node_modules/@revenuecat/purchases-typescript-internal-esm/dist/purchaseParams.js
+var init_purchaseParams = __esm({
+  "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/purchaseParams.js"() {
+  }
+});
+
 // node_modules/@revenuecat/purchases-typescript-internal-esm/dist/purchasesConfiguration.js
 var init_purchasesConfiguration = __esm({
   "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/purchasesConfiguration.js"() {
@@ -773,16 +870,39 @@ var init_webRedemption = __esm({
   }
 });
 
+// node_modules/@revenuecat/purchases-typescript-internal-esm/dist/storefront.js
+var init_storefront = __esm({
+  "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/storefront.js"() {
+  }
+});
+
+// node_modules/@revenuecat/purchases-typescript-internal-esm/dist/virtualCurrency.js
+var init_virtualCurrency = __esm({
+  "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/virtualCurrency.js"() {
+  }
+});
+
+// node_modules/@revenuecat/purchases-typescript-internal-esm/dist/paywallInteractionEvent.js
+var init_paywallInteractionEvent = __esm({
+  "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/paywallInteractionEvent.js"() {
+  }
+});
+
 // node_modules/@revenuecat/purchases-typescript-internal-esm/dist/index.js
 var init_dist2 = __esm({
   "node_modules/@revenuecat/purchases-typescript-internal-esm/dist/index.js"() {
     init_errors();
+    init_errorNormalizer();
     init_customerInfo();
     init_offerings();
     init_enums();
+    init_purchaseParams();
     init_purchasesConfiguration();
     init_callbackTypes();
     init_webRedemption();
+    init_storefront();
+    init_virtualCurrency();
+    init_paywallInteractionEvent();
   }
 });
 
@@ -821,9 +941,20 @@ var init_web = __esm({
           nonSubscriptionTransactions: [],
           subscriptionsByProductIdentifier: {}
         };
+        this.mockEmptyVirtualCurrencies = {
+          all: {}
+        };
       }
       configure(_configuration) {
         return this.mockNonReturningFunctionIfEnabled("configure");
+      }
+      parseAsWebPurchaseRedemption(_options) {
+        return this.mockReturningFunctionIfEnabled("parseAsWebPurchaseRedemption", { webPurchaseRedemption: null });
+      }
+      redeemWebPurchase(_options) {
+        return this.mockReturningFunctionIfEnabled("redeemWebPurchase", {
+          result: WebPurchaseRedemptionResultType.INVALID_TOKEN
+        });
       }
       setMockWebResults(options) {
         this.shouldMockWebResults = options.shouldMockWebResults;
@@ -919,6 +1050,11 @@ var init_web = __esm({
       getAppUserID() {
         return this.mockReturningFunctionIfEnabled("getAppUserID", {
           appUserID: "test-web-user-id"
+        });
+      }
+      getStorefront() {
+        return this.mockReturningFunctionIfEnabled("getStorefront", {
+          countryCode: "USA"
         });
       }
       logIn(_appUserID) {
@@ -1030,6 +1166,9 @@ var init_web = __esm({
       setOnesignalUserID(_onesignalUserID) {
         return this.mockNonReturningFunctionIfEnabled("setOnesignalUserID");
       }
+      setSingularDeviceID(_singularDeviceID) {
+        return this.mockNonReturningFunctionIfEnabled("setSingularDeviceID");
+      }
       setAirshipChannelID(_airshipChannelID) {
         return this.mockNonReturningFunctionIfEnabled("setAirshipChannelID");
       }
@@ -1081,11 +1220,33 @@ var init_web = __esm({
         const mockResult = { isConfigured: true };
         return this.mockReturningFunctionIfEnabled("isConfigured", mockResult);
       }
+      overridePreferredUILocale(_options) {
+        return this.mockNonReturningFunctionIfEnabled("overridePreferredUILocale");
+      }
+      getVirtualCurrencies() {
+        return this.mockReturningFunctionIfEnabled("getVirtualCurrencies", {
+          virtualCurrencies: this.mockEmptyVirtualCurrencies
+        });
+      }
+      invalidateVirtualCurrenciesCache() {
+        return this.mockNonReturningFunctionIfEnabled("invalidateVirtualCurrenciesCache");
+      }
+      getCachedVirtualCurrencies() {
+        return this.mockReturningFunctionIfEnabled("getCachedVirtualCurrencies", {
+          cachedVirtualCurrencies: this.mockEmptyVirtualCurrencies
+        });
+      }
+      trackCustomPaywallImpression(_options) {
+        return this.mockNonReturningFunctionIfEnabled("trackCustomPaywallImpression");
+      }
       mockTransaction(productIdentifier) {
         return {
           productIdentifier,
           purchaseDate: (/* @__PURE__ */ new Date()).toISOString(),
-          transactionIdentifier: ""
+          transactionIdentifier: "",
+          purchaseToken: null,
+          originalJson: null,
+          signature: null
         };
       }
       mockNonReturningFunctionIfEnabled(functionName) {
@@ -1111,13 +1272,74 @@ init_dist();
 
 // node_modules/@revenuecat/purchases-capacitor/dist/esm/index.js
 init_dist();
+init_dist2();
 
 // node_modules/@revenuecat/purchases-capacitor/dist/esm/definitions.js
 init_dist2();
 
 // node_modules/@revenuecat/purchases-capacitor/dist/esm/index.js
-var Purchases = registerPlugin("Purchases", {
+var nativePlugin = registerPlugin("Purchases", {
   web: () => Promise.resolve().then(() => (init_web(), web_exports)).then((m) => new m.PurchasesWeb())
+});
+function normalizeRejection(result) {
+  if (!(result instanceof Promise)) {
+    return result;
+  }
+  const normalized = result.then(void 0, (error) => {
+    throw normalizePurchasesError(error);
+  });
+  const remove = result.remove;
+  if (typeof remove === "function") {
+    normalized.remove = remove;
+  }
+  return normalized;
+}
+function normalizeRedemptionError(result) {
+  if (!(result instanceof Promise)) {
+    return result;
+  }
+  return result.then((redemption) => {
+    normalizePurchasesError(redemption === null || redemption === void 0 ? void 0 : redemption.error);
+    return redemption;
+  });
+}
+function getNativeTrackCustomPaywallImpressionOptions(options) {
+  var _a;
+  const offering = options === null || options === void 0 ? void 0 : options.offering;
+  const nativeOptions = {};
+  if ((options === null || options === void 0 ? void 0 : options.paywallId) != null) {
+    nativeOptions.paywallId = options.paywallId;
+  }
+  if (offering != null) {
+    nativeOptions.offeringId = offering.identifier;
+    const presentedOfferingContext = (_a = offering.availablePackages[0]) === null || _a === void 0 ? void 0 : _a.presentedOfferingContext;
+    if (presentedOfferingContext != null) {
+      nativeOptions.presentedOfferingContext = presentedOfferingContext;
+    }
+  } else if ((options === null || options === void 0 ? void 0 : options.offeringId) != null) {
+    nativeOptions.offeringId = options.offeringId;
+  }
+  return nativeOptions;
+}
+function toNativeArgs(prop, args) {
+  if (prop !== "trackCustomPaywallImpression") {
+    return args;
+  }
+  return [getNativeTrackCustomPaywallImpressionOptions(args[0])];
+}
+var Purchases = new Proxy(nativePlugin, {
+  get(target, prop, receiver) {
+    const value = Reflect.get(target, prop, receiver);
+    if (typeof value !== "function") {
+      return value;
+    }
+    return new Proxy(value, {
+      apply: (method, _thisArg, args) => {
+        const result = normalizeRejection(Reflect.apply(method, target, toNativeArgs(prop, args)));
+        return prop === "redeemWebPurchase" ? normalizeRedemptionError(result) : result;
+      }
+    });
+  }
 });
 export {
   Capacitor,
