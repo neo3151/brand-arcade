@@ -1,5 +1,7 @@
 /**
- * arcade-store.js — Hub-only RevenueCat store (Phase 1).
+ * arcade-store.js — Hub-only RevenueCat store.
+ * Phase 1: Arcade Patron and premium CRT phosphors.
+ * Phase 2: per-game cosmetic skins and packs. Gameplay stays free.
  *
  * Standalone game apps do not load this file. On the web and the installed
  * PWA, init() sees a non-native platform and leaves every price unavailable.
@@ -48,6 +50,97 @@
       kind: 'theme',
       themeId: 'tron',
       name: 'Tron Grid'
+    },
+    {
+      id: 'marble',
+      productId: 'com.gamingempire.benchmarkarcade.blockblast.skin.marble',
+      entitlementId: 'blockblast_skin_marble',
+      kind: 'cosmetic',
+      name: 'Marble'
+    },
+    {
+      id: 'walnut',
+      productId: 'com.gamingempire.benchmarkarcade.blockblast.skin.walnut',
+      entitlementId: 'blockblast_skin_walnut',
+      kind: 'cosmetic',
+      name: 'Walnut Inlay'
+    },
+    {
+      id: 'stainedglass',
+      productId: 'com.gamingempire.benchmarkarcade.blockblast.skin.stainedglass',
+      entitlementId: 'blockblast_skin_stainedglass',
+      kind: 'cosmetic',
+      name: 'Stained Glass'
+    },
+    {
+      id: 'solitaire-atelier',
+      productId: 'com.gamingempire.benchmarkarcade.solitaire.pack.atelier',
+      entitlementId: 'solitaire_pack_atelier',
+      kind: 'cosmetic',
+      name: 'Solitaire Atelier'
+    },
+    {
+      id: 'spider-atelier',
+      productId: 'com.gamingempire.benchmarkarcade.spidersolitaire.pack.atelier',
+      entitlementId: 'spidersolitaire_pack_atelier',
+      kind: 'cosmetic',
+      name: 'Spider Atelier'
+    },
+    {
+      id: 'cardroom',
+      productId: 'com.gamingempire.benchmarkarcade.cardroom.pack.cardroom',
+      entitlementId: 'cardroom_pack',
+      kind: 'cosmetic',
+      name: 'Card Room'
+    },
+    {
+      id: 'spades-salon',
+      productId: 'com.gamingempire.benchmarkarcade.spades.pack.salon',
+      entitlementId: 'spades_pack_salon',
+      kind: 'cosmetic',
+      name: 'Spades Salon'
+    },
+    {
+      id: 'mahjong-tiles',
+      productId: 'com.gamingempire.benchmarkarcade.mahjong.pack.tiles',
+      entitlementId: 'mahjong_pack_tiles',
+      kind: 'cosmetic',
+      name: 'Mahjong Tiles'
+    },
+    {
+      id: 'minesweeper-sectors',
+      productId: 'com.gamingempire.benchmarkarcade.minesweeper.pack.sectors',
+      entitlementId: 'minesweeper_pack_sectors',
+      kind: 'cosmetic',
+      name: 'Minesweeper Sectors'
+    },
+    {
+      id: 'codebreaker-terminals',
+      productId: 'com.gamingempire.benchmarkarcade.codebreaker.pack.terminals',
+      entitlementId: 'codebreaker_pack_terminals',
+      kind: 'cosmetic',
+      name: 'Codebreaker Terminals'
+    },
+    {
+      id: 'sudoku-ink',
+      productId: 'com.gamingempire.benchmarkarcade.sudoku.pack.ink',
+      entitlementId: 'sudoku_pack_ink',
+      kind: 'cosmetic',
+      name: 'Sudoku Ink'
+    },
+    {
+      id: 'nonogram-mosaic',
+      productId: 'com.gamingempire.benchmarkarcade.nonogram.pack.mosaic',
+      entitlementId: 'nonogram_pack_mosaic',
+      kind: 'cosmetic',
+      name: 'Nonogram Mosaic'
+    },
+    {
+      id: 'wordsearch-atlas',
+      productId: 'com.gamingempire.benchmarkarcade.wordsearch.pack.atlas',
+      entitlementId: 'wordsearch_pack_atlas',
+      kind: 'cosmetic',
+      name: 'Word Search Atlas'
     }
   ];
 

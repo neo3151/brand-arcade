@@ -2,6 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+<script id="arcade-cosmetics-loader">
+(function () {
+  var parts = location.pathname.split('/').filter(Boolean);
+  if (parts.length && /\.[a-z0-9]+$/i.test(parts[parts.length - 1])) parts.pop();
+  if (parts.length < 1) return;
+  var prefix = '';
+  for (var i = 0; i < parts.length; i++) prefix += '../';
+  document.write(
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-cosmetics.css">' +
+    '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+  );
+})();
+</script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="description" content="Zen Nonogram: Pixel Tapestry — Ad-free Japanese logic picture puzzles with 5,000 seeded levels and smart step-by-step hints." />
   <title>Zen Nonogram: Pixel Tapestry</title>

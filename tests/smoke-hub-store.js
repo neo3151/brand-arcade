@@ -93,7 +93,7 @@ async function main() {
         }
         if (msg.method === 'Network.responseReceived') {
           const resp = msg.params.response;
-          if (resp.status >= 400 && /arcade-store|arcade-passport|arcade-purchases|index\.html/.test(resp.url)) {
+          if (resp.status >= 400 && /arcade-store|arcade-passport|arcade-purchases|arcade-cosmetics|index\.html/.test(resp.url)) {
             problems.push('http ' + resp.status + ' ' + resp.url);
           }
         }
@@ -141,8 +141,9 @@ async function main() {
       const value = evalResult.result && evalResult.result.value;
       if (!value) problems.push('no eval result');
       else if (name === 'blockblast menu') {
-        if (value.store) problems.push('game page loaded ArcadeStore');
-        if (value.refused !== false && value.refused !== 'missing') problems.push('unexpected apply ' + value.refused);
+        if (!value.store) problems.push('hub game page did not load ArcadeStore');
+        if (value.price !== null) problems.push('web price ' + value.price);
+        if (value.priceText) problems.push('price text ' + value.priceText);
       } else {
         if (!value.store) problems.push('ArcadeStore missing');
         if (!value.native) problems.push('Capacitor bridge did not load');

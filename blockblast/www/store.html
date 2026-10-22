@@ -2,6 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+<script id="arcade-cosmetics-loader">
+(function () {
+  var parts = location.pathname.split('/').filter(Boolean);
+  if (parts.length && /\.[a-z0-9]+$/i.test(parts[parts.length - 1])) parts.pop();
+  if (parts.length < 1) return;
+  var prefix = '';
+  for (var i = 0; i < parts.length; i++) prefix += '../';
+  document.write(
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-cosmetics.css">' +
+    '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+  );
+})();
+</script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Timber Block Blast — Themes & Supply</title>
   <link rel="stylesheet" href="css/main.css">
@@ -47,7 +64,8 @@
             <!-- Populated dynamically -->
           </div>
 
-          <footer style="margin-top:auto;text-align:center;">
+          <div id="paid-cosmetic-shelf"></div>
+<footer style="margin-top:auto;text-align:center;">
             <p class="store-legal">Themes are bought with coins you earn by playing. This game is 100% free and ad-free.</p>
           </footer>
         </div>
@@ -129,10 +147,13 @@
 
         const unlocked = window.Progress.getUnlockedThemes();
         const selected = window.Progress.getSelectedTheme();
+        const paidOn = window.ArcadeCosmetics && window.ArcadeCosmetics.equippedId
+          ? window.ArcadeCosmetics.equippedId('blockblast')
+          : '';
 
         themes.forEach(th => {
           const isUnlocked = unlocked.includes(th.id);
-          const isSelected = selected === th.id;
+          const isSelected = !paidOn && selected === th.id;
 
           const card = document.createElement('div');
           card.className = `theme-card ${isSelected ? 'active' : ''}`;
@@ -196,6 +217,9 @@
       updateCoinsDisplay();
       renderSupply();
       renderThemes();
+      if (window.ArcadeCosmetics && window.ArcadeCosmetics.on) {
+        window.ArcadeCosmetics.on('change', renderThemes);
+      }
     });
   </script>
   <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
