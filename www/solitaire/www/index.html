@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Curious Solitaire — A Whimsical Card Journey</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/menu.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+</head>
+<body>
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+      <div class="menu-container">
+    <!-- Brand / Title -->
+    <div class="menu-logo-wrap">
+      <div class="menu-brand-icon">🐇⏱️</div>
+      <h1 class="menu-title">Curious Solitaire</h1>
+      <p class="menu-subtitle">Through the Looking Glass into the Queen’s Garden</p>
+    </div>
+
+    <!-- Main Menu Card -->
+    <div class="menu-card">
+      <!-- Mode Selection (Draw 1 vs Draw 3) -->
+      <div class="mode-selector">
+        <button id="mode-draw1" class="mode-btn mode-btn--active" type="button">Turn 1 (Curious)</button>
+        <button id="mode-draw3" class="mode-btn" type="button">Turn 3 (Classic)</button>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="menu-actions">
+        <!-- Continue Button (Hidden if no active game) -->
+        <button id="btn-continue" class="btn btn--gold menu-btn-primary" style="display: none;" type="button">
+          <span>▶</span> Resume Deal #<span id="continue-deal-num">1</span> (<span id="continue-time">00:00</span>)
+        </button>
+
+        <button id="btn-play" class="btn btn--gold menu-btn-primary" type="button">
+          <span>✨</span> Play Next Deal
+        </button>
+
+        <button id="btn-select-deal" class="btn btn--outline" type="button">
+          <span>📜</span> Choose Deal (1 – 1,000)
+        </button>
+
+        <a href="store.html" class="btn btn--crimson">
+          <span>🗝️</span> Curiosity Shop <span id="menu-powerups-badge" class="badge badge--pill">0</span>
+        </a>
+
+        <button id="btn-rules" class="btn btn--outline" type="button">
+          <span>📖</span> How to Play
+        </button>
+      </div>
+
+      <!-- Stats Strip -->
+      <div class="stats-strip">
+        <div>
+          <div id="stat-solved" class="stats-strip__val">0</div>
+          <div class="stats-strip__lbl">Deals Won</div>
+        </div>
+        <div>
+          <div id="stat-streak" class="stats-strip__val">0</div>
+          <div class="stats-strip__lbl">Daily Streak</div>
+        </div>
+        <div>
+          <div id="stat-hints" class="stats-strip__val">0</div>
+          <div class="stats-strip__lbl">Hints Left</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deal Selector Modal (1 - 1,000 Paginated) -->
+  <div id="deal-modal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title">Select a Curious Deal</h2>
+        <button id="deal-modal-close" class="modal-close-btn" type="button">&times;</button>
+      </div>
+
+      <div class="deal-pager">
+        <button id="pager-prev" class="pager-btn" type="button">&larr; Previous</button>
+        <span id="pager-label" style="font-weight: 700; color: var(--gold-300);">Deals 1 – 50</span>
+        <button id="pager-next" class="pager-btn" type="button">Next &rarr;</button>
+      </div>
+
+      <div id="deal-grid" class="deal-grid">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- How to Play Modal -->
+  <div id="rules-modal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title">Rules of the Garden</h2>
+        <button id="rules-modal-close" class="modal-close-btn" type="button">&times;</button>
+      </div>
+      <div style="font-size: 0.9rem; line-height: 1.55; color: #cbd5e1; display: flex; flex-direction: column; gap: 0.75rem;">
+        <p><strong style="color: var(--gold-400);">Objective:</strong> Build four Royal Foundations from <strong>Ace to King</strong> for each suit (♠, ♥, ♦, ♣).</p>
+        <p><strong style="color: var(--gold-400);">Tableau Building:</strong> Stack cards in <strong>descending order with alternating colors</strong> (e.g., Red 7 upon Black 8). Only <strong>Kings</strong> may move to open lanes.</p>
+        <p><strong style="color: var(--gold-400);">Touch & Drag:</strong> Drag stacks smoothly or simply <strong>tap any card</strong> to auto-send it to its best valid place.</p>
+        <p><strong style="color: var(--gold-400);">Foundation Play:</strong> You can also drag or tap cards from the foundations back down to the table if needed.</p>
+        <p><strong style="color: var(--gold-400);">Power-Ups (No Ads):</strong></p>
+        <ul style="padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem;">
+          <li><strong>Looking Glass Hint:</strong> Reveals the smartest strategic move and explains why (free guidance for deck draws).</li>
+          <li><strong>Cheshire Peek:</strong> Flips a face-down card temporarily to reveal what lies ahead.</li>
+          <li><strong>Wonderland Reshuffle:</strong> Reshuffles the pocket deck when you find yourself in a corner (fully undoable).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/klondike-gen.js"></script>
+  <script src="js/solitaire-engine.js"></script>
+  <script src="js/progress.js"></script>
+  <script>
+    (function() {
+      let currentMode = 1; // Turn 1 default
+      let currentPage = 0;
+      const DEALS_PER_PAGE = 50;
+      const TOTAL_DEALS = 1000;
+
+      const btnDraw1 = document.getElementById('mode-draw1');
+      const btnDraw3 = document.getElementById('mode-draw3');
+      const btnContinue = document.getElementById('btn-continue');
+      const btnPlay = document.getElementById('btn-play');
+      const btnSelectDeal = document.getElementById('btn-select-deal');
+      const btnRules = document.getElementById('btn-rules');
+
+      const dealModal = document.getElementById('deal-modal');
+      const dealModalClose = document.getElementById('deal-modal-close');
+      const rulesModal = document.getElementById('rules-modal');
+      const rulesModalClose = document.getElementById('rules-modal-close');
+
+      const pagerPrev = document.getElementById('pager-prev');
+      const pagerNext = document.getElementById('pager-next');
+      const pagerLabel = document.getElementById('pager-label');
+      const dealGrid = document.getElementById('deal-grid');
+
+      // Modals: Backdrop click & Escape key to close
+      dealModal.addEventListener('click', e => {
+        if (e.target === dealModal) dealModal.classList.remove('modal--open');
+      });
+      rulesModal.addEventListener('click', e => {
+        if (e.target === rulesModal) rulesModal.classList.remove('modal--open');
+      });
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          dealModal.classList.remove('modal--open');
+          rulesModal.classList.remove('modal--open');
+        }
+      });
+
+      // Mode toggling
+      btnDraw1.addEventListener('click', () => setMode(1));
+      btnDraw3.addEventListener('click', () => setMode(3));
+
+      function setMode(mode) {
+        currentMode = mode;
+        if (mode === 1) {
+          btnDraw1.classList.add('mode-btn--active');
+          btnDraw3.classList.remove('mode-btn--active');
+        } else {
+          btnDraw3.classList.add('mode-btn--active');
+          btnDraw1.classList.remove('mode-btn--active');
+        }
+        updateUI();
+      }
+
+      function updateUI() {
+        const progress = window.SolitaireProgress.load();
+        const activeGame = window.SolitaireProgress.getActiveGame();
+
+        // Continue Button
+        if (activeGame && activeGame.engine) {
+          btnContinue.style.display = 'inline-flex';
+          document.getElementById('continue-deal-num').textContent = activeGame.engine.dealNumber;
+          document.getElementById('continue-time').textContent = formatTime(activeGame.elapsed || 0);
+          btnContinue.onclick = () => {
+            window.location.href = `game.html?deal=${activeGame.engine.dealNumber}&mode=${activeGame.engine.drawMode}&continue=1`;
+          };
+        } else {
+          btnContinue.style.display = 'none';
+        }
+
+        // Play Next Deal Button
+        const modeKey = currentMode === 3 ? 'draw3' : 'draw1';
+        const completedDeals = progress[modeKey]?.completed || [];
+        let nextDeal = 1;
+        while (completedDeals.includes(nextDeal) && nextDeal < TOTAL_DEALS) {
+          nextDeal++;
+        }
+
+        btnPlay.onclick = () => {
+          if (activeGame && activeGame.engine) {
+            if (!confirm(`An unfinished game (Deal #${activeGame.engine.dealNumber}) is currently in progress. Start a fresh deal?`)) {
+              return;
+            }
+            window.SolitaireProgress.clearActiveGame();
+          }
+          window.location.href = `game.html?deal=${nextDeal}&mode=${currentMode}`;
+        };
+
+        // Stats
+        document.getElementById('stat-solved').textContent = progress.stats.gamesWon || 0;
+        document.getElementById('stat-streak').textContent = progress.streak.count || 0;
+        document.getElementById('stat-hints').textContent = progress.hints || 0;
+
+        const totalPowerups = (progress.hints || 0) + (progress.peeks || 0) + (progress.shuffles || 0);
+        const powerupBadge = document.getElementById('menu-powerups-badge');
+        if (powerupBadge) powerupBadge.textContent = totalPowerups;
+      }
+
+      // Modals
+      btnSelectDeal.addEventListener('click', () => {
+        dealModal.classList.add('modal--open');
+        renderDealGrid();
+      });
+      dealModalClose.addEventListener('click', () => dealModal.classList.remove('modal--open'));
+
+      btnRules.addEventListener('click', () => rulesModal.classList.add('modal--open'));
+      rulesModalClose.addEventListener('click', () => rulesModal.classList.remove('modal--open'));
+
+      // Pager
+      pagerPrev.addEventListener('click', () => {
+        if (currentPage > 0) {
+          currentPage--;
+          renderDealGrid();
+        }
+      });
+      pagerNext.addEventListener('click', () => {
+        const maxPages = Math.ceil(TOTAL_DEALS / DEALS_PER_PAGE);
+        if (currentPage < maxPages - 1) {
+          currentPage++;
+          renderDealGrid();
+        }
+      });
+
+      function renderDealGrid() {
+        const start = currentPage * DEALS_PER_PAGE + 1;
+        const end = Math.min(start + DEALS_PER_PAGE - 1, TOTAL_DEALS);
+        const maxPages = Math.ceil(TOTAL_DEALS / DEALS_PER_PAGE);
+
+        pagerLabel.textContent = `Deals ${start} – ${end}`;
+        pagerPrev.disabled = currentPage === 0;
+        pagerNext.disabled = currentPage >= maxPages - 1;
+
+        dealGrid.innerHTML = '';
+        const progress = window.SolitaireProgress.load();
+        const modeKey = currentMode === 3 ? 'draw3' : 'draw1';
+        const completed = progress[modeKey]?.completed || [];
+        const bestTimes = progress[modeKey]?.bestTimes || {};
+
+        for (let d = start; d <= end; d++) {
+          const isDone = completed.includes(d);
+          const cell = document.createElement('div');
+          cell.className = `deal-cell ${isDone ? 'deal-cell--completed' : ''}`;
+          cell.innerHTML = `
+            <div class="deal-cell__num">${d}</div>
+            <div class="deal-cell__badge">${isDone ? '⭐ ' + formatTime(bestTimes[d] || 0) : '—'}</div>
+          `;
+          cell.addEventListener('click', () => {
+            const active = window.SolitaireProgress.getActiveGame();
+            if (active && active.engine) {
+              if (!confirm(`Abandon current Deal #${active.engine.dealNumber} and start Deal #${d}?`)) {
+                return;
+              }
+              window.SolitaireProgress.clearActiveGame();
+            }
+            window.location.href = `game.html?deal=${d}&mode=${currentMode}`;
+          });
+          dealGrid.appendChild(cell);
+        }
+      }
+
+        updateUI();
+      })();
+    </script>
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <script src="js/mobile-shell.js"></script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

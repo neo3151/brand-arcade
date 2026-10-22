@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>BLACK VAULT — Decoding Terminal</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/game.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+</head>
+<body>
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+      <div class="game-page" style="height: 100%; max-height: 100%; flex: 1;">
+
+    <!-- Top Command HUD -->
+    <header class="hud-bar">
+      <div class="hud-group">
+        <a href="index.html" class="btn btn--secondary" id="btn-back-base" style="padding: 0.35rem 0.65rem; font-size: 0.85rem;" title="Return to Dossier Base">← BASE</a>
+        <div>
+          <div class="hud-title" id="clearance-label">Field Operative</div>
+          <div class="hud-sub">DECODING TELEPRINTER // LINE ACTIVE</div>
+        </div>
+      </div>
+
+      <div class="hud-group">
+        <div style="font-family: var(--font-typewriter); font-size: 1.15rem; font-weight: 800; color: var(--color-amber-crt); background: #111412; padding: 0.3rem 0.65rem; border: 1px solid var(--border-steel); border-radius: var(--radius-sm);" id="timer-display">
+          00:00
+        </div>
+        <button id="btn-mute" class="btn btn--secondary" style="padding: 0.35rem 0.6rem; font-size: 1.05rem;" title="Toggle Sound">🔊</button>
+        <a href="store.html" class="deaddrop-badge" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;" title="Dead Drop Tactical Armory">📦 ARMORY</a>
+      </div>
+    </header>
+
+    <!-- Decoding Terminal Viewport -->
+    <main class="terminal-viewport">
+      <div class="terminal-frame">
+
+        <!-- Concealed Vault Compartment (Top Secret Code) -->
+        <div class="vault-header">
+          <div class="vault-label">CLASSIFIED CIPHER VAULT</div>
+          <div class="vault-slots" id="vault-slots">
+            <!-- Rendered by game.js -->
+          </div>
+        </div>
+
+        <!-- Teleprinter Guess Board Rows -->
+        <div class="board-rows" id="board-rows">
+          <!-- Rendered dynamically by game.js -->
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Bottom Pin Palette Tray & Tactical Controls -->
+    <footer class="tray-bar">
+      <!-- Pin Selection Palette -->
+      <div class="color-palette" id="color-palette">
+        <!-- Rendered by game.js -->
+      </div>
+
+      <!-- Tactical Equipment Quickbar -->
+      <div class="equipment-bar">
+        <button type="button" class="equip-btn" id="btn-equip-decrypt" title="Signal Decryptor: Permanently reveals 1 secret pin compartment">
+          <span>⚡ DECRYPT</span>
+          <span class="equip-badge" id="badge-decrypt">0</span>
+        </button>
+        <button type="button" class="equip-btn" id="btn-equip-filter" title="Frequency Filter: Disables 2 non-code colors on the palette">
+          <span>📡 FILTER</span>
+          <span class="equip-badge" id="badge-filter">0</span>
+        </button>
+        <button type="button" class="equip-btn" id="btn-equip-rewind" title="Magnetic Tape Rewind: Adds +2 extra guess attempts">
+          <span>📼 REWIND</span>
+          <span class="equip-badge" id="badge-rewind">0</span>
+        </button>
+        <button type="button" class="equip-btn" id="btn-equip-probe" title="Wiretap Logic Probe: Verifies pending row against all past clues">
+          <span>🔍 PROBE</span>
+          <span class="equip-badge" id="badge-probe">0</span>
+        </button>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Victory Vault Decrypted Modal -->
+  <div class="modal-backdrop" id="victory-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: var(--color-green-crt);">★ CIPHER CRACKED // MISSION SUCCESS ★</h3>
+      </div>
+      <div class="modal-body" style="text-align: center; display: flex; flex-direction: column; gap: var(--space-4);">
+        <div id="modal-record-badge" style="display: none; background: #b45309; color: #fff; font-family: var(--font-typewriter); font-size: 0.85rem; font-weight: 800; padding: 0.3rem 0.8rem; border-radius: 2px; align-self: center;">
+          ★ NEW CLEARANCE RECORD ★
+        </div>
+
+        <p style="font-size: 0.95rem; color: var(--color-text-main);">
+          Teleprinter signal fully descrambled. The classified code sequence has been extracted from the bunker vault without detection.
+        </p>
+
+        <div style="background: #111512; border: 1.5px solid var(--border-steel); border-radius: var(--radius-sm); padding: var(--space-4); display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2);">
+          <div>
+            <div style="font-family: var(--font-typewriter); font-size: 0.75rem; color: var(--color-text-muted);">TIME</div>
+            <div style="font-family: var(--font-typewriter); font-size: 1.4rem; font-weight: 900; color: var(--color-amber-crt);" id="modal-time">00:00</div>
+          </div>
+          <div>
+            <div style="font-family: var(--font-typewriter); font-size: 0.75rem; color: var(--color-text-muted);">ROWS USED</div>
+            <div style="font-family: var(--font-typewriter); font-size: 1.4rem; font-weight: 900; color: #fff;" id="modal-rows">0 / 10</div>
+          </div>
+          <div>
+            <div style="font-family: var(--font-typewriter); font-size: 0.75rem; color: var(--color-text-muted);">STREAK</div>
+            <div style="font-family: var(--font-typewriter); font-size: 1.4rem; font-weight: 900; color: var(--color-tape-cyan);" id="modal-streak">1</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; gap: var(--space-3);">
+        <button type="button" class="btn btn--secondary" id="btn-victory-menu" style="flex: 1;">DOSSIER MENU</button>
+        <button type="button" class="btn btn--primary" id="btn-victory-next" style="flex: 1;">NEXT MISSION</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Failure Wiretap Compromised Modal -->
+  <div class="modal-backdrop" id="failure-modal">
+    <div class="modal-dialog">
+      <div class="modal-header" style="border-bottom-color: var(--color-classified-red);">
+        <h3 class="modal-title" style="color: var(--color-classified-red);">⚠ TRANSMISSION TERMINATED // COMPROMISED</h3>
+      </div>
+      <div class="modal-body" style="text-align: center; display: flex; flex-direction: column; gap: var(--space-4);">
+        <p style="font-size: 0.95rem; color: var(--color-text-main);">
+          All teleprinter paper lines were depleted. The bunker detected carrier frequency fluctuations and scrambled the cipher lock.
+        </p>
+        <p style="font-size: 0.85rem; color: var(--color-text-muted);">
+          The correct classified combination has been unmasked in the top vault compartment for debriefing analysis.
+        </p>
+      </div>
+      <div class="modal-footer" style="display: flex; gap: var(--space-3);">
+        <button type="button" class="btn btn--secondary" id="btn-failure-menu" style="flex: 1;">RETURN TO BASE</button>
+        <button type="button" class="btn btn--primary" id="btn-failure-retry" style="flex: 1;">RETRY INTERCEPT</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <script src="js/utils.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/cipher-engine.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

@@ -4,9 +4,24 @@
   "description": "Collection of web and capacitor casual games",
   "scripts": {
     "start": "npx serve -l 3000 .",
-    "serve": "npx serve -l 3000 ."
+    "serve": "npx serve -l 3000 .",
+    "build": "node sync-hub.js",
+    "sync": "node sync-hub.js",
+    "cap:sync": "node sync-hub.js && cap sync",
+    "cap:ios": "node sync-hub.js && cap open ios",
+    "cap:android": "node sync-hub.js && cap open android"
   },
-  "keywords": ["games", "html5", "capacitor"],
+  "keywords": [
+    "games",
+    "html5",
+    "capacitor"
+  ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/android": "^6.2.2",
+    "@capacitor/cli": "^6.2.2",
+    "@capacitor/core": "^6.2.2",
+    "@capacitor/ios": "^6.2.2"
+  }
 }

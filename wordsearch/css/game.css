@@ -10,7 +10,7 @@
 /* ── Header ──────────────────────────────────────────────────────────────── */
 .game-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
+  padding: calc(env(safe-area-inset-top, 0px) + var(--space-3)) var(--space-4) var(--space-3);
   background: var(--color-bg); border-bottom: 1.5px solid var(--color-border);
   position: sticky; top: 0; z-index: 50; gap: var(--space-3);
 }
@@ -23,8 +23,22 @@
   background: var(--color-bg-muted); border: 1.5px solid var(--color-border);
   color: var(--color-text-muted); padding: 0.5rem 0.75rem;
   border-radius: var(--radius-md); font-size: var(--font-size-sm); font-weight: 600;
+  cursor: pointer; touch-action: manipulation;
 }
 #back-btn:hover { background: var(--color-border); color: var(--color-text); }
+
+.btn--hub-return {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(10, 15, 29, 0.88); border: 1.5px solid #06b6d4;
+  color: #38bdf8; padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-md); font-size: var(--font-size-xs); font-weight: 700;
+  text-decoration: none; box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+  cursor: pointer; touch-action: manipulation;
+}
+.btn--hub-return:hover {
+  background: rgba(6, 182, 212, 0.18); border-color: #22d3ee; color: #e0f2fe;
+  text-decoration: none;
+}
 
 #category-badge { font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text); }
 #difficulty-badge {

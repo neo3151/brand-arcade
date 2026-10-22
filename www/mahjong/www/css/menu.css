@@ -1,0 +1,280 @@
+/* ==========================================================================
+   CELESTIAL JADE: MAHJONG SOLITAIRE — Menu & Sanctuary Styles
+   ========================================================================== */
+
+.menu-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Header */
+.menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-5);
+  margin-top: calc(env(safe-area-inset-top, 0px) + 4px);
+  background: var(--bg-surface);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.menu-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.menu-brand__icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6));
+}
+
+.menu-brand__title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: linear-gradient(180deg, #fff 0%, #c5a059 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.menu-brand__sub {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  color: var(--color-gold-leaf);
+  letter-spacing: 0.12em;
+}
+
+.emporium-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid var(--border-gold);
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-gold-leaf);
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.emporium-badge:hover {
+  background: rgba(212, 175, 55, 0.25);
+  box-shadow: 0 0 14px rgba(212, 175, 55, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Hero Section */
+.sanctuary-hero {
+  background: linear-gradient(135deg, #132a1f 0%, #0c1a13 100%);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75);
+}
+
+.sanctuary-hero::after {
+  content: '🀄';
+  position: absolute;
+  right: -20px;
+  bottom: -40px;
+  font-size: 12rem;
+  opacity: 0.04;
+  color: #fff;
+  pointer-events: none;
+}
+
+.hero-seal {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  color: var(--color-gold-leaf);
+  border: 1px solid var(--border-gold);
+  padding: 0.15rem 0.6rem;
+  border-radius: 2px;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-3);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-2);
+}
+
+.hero-desc {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  max-width: 620px;
+  line-height: 1.6;
+}
+
+/* Active Game Banner */
+.active-sanctuary-banner {
+  background: linear-gradient(135deg, #163625 0%, #0f2419 100%);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+}
+
+.active-banner-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.active-banner-sub {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: var(--color-gold-leaf);
+}
+
+/* Layout Cards Grid */
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-4);
+}
+
+.layout-card {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-jade);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+  transition: all 0.18s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.layout-card:hover {
+  border-color: var(--border-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85), 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+.layout-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.layout-badge {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+  background: rgba(5, 150, 105, 0.2);
+  color: var(--color-jade-light);
+  border: 1px solid var(--border-jade);
+}
+
+.layout-card__title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.layout-card__specs {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-2) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.spec-val {
+  color: var(--color-gold-leaf);
+  font-weight: 700;
+}
+
+.layout-card__record {
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  color: var(--color-text-dark);
+}
+
+.layout-card__record strong {
+  color: var(--color-gold-leaf);
+}
+
+/* Records Ribbon */
+.records-ribbon {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-jade);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-3);
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.record-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.record-val {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.record-val--gold { color: var(--color-gold-leaf); }
+.record-val--jade { color: var(--color-jade-light); }
+
+.record-label {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Footer Intel */
+.sanctuary-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: 0.85rem;
+  color: var(--color-text-dark);
+  font-family: var(--font-serif);
+  padding: 0 var(--space-2);
+}

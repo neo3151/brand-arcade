@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>CELESTIAL JADE — Mahjong Solitaire</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/menu.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+</head>
+<body>
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+      <div class="menu-page">
+
+    <!-- Top Command Header -->
+    <header class="menu-header">
+      <div class="menu-brand">
+        <span class="menu-brand__icon">🀄</span>
+        <div>
+          <h1 class="menu-brand__title">CELESTIAL JADE</h1>
+          <div class="menu-brand__sub">IMPERIAL MAHJONG SANCTUARY</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: var(--space-3);">
+        <button id="btn-menu-mute" class="btn btn--secondary" style="padding: 0.35rem 0.6rem; font-size: 1.1rem;" title="Toggle Sound">🔊</button>
+        <a href="store.html" class="emporium-badge" id="emporium-link" title="Pavilion Emporium">
+          <span>🏛️ EMPORIUM</span>
+          <span id="menu-supply-total" style="color: #fff; background: #059669; padding: 0.1rem 0.45rem; border-radius: 2px; font-size: 0.75rem; font-weight: 700;">0</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Sanctuary Hero -->
+    <section class="sanctuary-hero">
+      <div class="hero-seal">IMPERIAL GARDEN ARCHIVE</div>
+      <h2 class="hero-title">ANCIENT TILE HARMONY</h2>
+      <p class="hero-desc">
+        Welcome to the peaceful pavilions of the Celestial Dynasty. Disassemble intricate 3D layered formations of 
+        hand-carved jade and ivory tiles. Match complementary pairs to clear the board, cultivate focus, and master the timeless art of Mahjong Solitaire.
+      </p>
+    </section>
+
+    <!-- Active Game Continuity Banner -->
+    <section class="active-sanctuary-banner" id="active-game-banner" style="display: none;">
+      <div>
+        <div class="active-banner-title">IN-PROGRESS SESSION DETECTED</div>
+        <div class="active-banner-sub" id="active-game-info">LAYOUT: THE CLASSIC TURTLE // 96 TILES REMAINING</div>
+      </div>
+      <div style="display: flex; gap: var(--space-2);">
+        <a href="#" id="btn-resume-session" class="btn btn--primary">RESUME SESSION</a>
+        <button id="btn-abort-session" class="btn btn--danger" title="Clear and discard in-progress session">DISCARD</button>
+      </div>
+    </section>
+
+    <!-- Layout Selection -->
+    <div>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
+        <h3 style="font-family: var(--font-serif); font-size: 1.15rem; color: #fff; letter-spacing: 0.05em;">SELECT TIERED FORMATION</h3>
+        <button id="btn-rules" class="btn btn--secondary" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">📜 RULES & PROTOCOL</button>
+      </div>
+
+      <div class="layout-grid">
+        <!-- Layout 1: The Classic Turtle -->
+        <div class="layout-card" data-layout="turtle">
+          <div class="layout-card__header">
+            <span class="layout-badge">ICONIC PYRAMID</span>
+            <span style="font-size: 1.4rem;">🐢</span>
+          </div>
+          <div class="layout-card__title">The Classic Turtle</div>
+          <div class="layout-card__specs">
+            <div>Total Tiles: <span class="spec-val">144 Tiles</span></div>
+            <div>Layers: <span class="spec-val">5 Tiered Levels</span></div>
+            <div>Difficulty: <span class="spec-val">Balanced Masterpiece</span></div>
+          </div>
+          <div class="layout-card__record" id="record-turtle">
+            Best Clear: <strong>--:--</strong>
+          </div>
+          <a href="game.html?layout=turtle" class="btn btn--primary start-btn" style="text-align: center; margin-top: auto;">ENTER TURTLE</a>
+        </div>
+
+        <!-- Layout 2: The Imperial Dragon -->
+        <div class="layout-card" data-layout="dragon">
+          <div class="layout-card__header">
+            <span class="layout-badge" style="background: rgba(217, 119, 6, 0.2); color: #f59e0b; border-color: #d97706;">SERPENTINE</span>
+            <span style="font-size: 1.4rem;">🐉</span>
+          </div>
+          <div class="layout-card__title">The Imperial Dragon</div>
+          <div class="layout-card__specs">
+            <div>Total Tiles: <span class="spec-val">144 Tiles</span></div>
+            <div>Layers: <span class="spec-val">5 Tiered Levels</span></div>
+            <div>Difficulty: <span class="spec-val">Deep Strategy</span></div>
+          </div>
+          <div class="layout-card__record" id="record-dragon">
+            Best Clear: <strong>--:--</strong>
+          </div>
+          <a href="game.html?layout=dragon" class="btn btn--primary start-btn" style="text-align: center; margin-top: auto;">ENTER DRAGON</a>
+        </div>
+
+        <!-- Layout 3: The Stone Fortress -->
+        <div class="layout-card" data-layout="fortress">
+          <div class="layout-card__header">
+            <span class="layout-badge" style="background: rgba(2, 132, 199, 0.2); color: #38bdf8; border-color: #0284c7;">DOUBLE BASTIONS</span>
+            <span style="font-size: 1.4rem;">🏯</span>
+          </div>
+          <div class="layout-card__title">The Stone Fortress</div>
+          <div class="layout-card__specs">
+            <div>Total Tiles: <span class="spec-val">144 Tiles</span></div>
+            <div>Layers: <span class="spec-val">5 Tiered Levels</span></div>
+            <div>Difficulty: <span class="spec-val">Rampart Defense</span></div>
+          </div>
+          <div class="layout-card__record" id="record-fortress">
+            Best Clear: <strong>--:--</strong>
+          </div>
+          <a href="game.html?layout=fortress" class="btn btn--primary start-btn" style="text-align: center; margin-top: auto;">ENTER FORTRESS</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sanctuary Records Ribbon -->
+    <section class="records-ribbon">
+      <div class="record-item">
+        <div class="record-val record-val--gold" id="stat-attempted">0</div>
+        <div class="record-label">Sanctuaries Entered</div>
+      </div>
+      <div class="record-item">
+        <div class="record-val record-val--jade" id="stat-cleared">0</div>
+        <div class="record-label">Formations Cleared</div>
+      </div>
+      <div class="record-item">
+        <div class="record-val" id="stat-streak">0</div>
+        <div class="record-label">Active Harmony Streak</div>
+      </div>
+      <div class="record-item">
+        <div class="record-val record-val--gold" id="stat-best-streak">0</div>
+        <div class="record-label">Best Streak</div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="sanctuary-footer">
+      <div>CELESTIAL JADE v1.0 // 100% AD-FREE IMPERIAL SOLITAIRE</div>
+      <div>PURE OFFLINE ENGINE</div>
+    </footer>
+
+  </div>
+
+  <!-- Rules Protocol Dialog -->
+  <div class="modal-backdrop" id="rules-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">THE PATH OF HARMONY // RULES</h3>
+        <button class="modal-close-btn" id="btn-close-rules">✕</button>
+      </div>
+      <div class="modal-body" style="font-size: 0.92rem; line-height: 1.6; display: flex; flex-direction: column; gap: var(--space-3);">
+        <p><strong>1. OBJECTIVE:</strong> Clear all 144 carved jade and bone tiles from the sacred formation by matching open pairs.</p>
+        
+        <p><strong>2. MATCHING PRINCIPLES:</strong></p>
+        <ul style="padding-left: 1.2rem; display: flex; flex-direction: column; gap: 6px;">
+          <li><strong>Suits & Honors (Wan, Bamboo, Dots, Winds, Dragons):</strong> Must match exactly in both suit and value (e.g. 5-Bamboo matches 5-Bamboo; East Wind matches East Wind).</li>
+          <li><strong style="color: #ea580c;">Seasons (🌸 Spring, ☀️ Summer, 🍁 Autumn, ❄️ Winter):</strong> Any Season tile matches with <em>any</em> other Season tile!</li>
+          <li><strong style="color: #10b981;">Flowers (🌺 Plum, 🌿 Orchid, 🌼 Chrysanthemum, 🎋 Bamboo):</strong> Any Flower tile matches with <em>any</em> other Flower tile!</li>
+        </ul>
+
+        <p><strong>3. FREE TILE CONDITIONS:</strong> A tile is selectable only when:</p>
+        <ul style="padding-left: 1.2rem; display: flex; flex-direction: column; gap: 6px;">
+          <li>No tile is resting directly on top of it on a higher layer.</li>
+          <li>At least one lateral side (left or right) is open and unblocked.</li>
+        </ul>
+        <p style="font-size: 0.85rem; color: var(--color-gold-leaf);"><em>Tip: Free tiles are bright and interactive. Blocked tiles are dimmed to guide your vision effortlessly.</em></p>
+
+        <p><strong>4. SACRED EMPORIUM SUPPLIES:</strong></p>
+        <ul style="padding-left: 1.2rem; display: flex; flex-direction: column; gap: 6px;">
+          <li><strong>Compass Hint (🧭):</strong> Illuminates an open matching pair with a vibrant jade pulse.</li>
+          <li><strong>Dragon Shuffle (🐉):</strong> Rearranges remaining tiles to open matching paths.</li>
+          <li><strong>Time Rewind (⏳):</strong> Reverses the last match and restores both tiles to the board.</li>
+          <li><strong>Celestial Lotus (🪷):</strong> Banishes any chosen free tile and its open matching twin (or any open pair).</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--primary" id="btn-ok-rules" style="width: 100%;">ACKNOWLEDGED // ENTER SANCTUARY</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <script src="js/utils.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/mahjong-tiles.js"></script>
+  <script src="js/layouts.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Audio Mute toggle
+      const muteBtn = document.getElementById('btn-menu-mute');
+      function syncMute() {
+        if (muteBtn) {
+          muteBtn.textContent = Utils.sound.isMuted() ? '🔇' : '🔊';
+        }
+      }
+      if (muteBtn) {
+        muteBtn.addEventListener('click', () => {
+          Utils.sound.toggleMute();
+          syncMute();
+        });
+        syncMute();
+      }
+
+      function formatTime(totalSeconds) {
+        if (totalSeconds === null || totalSeconds === undefined) return '--:--';
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }
+
+      // Emporium Inventory Counter
+      const inv = Progress.getInventory();
+      const totalSupplies = (inv.hints || 0) + (inv.shuffles || 0) + (inv.undos || 0) + (inv.lotuses || 0);
+      const supplyBadge = document.getElementById('menu-supply-total');
+      if (supplyBadge) supplyBadge.textContent = totalSupplies;
+
+      // Stats Ribbon
+      const stats = Progress.getStats();
+      const attEl = document.getElementById('stat-attempted');
+      const clrEl = document.getElementById('stat-cleared');
+      const stkEl = document.getElementById('stat-streak');
+      const bstEl = document.getElementById('stat-best-streak');
+
+      if (attEl) attEl.textContent = stats.gamesAttempted;
+      if (clrEl) clrEl.textContent = stats.gamesCleared;
+      if (stkEl) stkEl.textContent = stats.currentStreak;
+      if (bstEl) bstEl.textContent = stats.bestStreak;
+
+      // Layout Records
+      ['turtle', 'dragon', 'fortress'].forEach(layoutId => {
+        const recEl = document.getElementById(`record-${layoutId}`);
+        if (recEl) {
+          const t = formatTime(stats.bestTimes[layoutId]);
+          recEl.innerHTML = `Best Clear: <strong>${t}</strong>`;
+        }
+      });
+
+      // Active Session Banner Check
+      const active = Progress.getActiveGame();
+      const banner = document.getElementById('active-game-banner');
+      const resumeBtn = document.getElementById('btn-resume-session');
+      const abortBtn = document.getElementById('btn-abort-session');
+      const infoEl = document.getElementById('active-game-info');
+
+      if (active && !active.isGameOver && active.activeTiles && active.activeTiles.length > 0 && banner) {
+        banner.style.display = 'flex';
+        const def = MahjongLayouts.DEFINITIONS[active.layoutId] || MahjongLayouts.DEFINITIONS.turtle;
+        infoEl.textContent = `LAYOUT: ${def.title.toUpperCase()} // ${active.activeTiles.length} TILES REMAINING`;
+        resumeBtn.href = `game.html?layout=${active.layoutId}&continue=1`;
+
+        abortBtn.addEventListener('click', () => {
+          if (confirm('Are you sure you want to discard this in-progress session? Progress will be cleared.')) {
+            Progress.clearActiveGame();
+            banner.style.display = 'none';
+            Utils.showToast('IN-PROGRESS SESSION DISCARDED', 2500, 'warning');
+          }
+        });
+      }
+
+      // Check active game overwrite confirmation when clicking new layout
+      document.querySelectorAll('.start-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const savedGame = Progress.getActiveGame();
+          if (savedGame && !savedGame.isGameOver && savedGame.activeTiles && savedGame.activeTiles.length > 0) {
+            if (!confirm('An in-progress sanctuary session is open. Starting a new formation will discard it. Proceed?')) {
+              e.preventDefault();
+            }
+          }
+        });
+      });
+
+      // Rules Modal
+      const rulesModal = document.getElementById('rules-modal');
+      const btnRules = document.getElementById('btn-rules');
+      const btnCloseRules = document.getElementById('btn-close-rules');
+      const btnOkRules = document.getElementById('btn-ok-rules');
+
+      function openRules() {
+        if (rulesModal) rulesModal.classList.add('modal-backdrop--open');
+        Utils.sound.play('click');
+      }
+      function closeRules() {
+        if (rulesModal) rulesModal.classList.remove('modal-backdrop--open');
+        Utils.sound.play('click');
+      }
+
+      if (btnRules) btnRules.addEventListener('click', openRules);
+      if (btnCloseRules) btnCloseRules.addEventListener('click', closeRules);
+      if (btnOkRules) btnOkRules.addEventListener('click', closeRules);
+    });
+  </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

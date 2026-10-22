@@ -96,76 +96,6 @@
         </div>
       </div>
 
-      <!-- Difficulty & Level Modal -->
-      <div id="diff-modal" class="modal-backdrop">
-        <div class="modal-card">
-          <div class="modal-header">
-            <h2 class="modal-title" id="modal-heading">Choose Difficulty</h2>
-            <button class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">&times;</button>
-          </div>
-
-          <!-- Difficulties List -->
-          <div id="diff-list" class="diff-list">
-            <div class="diff-card" data-diff="beginner">
-              <div class="diff-info">
-                <div class="diff-name">Beginner</div>
-                <div class="diff-grid-size">5x5 Grid • 1,000 Levels</div>
-              </div>
-              <div class="diff-progress" id="prog-beginner">Lvl 1</div>
-            </div>
-
-            <div class="diff-card" data-diff="easy">
-              <div class="diff-info">
-                <div class="diff-name">Easy</div>
-                <div class="diff-grid-size">10x10 Grid • 1,000 Levels</div>
-              </div>
-              <div class="diff-progress" id="prog-easy">Lvl 1</div>
-            </div>
-
-            <div class="diff-card" data-diff="medium">
-              <div class="diff-info">
-                <div class="diff-name">Medium</div>
-                <div class="diff-grid-size">15x15 Grid • 1,000 Levels</div>
-              </div>
-              <div class="diff-progress" id="prog-medium">Lvl 1</div>
-            </div>
-
-            <div class="diff-card" data-diff="hard">
-              <div class="diff-info">
-                <div class="diff-name">Hard</div>
-                <div class="diff-grid-size">20x20 Grid • 1,000 Levels</div>
-              </div>
-              <div class="diff-progress" id="prog-hard">Lvl 1</div>
-            </div>
-
-            <div class="diff-card" data-diff="master">
-              <div class="diff-info">
-                <div class="diff-name">Master</div>
-                <div class="diff-grid-size">20x20 Expert • 1,000 Levels</div>
-              </div>
-              <div class="diff-progress" id="prog-master">Lvl 1</div>
-            </div>
-          </div>
-
-          <!-- Level Picker (Hidden by default, shown when difficulty picked) -->
-          <div id="level-picker" class="level-picker">
-            <div class="level-picker-header">
-              <button id="back-to-diff-btn" class="back-btn-sm">← Difficulties</button>
-              <span id="selected-diff-title" style="font-weight:800;font-size:0.9rem;color:#34d399;"></span>
-            </div>
-
-            <div class="level-pagination">
-              <button id="prev-page-btn" class="page-arrow">‹</button>
-              <span id="page-indicator">Levels 1 – 50</span>
-              <button id="next-page-btn" class="page-arrow">›</button>
-            </div>
-
-            <div class="level-grid" id="level-grid-container">
-              <!-- Populated by JS -->
-            </div>
-          </div>
-        </div>
-      </div>
     </div><!-- /.device-screen -->
 
     <!-- Virtual Home Indicator -->
@@ -173,6 +103,77 @@
       <div class="device-home-pill"></div>
     </div>
   </div><!-- /.device-shell -->
+
+  <!-- Difficulty & Level Modal (Direct Body Child for Native iOS Gestures) -->
+  <div id="diff-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-heading">Choose Difficulty</h2>
+        <button class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <!-- Difficulties List -->
+      <div id="diff-list" class="diff-list">
+        <div class="diff-card" data-diff="beginner">
+          <div class="diff-info">
+            <div class="diff-name">Beginner</div>
+            <div class="diff-grid-size">5x5 Grid • 1,000 Levels</div>
+          </div>
+          <div class="diff-progress" id="prog-beginner">Lvl 1</div>
+        </div>
+
+        <div class="diff-card" data-diff="easy">
+          <div class="diff-info">
+            <div class="diff-name">Easy</div>
+            <div class="diff-grid-size">10x10 Grid • 1,000 Levels</div>
+          </div>
+          <div class="diff-progress" id="prog-easy">Lvl 1</div>
+        </div>
+
+        <div class="diff-card" data-diff="medium">
+          <div class="diff-info">
+            <div class="diff-name">Medium</div>
+            <div class="diff-grid-size">15x15 Grid • 1,000 Levels</div>
+          </div>
+          <div class="diff-progress" id="prog-medium">Lvl 1</div>
+        </div>
+
+        <div class="diff-card" data-diff="hard">
+          <div class="diff-info">
+            <div class="diff-name">Hard</div>
+            <div class="diff-grid-size">20x20 Grid • 1,000 Levels</div>
+          </div>
+          <div class="diff-progress" id="prog-hard">Lvl 1</div>
+        </div>
+
+        <div class="diff-card" data-diff="master">
+          <div class="diff-info">
+            <div class="diff-name">Master</div>
+            <div class="diff-grid-size">20x20 Expert • 1,000 Levels</div>
+          </div>
+          <div class="diff-progress" id="prog-master">Lvl 1</div>
+        </div>
+      </div>
+
+      <!-- Level Picker (Hidden by default, shown when difficulty picked) -->
+      <div id="level-picker" class="level-picker">
+        <div class="level-picker-header">
+          <button id="back-to-diff-btn" class="back-btn-sm">← Difficulties</button>
+          <span id="selected-diff-title" style="font-weight:800;font-size:0.9rem;color:#34d399;"></span>
+        </div>
+
+        <div class="level-pagination">
+          <button id="prev-page-btn" class="page-arrow">‹</button>
+          <span id="page-indicator">Levels 1 – 50</span>
+          <button id="next-page-btn" class="page-arrow">›</button>
+        </div>
+
+        <div class="level-grid" id="level-grid-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script src="js/utils.js"></script>
@@ -307,5 +308,6 @@
       });
     });
   </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
 </body>
 </html>

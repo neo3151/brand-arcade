@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="Play Zen Nonogram: Pixel Tapestry — Solve logic picture puzzles with smart hints and procedural pixel art." />
+  <title>Play — Zen Nonogram</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="stylesheet" href="css/mobile-simulator.css" />
+</head>
+<body>
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <button id="sound-toggle-btn" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:0.75rem;">🔊</button>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+      <div class="game-page">
+        <!-- Game Top Header Nav -->
+        <header class="game-header">
+          <button id="back-btn" class="btn btn--ghost btn--sm" aria-label="Back to Menu">
+            ← Menu
+          </button>
+          <div class="level-badge">
+            <span id="header-diff-tag" class="level-diff-tag">BEGINNER</span>
+            <span id="header-level-num">Lvl 1</span>
+          </div>
+          <div class="game-stats-bar">
+            <div class="game-timer">
+              <span>⏱️</span>
+              <span id="game-timer-val">00:00</span>
+            </div>
+            <div id="lives-bar" class="lives-container" title="Lives remaining">
+              <span class="heart-icon" id="heart-1">❤️</span>
+              <span class="heart-icon" id="heart-2">❤️</span>
+              <span class="heart-icon" id="heart-3">❤️</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Main Board Viewport -->
+        <main class="board-viewport" id="board-viewport">
+          <div class="puzzle-container" id="puzzle-container">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </main>
+
+        <!-- Bottom Controls & Power-up Toolbar -->
+        <footer class="game-bottom-panel">
+          <!-- Primary Tool Toggle: Brush vs Mark (X) -->
+          <div class="tool-toggle-bar">
+            <button id="tool-fill-btn" class="tool-toggle-btn active mode-fill" aria-label="Brush Tool">
+              <span>🖌️</span>
+              <span>FILL</span>
+            </button>
+            <button id="tool-cross-btn" class="tool-toggle-btn mode-cross" aria-label="Cross Tool">
+              <span>✕</span>
+              <span>MARK</span>
+            </button>
+          </div>
+
+          <!-- Power-ups Bar -->
+          <div class="powerups-bar">
+            <button id="pwr-hint-btn" class="powerup-btn" aria-label="Smart Hint">
+              <span class="powerup-icon">💡</span>
+              <span class="powerup-name">HINT</span>
+              <span class="powerup-badge" id="badge-hints">5</span>
+            </button>
+
+            <button id="pwr-radar-btn" class="powerup-btn" aria-label="Line Radar">
+              <span class="powerup-icon">⚡</span>
+              <span class="powerup-name">RADAR</span>
+              <span class="powerup-badge" id="badge-radars">3</span>
+            </button>
+
+            <button id="pwr-bomb-btn" class="powerup-btn" aria-label="Pixel Bomb">
+              <span class="powerup-icon">💥</span>
+              <span class="powerup-name">BOMB</span>
+              <span class="powerup-badge" id="badge-bombs">2</span>
+            </button>
+
+            <button id="btn-undo" class="powerup-btn" aria-label="Undo move">
+              <span class="powerup-icon">↩️</span>
+              <span class="powerup-name">UNDO</span>
+            </button>
+          </div>
+        </footer>
+      </div>
+
+      <!-- Smart Hint Modal -->
+      <div id="hint-modal" class="modal-backdrop">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h2 class="modal-title" style="color:var(--gold-400);">💡 Smart Deduction</h2>
+            <button class="modal-close-btn" id="hint-close-btn">&times;</button>
+          </div>
+          <p id="hint-text" style="font-size:0.95rem;line-height:1.6;color:var(--slate-200);margin-bottom:1.25rem;">
+            <!-- Populated by JS -->
+          </p>
+          <button id="hint-apply-btn" class="btn btn--gold btn--full">
+            Apply Move
+          </button>
+        </div>
+      </div>
+
+      <!-- Victory Reveal Modal -->
+      <div id="victory-modal" class="modal-backdrop">
+        <div class="modal-card victory-card">
+          <div class="victory-title">✨ TAPESTRY COMPLETED!</div>
+          <div class="victory-art-name" id="victory-art-name">Heart of Jade</div>
+
+          <div class="victory-canvas-wrapper">
+            <canvas id="victory-canvas" class="victory-canvas"></canvas>
+          </div>
+
+          <div class="victory-stats">
+            <div>
+              <div style="font-size:0.75rem;color:var(--slate-400);font-weight:700;">TIME</div>
+              <div id="victory-time" style="font-family:var(--font-mono);font-size:1.1rem;font-weight:800;color:var(--slate-100);">01:24</div>
+            </div>
+            <div>
+              <div style="font-size:0.75rem;color:var(--slate-400);font-weight:700;">REWARD</div>
+              <div style="font-family:var(--font-mono);font-size:1.1rem;font-weight:800;color:var(--gold-400);">+25 🪙</div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:0.6rem;">
+            <button id="next-level-btn" class="btn btn--primary btn--full">
+              Next Level ▶
+            </button>
+            <button id="victory-menu-btn" class="btn btn--secondary btn--full">
+              Main Menu
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Over Modal -->
+      <div id="gameover-modal" class="modal-backdrop">
+        <div class="modal-card" style="text-align:center;">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem;">💔</div>
+          <h2 class="modal-title" style="margin-bottom:0.5rem;color:var(--coral-400);">Out of Lives</h2>
+          <p style="font-size:0.9rem;color:var(--slate-300);margin-bottom:1.25rem;">
+            Three strikes reached. Revive to continue solving, or restart this puzzle.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:0.65rem;">
+            <button id="revive-btn" class="btn btn--gold btn--full">
+              Revive for 50 🪙
+            </button>
+            <button id="restart-btn" class="btn btn--secondary btn--full">
+              Restart Puzzle
+            </button>
+            <button id="gameover-menu-btn" class="btn btn--ghost btn--full">
+              Back to Menu
+            </button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script src="js/level-generator.js"></script>
+  <script src="js/nonogram-engine.js"></script>
+  <script src="js/hint-engine.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { difficulty, level, continue: isContinue } = window.Utils.getQueryParams();
+
+      // UI elements
+      document.getElementById('header-diff-tag').textContent = difficulty.toUpperCase();
+      document.getElementById('header-level-num').textContent = `Lvl ${level}`;
+
+      // Load Level Data
+      const levelData = window.LevelGenerator.getLevel(difficulty, level);
+      const engine = new window.NonogramEngine(levelData);
+
+      // Active tool: 'fill' (1) or 'cross' (2)
+      let activeTool = 'fill';
+      let isDragging = false;
+      let dragTargetValue = null;
+      let activeHintData = null;
+      let lastTouchTime = 0;
+
+      // Timer & State Persistence
+      let elapsedSeconds = 0;
+      const timerValEl = document.getElementById('game-timer-val');
+      let timerInterval = null;
+
+      function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          if (!engine.isSolved && engine.lives > 0) {
+            elapsedSeconds++;
+            timerValEl.textContent = window.Utils.formatTime(elapsedSeconds);
+          }
+        }, 1000);
+      }
+
+      function persistActiveGame() {
+        if (engine.isSolved || engine.lives <= 0) return;
+        window.Progress.saveActiveGame({
+          difficulty,
+          level,
+          grid: engine.grid.map(row => [...row]),
+          lives: engine.lives,
+          elapsed: elapsedSeconds,
+          undoStack: JSON.parse(JSON.stringify(engine.undoStack))
+        });
+      }
+
+      // Check if continuing an active game
+      if (isContinue) {
+        const activeGame = window.Progress.getActiveGame();
+        if (activeGame && activeGame.difficulty === difficulty && activeGame.level === level) {
+          if (Array.isArray(activeGame.grid)) {
+            engine.grid = activeGame.grid.map(row => [...row]);
+          }
+          if (typeof activeGame.lives === 'number') {
+            engine.lives = activeGame.lives;
+          }
+          if (Array.isArray(activeGame.undoStack)) {
+            engine.undoStack = activeGame.undoStack;
+          }
+          if (typeof activeGame.elapsed === 'number') {
+            elapsedSeconds = activeGame.elapsed;
+            timerValEl.textContent = window.Utils.formatTime(elapsedSeconds);
+          }
+          // Re-evaluate line states
+          for (let r = 0; r < levelData.size; r++) {
+            if (engine.isRowComplete(r)) engine.completedRows.add(r);
+          }
+          for (let c = 0; c < levelData.size; c++) {
+            if (engine.isColComplete(c)) engine.completedCols.add(c);
+          }
+        }
+      }
+
+      startTimer();
+
+      window.addEventListener('pagehide', persistActiveGame);
+      window.addEventListener('beforeunload', persistActiveGame);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') persistActiveGame();
+      });
+
+      // Inventory badges
+      function updateInventoryBadges() {
+        const inv = window.Progress.getInventory();
+        document.getElementById('badge-hints').textContent = inv.hints;
+        document.getElementById('badge-radars').textContent = inv.radars;
+        document.getElementById('badge-bombs').textContent = inv.bombs;
+      }
+      updateInventoryBadges();
+
+      // Render Board Matrix & Clues
+      const container = document.getElementById('puzzle-container');
+      const size = levelData.size;
+
+      // Calculate cell dimensions dynamically based on size
+      let cellSize = 38;
+      if (size === 10) cellSize = 28;
+      if (size === 15) cellSize = 20;
+      if (size === 20) cellSize = 15;
+
+      const cornerSize = size <= 10 ? 60 : 75;
+
+      container.style.gridTemplateColumns = `${cornerSize}px auto`;
+      container.style.gridTemplateRows = `${cornerSize}px auto`;
+
+      // 1. Top-Left Corner
+      const corner = document.createElement('div');
+      corner.className = 'puzzle-corner';
+      corner.textContent = `${size}×${size}`;
+      container.appendChild(corner);
+
+      // 2. Top Column Clues
+      const colCluesContainer = document.createElement('div');
+      colCluesContainer.className = 'col-clues-container';
+      colCluesContainer.style.width = `${size * cellSize}px`;
+
+      for (let c = 0; c < size; c++) {
+        const colGroup = document.createElement('div');
+        colGroup.className = 'col-clue-group';
+        colGroup.style.width = `${cellSize}px`;
+        colGroup.id = `col-clue-group-${c}`;
+        if ((c + 1) % 5 === 0 && c !== size - 1) {
+          colGroup.classList.add('block-boundary');
+        }
+
+        const clues = levelData.colClues[c];
+        clues.forEach((num, idx) => {
+          const numEl = document.createElement('span');
+          numEl.className = 'clue-num';
+          numEl.style.fontSize = size <= 10 ? '0.75rem' : '0.65rem';
+          numEl.textContent = num;
+          numEl.id = `clue-col-${c}-${idx}`;
+          colGroup.appendChild(numEl);
+        });
+        colCluesContainer.appendChild(colGroup);
+      }
+      container.appendChild(colCluesContainer);
+
+      // 3. Left Row Clues
+      const rowCluesContainer = document.createElement('div');
+      rowCluesContainer.className = 'row-clues-container';
+      rowCluesContainer.style.height = `${size * cellSize}px`;
+
+      for (let r = 0; r < size; r++) {
+        const rowGroup = document.createElement('div');
+        rowGroup.className = 'row-clue-group';
+        rowGroup.style.height = `${cellSize}px`;
+        rowGroup.id = `row-clue-group-${r}`;
+        if ((r + 1) % 5 === 0 && r !== size - 1) {
+          rowGroup.classList.add('block-boundary');
+        }
+
+        const clues = levelData.rowClues[r];
+        clues.forEach((num, idx) => {
+          const numEl = document.createElement('span');
+          numEl.className = 'clue-num';
+          numEl.style.fontSize = size <= 10 ? '0.75rem' : '0.65rem';
+          numEl.textContent = num;
+          numEl.id = `clue-row-${r}-${idx}`;
+          rowGroup.appendChild(numEl);
+        });
+        rowCluesContainer.appendChild(rowGroup);
+      }
+      container.appendChild(rowCluesContainer);
+
+      // 4. Matrix Playable Grid
+      const matrix = document.createElement('div');
+      matrix.className = 'grid-matrix';
+      matrix.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
+      matrix.style.gridTemplateRows = `repeat(${size}, ${cellSize}px)`;
+
+      const cellElements = [];
+
+      for (let r = 0; r < size; r++) {
+        cellElements[r] = [];
+        for (let c = 0; c < size; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'grid-cell';
+          cell.dataset.r = r;
+          cell.dataset.c = c;
+          cell.id = `cell-${r}-${c}`;
+
+          if ((c + 1) % 5 === 0 && c !== size - 1) cell.classList.add('boundary-right');
+          if ((r + 1) % 5 === 0 && r !== size - 1) cell.classList.add('boundary-bottom');
+
+          // Mouse down handler
+          cell.addEventListener('mousedown', (e) => {
+            if (Date.now() - lastTouchTime < 600) return;
+            e.preventDefault();
+            if (engine.isSolved || engine.lives <= 0) return;
+            isDragging = true;
+            const isRightClick = e.button === 2;
+            const currentVal = engine.grid[r][c];
+
+            if (isRightClick) {
+              dragTargetValue = currentVal === 2 ? 0 : 2;
+            } else {
+              if (activeTool === 'fill') {
+                dragTargetValue = currentVal === 1 ? 0 : 1;
+              } else {
+                dragTargetValue = currentVal === 2 ? 0 : 2;
+              }
+            }
+            applyCellAction(r, c, dragTargetValue);
+          });
+
+          cell.addEventListener('mouseenter', () => {
+            if (Date.now() - lastTouchTime < 600) return;
+            if (isDragging && dragTargetValue !== null) {
+              applyCellAction(r, c, dragTargetValue);
+            }
+          });
+
+          // Prevent context menu on board
+          cell.addEventListener('contextmenu', (e) => e.preventDefault());
+
+          matrix.appendChild(cell);
+          cellElements[r][c] = cell;
+        }
+      }
+      container.appendChild(matrix);
+
+      // Render restored board if continuing an active game
+      function refreshAllCells() {
+        for (let r = 0; r < size; r++) {
+          for (let c = 0; c < size; c++) {
+            updateCellDisplay(r, c, engine.grid[r][c]);
+          }
+        }
+        updateClueStrikeouts();
+        updateLivesUI();
+      }
+
+      if (isContinue) {
+        refreshAllCells();
+      }
+
+      // Stop dragging on mouseup anywhere
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+        dragTargetValue = null;
+      });
+
+      // Touch Drag Support for Mobile
+      matrix.addEventListener('touchstart', (e) => {
+        lastTouchTime = Date.now();
+        if (engine.isSolved || engine.lives <= 0) return;
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && target.classList.contains('grid-cell')) {
+          e.preventDefault();
+          const r = parseInt(target.dataset.r, 10);
+          const c = parseInt(target.dataset.c, 10);
+          isDragging = true;
+          const currentVal = engine.grid[r][c];
+          dragTargetValue = activeTool === 'fill' ? (currentVal === 1 ? 0 : 1) : (currentVal === 2 ? 0 : 2);
+          applyCellAction(r, c, dragTargetValue);
+        }
+      }, { passive: false });
+
+      matrix.addEventListener('touchmove', (e) => {
+        lastTouchTime = Date.now();
+        if (!isDragging) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && target.classList.contains('grid-cell')) {
+          const r = parseInt(target.dataset.r, 10);
+          const c = parseInt(target.dataset.c, 10);
+          applyCellAction(r, c, dragTargetValue);
+        }
+      }, { passive: false });
+
+      matrix.addEventListener('touchend', () => {
+        lastTouchTime = Date.now();
+        isDragging = false;
+        dragTargetValue = null;
+      });
+
+      // Cell Action Execution
+      function applyCellAction(r, c, targetVal) {
+        const res = engine.setCell(r, c, targetVal);
+        if (res.status === 'mistake') {
+          updateLivesUI();
+          if (window.SoundFX) window.SoundFX.playError();
+          updateCellDisplay(r, c, 2);
+          window.Utils.showToast(`Mistake! Life lost. (${res.lives} remaining)`, 'error');
+          if (res.isGameOver) {
+            handleGameOver();
+          } else {
+            persistActiveGame();
+          }
+          return;
+        }
+
+        if (res.status === 'success') {
+          if (targetVal === 1 && window.SoundFX) window.SoundFX.playFill();
+          else if (targetVal === 2 && window.SoundFX) window.SoundFX.playCross();
+          else if (targetVal === 0 && window.SoundFX) window.SoundFX.playErase();
+
+          updateCellDisplay(r, c, targetVal);
+
+          if (res.newlyCompletedLine && window.SoundFX) {
+            window.SoundFX.playLineComplete();
+          }
+
+          if (res.newlyCrossed && res.newlyCrossed.length > 0) {
+            res.newlyCrossed.forEach(cell => updateCellDisplay(cell.r, cell.c, 2));
+          }
+
+          updateClueStrikeouts();
+
+          if (res.isSolved) {
+            handleVictory();
+          } else {
+            persistActiveGame();
+          }
+        }
+      }
+
+      function updateCellDisplay(r, c, val) {
+        const el = cellElements[r][c];
+        if (!el) return;
+        el.classList.remove('filled', 'crossed', 'hint-pulse');
+        if (val === 1) el.classList.add('filled');
+        else if (val === 2) el.classList.add('crossed');
+      }
+
+      function updateClueStrikeouts() {
+        for (let r = 0; r < size; r++) {
+          const rowGroup = document.getElementById(`row-clue-group-${r}`);
+          if (rowGroup) {
+            const isComp = engine.completedRows.has(r);
+            rowGroup.querySelectorAll('.clue-num').forEach(el => {
+              el.classList.toggle('completed', isComp);
+            });
+          }
+        }
+        for (let c = 0; c < size; c++) {
+          const colGroup = document.getElementById(`col-clue-group-${c}`);
+          if (colGroup) {
+            const isComp = engine.completedCols.has(c);
+            colGroup.querySelectorAll('.clue-num').forEach(el => {
+              el.classList.toggle('completed', isComp);
+            });
+          }
+        }
+      }
+
+      function updateLivesUI() {
+        for (let i = 1; i <= 3; i++) {
+          const heart = document.getElementById(`heart-${i}`);
+          if (heart) {
+            heart.classList.toggle('lost', i > engine.lives);
+          }
+        }
+      }
+
+      // Tool Toggles
+      const fillBtn = document.getElementById('tool-fill-btn');
+      const crossBtn = document.getElementById('tool-cross-btn');
+
+      fillBtn.addEventListener('click', () => {
+        activeTool = 'fill';
+        fillBtn.classList.add('active');
+        crossBtn.classList.remove('active');
+      });
+
+      crossBtn.addEventListener('click', () => {
+        activeTool = 'cross';
+        crossBtn.classList.add('active');
+        fillBtn.classList.remove('active');
+      });
+
+      // Undo button
+      document.getElementById('btn-undo').addEventListener('click', () => {
+        const reverted = engine.undo();
+        if (reverted) {
+          reverted.forEach(item => updateCellDisplay(item.r, item.c, item.val));
+          updateClueStrikeouts();
+          persistActiveGame();
+          if (window.SoundFX) window.SoundFX.playErase();
+        } else {
+          window.Utils.showToast('Nothing to undo', 'info');
+        }
+      });
+
+      // Smart Hint Button
+      const hintBtn = document.getElementById('pwr-hint-btn');
+      hintBtn.addEventListener('click', () => {
+        const inv = window.Progress.getInventory();
+        if (inv.hints <= 0) {
+          window.Utils.showToast('Out of hints! Visit store to refill.', 'warning');
+          return;
+        }
+
+        const hint = window.HintEngine.findBestHint(engine);
+        if (!hint) {
+          window.Utils.showToast('Board is already complete or no hints available!', 'info');
+          return;
+        }
+
+        activeHintData = hint;
+        document.getElementById('hint-text').textContent = hint.reason;
+
+        // Highlight cell on board
+        const cell = cellElements[hint.r][hint.c];
+        cell.classList.add('hint-pulse');
+
+        window.Utils.openModal('hint-modal');
+      });
+
+      document.getElementById('hint-close-btn').addEventListener('click', () => {
+        window.Utils.closeModal('hint-modal');
+        if (activeHintData) {
+          const cell = cellElements[activeHintData.r][activeHintData.c];
+          cell.classList.remove('hint-pulse');
+        }
+      });
+
+      document.getElementById('hint-apply-btn').addEventListener('click', () => {
+        if (!activeHintData) return;
+        window.Progress.modifyItem('hints', -1);
+        updateInventoryBadges();
+
+        applyCellAction(activeHintData.r, activeHintData.c, activeHintData.targetVal);
+        window.Utils.closeModal('hint-modal');
+        const cell = cellElements[activeHintData.r][activeHintData.c];
+        cell.classList.remove('hint-pulse');
+        activeHintData = null;
+        persistActiveGame();
+      });
+
+      // Line Radar Power-up
+      document.getElementById('pwr-radar-btn').addEventListener('click', () => {
+        const inv = window.Progress.getInventory();
+        if (inv.radars <= 0) {
+          window.Utils.showToast('Out of Line Radars! Visit store to refill.', 'warning');
+          return;
+        }
+
+        // Find the first uncompleted row
+        let targetRow = -1;
+        for (let r = 0; r < size; r++) {
+          if (!engine.completedRows.has(r)) {
+            targetRow = r;
+            break;
+          }
+        }
+
+        if (targetRow === -1) {
+          window.Utils.showToast('All rows already solved!', 'info');
+          return;
+        }
+
+        window.Progress.modifyItem('radars', -1);
+        updateInventoryBadges();
+        if (window.SoundFX) window.SoundFX.playPowerup();
+
+        const changed = engine.applyLineRadar('row', targetRow);
+        changed.forEach(c => updateCellDisplay(c.r, c.c, c.curr));
+        updateClueStrikeouts();
+        persistActiveGame();
+        window.Utils.showToast(`Line Radar scanned Row ${targetRow + 1}!`, 'success');
+
+        if (engine.isSolved) handleVictory();
+      });
+
+      // Pixel Bomb Power-up
+      document.getElementById('pwr-bomb-btn').addEventListener('click', () => {
+        const inv = window.Progress.getInventory();
+        if (inv.bombs <= 0) {
+          window.Utils.showToast('Out of Pixel Bombs! Visit store to refill.', 'warning');
+          return;
+        }
+
+        // Find an area with unsolved cells
+        let targetR = Math.floor(size / 2);
+        let targetC = Math.floor(size / 2);
+        for (let r = 0; r < size; r++) {
+          for (let c = 0; c < size; c++) {
+            if (engine.grid[r][c] === 0) {
+              targetR = r;
+              targetC = c;
+              break;
+            }
+          }
+        }
+
+        window.Progress.modifyItem('bombs', -1);
+        updateInventoryBadges();
+        if (window.SoundFX) window.SoundFX.playPowerup();
+
+        const changed = engine.applyPixelBomb(targetR, targetC);
+        changed.forEach(c => updateCellDisplay(c.r, c.c, c.curr));
+        updateClueStrikeouts();
+        persistActiveGame();
+        window.Utils.showToast(`Pixel Bomb detonated around (${targetR + 1}, ${targetC + 1})!`, 'success');
+
+        if (engine.isSolved) handleVictory();
+      });
+
+      // Victory Handler
+      function handleVictory() {
+        clearInterval(timerInterval);
+        if (window.SoundFX) window.SoundFX.playVictory();
+
+        // Clear active in-progress game so continue doesn't reload completed level
+        window.Progress.clearActiveGame();
+
+        // Mark level complete in progress
+        const res = window.Progress.completeLevel(difficulty, level, elapsedSeconds);
+
+        document.getElementById('victory-art-name').textContent = levelData.name;
+        document.getElementById('victory-time').textContent = window.Utils.formatTime(elapsedSeconds);
+
+        // Draw pixel art on victory canvas
+        const canvas = document.getElementById('victory-canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, size, size);
+
+        for (let r = 0; r < size; r++) {
+          for (let c = 0; c < size; c++) {
+            if (levelData.solution[r][c] === 1) {
+              ctx.fillStyle = levelData.color || '#10b981';
+              ctx.fillRect(c, r, 1, 1);
+            }
+          }
+        }
+
+        window.Utils.openModal('victory-modal');
+      }
+
+      // Next level button
+      document.getElementById('next-level-btn').addEventListener('click', () => {
+        const nextLvl = Math.min(1000, level + 1);
+        window.location.href = `game.html?difficulty=${difficulty}&level=${nextLvl}`;
+      });
+
+      document.getElementById('victory-menu-btn').addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+
+      // Game Over Handler
+      function handleGameOver() {
+        clearInterval(timerInterval);
+        window.Progress.clearActiveGame();
+        window.Utils.openModal('gameover-modal');
+      }
+
+      document.getElementById('revive-btn').addEventListener('click', () => {
+        const inv = window.Progress.getInventory();
+        if (inv.coins >= 50) {
+          window.Progress.modifyItem('coins', -50);
+          engine.lives = 3;
+          updateLivesUI();
+          window.Utils.closeModal('gameover-modal');
+          window.Utils.showToast('Revived with full lives!', 'success');
+          startTimer();
+          persistActiveGame();
+        } else {
+          window.Utils.showToast('Not enough coins to revive!', 'warning');
+        }
+      });
+
+      document.getElementById('restart-btn').addEventListener('click', () => {
+        window.Progress.clearActiveGame();
+        window.location.href = `game.html?difficulty=${difficulty}&level=${level}`;
+      });
+
+      document.getElementById('gameover-menu-btn').addEventListener('click', () => {
+        window.Progress.clearActiveGame();
+        window.location.href = 'index.html';
+      });
+
+      document.getElementById('back-btn').addEventListener('click', () => {
+        persistActiveGame();
+        window.location.href = 'index.html';
+      });
+    });
+  </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

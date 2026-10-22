@@ -15,6 +15,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Chakra+Petch:ital,wght@0,500;0,600;0,700;0,800;1,700&family=Outfit:wght@600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
   <script src="assets/arcade-daily.js"></script>
+  <script src="assets/arcade-inspector.js"></script>
+  <script src="assets/arcade-passport.js"></script>
 
   <style>
     :root {
@@ -63,10 +65,11 @@
       color: #e2e8f0;
       font-family: var(--font-retro);
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 16px 40px 16px;
+      padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
       overflow-x: hidden;
       line-height: 1.4;
       transition: background-image 0.4s ease;
@@ -115,7 +118,7 @@
     /* ARCADE MARQUEE TOP HEADER */
     .arcade-header {
       width: 100%;
-      padding: 20px 0 14px 0;
+      padding: max(16px, env(safe-area-inset-top)) 0 14px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -470,6 +473,9 @@
       perspective: 1200px;
       min-height: 480px;
       padding: 10px 0;
+      touch-action: pan-y;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     /* Flanking Ghost Cabinets (3D Perspective) */
@@ -1149,7 +1155,12 @@
       border-radius: 12px;
       color: #e2e8f0;
       padding: 20px;
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
       max-width: 480px;
+      max-height: 88vh;
+      max-height: 88dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       width: 90%;
       margin: auto;
       box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(6, 182, 212, 0.4);
@@ -1286,6 +1297,9 @@
           <button type="button" id="btn-open-daily" class="btn-toggle-arcade" style="color: var(--neon-yellow); border-color: rgba(250,204,21,0.5);" title="Today's Universal Daily Challenge">
             📅 DAILY RUN
           </button>
+          <button type="button" id="btn-open-passport" class="btn-toggle-arcade" style="color: var(--neon-yellow); border-color: rgba(250,204,21,0.5);" title="Open Arcade Passport & Cross-Game Trophy Room">
+            🏆 PASSPORT (<span id="passport-trophy-count">0/8</span>)
+          </button>
           <button type="button" id="btn-toggle-crt" class="btn-toggle-arcade" title="Toggle CRT scanlines">
             📺 CRT: ON
           </button>
@@ -1297,6 +1311,9 @@
           </button>
           <button type="button" id="btn-open-pledge" class="btn-toggle-arcade" style="color: var(--neon-pink); border-color: rgba(236,72,153,0.4);" title="Why zero ads?">
             🛡️ MANIFESTO
+          </button>
+          <button type="button" id="btn-hub-dev-inspector" class="btn-toggle-arcade" style="color: var(--neon-cyan); border-color: rgba(6,182,212,0.4);" title="Open 'Behind the Build' Developer Telemetry & Architecture HUD (Hotkey: ~ or D)">
+            🛠️ DEV HUD
           </button>
         </div>
       </div>
@@ -1404,7 +1421,7 @@
               <button type="button" id="hero-btn-app" class="btn-push-sub" title="Standalone App Store & Deep Links">
                 <span>📲</span> STORE APP
               </button>
-              <a href="blockblast/www/" id="hero-btn-play" class="btn-push-play">
+              <a href="blockblast/www/index.html" id="hero-btn-play" class="btn-push-play">
                 <span>🕹️</span> PUSH START (PLAY)
               </a>
             </div>
@@ -1491,7 +1508,7 @@
 
       <!-- Actions Strip -->
       <div style="display: flex; gap: 10px;">
-        <a id="btn-launch-daily" href="blockblast/www/?daily=1" class="btn-push-play" style="flex: 1.5; justify-content: center; font-size: 0.92rem;">
+        <a id="btn-launch-daily" href="blockblast/www/index.html?daily=1" class="btn-push-play" style="flex: 1.5; justify-content: center; font-size: 0.92rem;">
           <span>🕹️</span> LAUNCH MISSION
         </a>
         <button type="button" id="btn-simulate-daily" class="btn-push-sub" style="flex: 1; font-size: 0.85rem; justify-content: center; white-space: nowrap;" title="Simulate completion to test the Wordle share card">
@@ -1529,6 +1546,11 @@
       <button class="modal-close-retro" type="button" data-close="modal-cart-info">✕</button>
     </div>
     <div style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Platform Detection Banner -->
+      <div id="cart-platform-banner" style="display: none; padding: 10px 14px; border-radius: 6px; font-family: var(--font-arcade); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.05em; text-align: center; line-height: 1.45;">
+      </div>
+
       <div style="display: flex; gap: 12px; align-items: center; background: #090e1a; padding: 12px; border: 1.5px solid var(--arcade-border); border-radius: 6px;">
         <div id="cart-modal-icon" style="font-size: 2.8rem; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; background: #162035; border-radius: 6px; flex-shrink: 0;">
           🎮
@@ -1544,19 +1566,19 @@
         You can launch this title instantly right here in the hub, or download it as an <strong>individual standalone app</strong> from Google Play and the Apple App Store for dedicated offline play!
       </p>
 
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <button type="button" id="btn-cart-deep" class="btn-push-play" style="justify-content: center;">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" id="btn-cart-deep" class="btn-push-play" style="justify-content: center; min-height: 48px; font-size: 0.8rem; padding: 10px 12px; text-align: center; line-height: 1.3;">
           <span>📲</span> LAUNCH INSTALLED APP (DEEP LINK)
         </button>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-          <a id="btn-cart-playstore" href="#" target="_blank" class="btn-push-sub" style="justify-content: center;">
+        <div id="cart-store-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <a id="btn-cart-appstore" href="#" target="_blank" class="btn-push-sub" style="justify-content: center; min-height: 44px; font-size: 0.78rem; padding: 8px 10px;">
+            <span>🍎</span> APP STORE (iOS)
+          </a>
+          <a id="btn-cart-playstore" href="#" target="_blank" class="btn-push-sub" style="justify-content: center; min-height: 44px; font-size: 0.78rem; padding: 8px 10px;">
             <span>🤖</span> GOOGLE PLAY
           </a>
-          <a id="btn-cart-appstore" href="#" target="_blank" class="btn-push-sub" style="justify-content: center;">
-            <span>🍎</span> APP STORE
-          </a>
         </div>
-        <a id="btn-cart-web" href="#" class="btn-push-sub" style="justify-content: center; color: #94a3b8;">
+        <a id="btn-cart-web" href="#" class="btn-push-sub" style="justify-content: center; color: #94a3b8; min-height: 44px;">
           <span>🌐</span> PLAY INSTANT WEB EDITION
         </a>
       </div>
@@ -1625,6 +1647,11 @@
     </div>
   </dialog>
 
+  <!-- ARCADE PASSPORT & TROPHY ROOM MODAL -->
+  <dialog id="modal-passport" class="retro-modal" style="max-width: 720px; width: 95%;">
+    <!-- Dynamically populated by window.ArcadePassport.renderModalContent() -->
+  </dialog>
+
   <!-- RETRO SOUND TOAST -->
   <div id="retro-toast" class="retro-toast">
     <span id="toast-icon">★</span>
@@ -1646,7 +1673,7 @@
           speed: '2–4 MINS',
           speedType: 'ULTRA FAST',
           icon: '🧱',
-          path: 'blockblast/www/',
+          path: 'blockblast/www/index.html',
           appId: 'com.gamingempire.blockblast',
           scheme: 'blockblast://',
           glow: '#f59e0b',
@@ -1663,7 +1690,7 @@
           speed: '3–5 MINS',
           speedType: 'ULTRA FAST',
           icon: '💣',
-          path: 'minesweeper/www/',
+          path: 'minesweeper/www/index.html',
           appId: 'com.gamingempire.infernosweeper',
           scheme: 'infernosweeper://',
           glow: '#f97316',
@@ -1680,7 +1707,7 @@
           speed: '3–6 MINS',
           speedType: 'FAST BURST',
           icon: '🔐',
-          path: 'codebreaker/www/',
+          path: 'codebreaker/www/index.html',
           appId: 'com.gamingempire.blackvault',
           scheme: 'blackvault://',
           glow: '#06b6d4',
@@ -1697,7 +1724,7 @@
           speed: '4–8 MINS',
           speedType: 'FAST BURST',
           icon: '🔤',
-          path: 'wordsearch/www/',
+          path: 'wordsearch/www/index.html',
           appId: 'com.gamingempire.wordsearch',
           scheme: 'wordsearch://',
           glow: '#eab308',
@@ -1714,12 +1741,12 @@
           speed: '5–10 MINS',
           speedType: 'DAILY HABIT',
           icon: '🃏',
-          path: 'solitaire/www/',
+          path: 'solitaire/www/index.html',
           appId: 'com.gamingempire.curioussolitaire',
           scheme: 'curioussolitaire://',
           glow: '#10b981',
           border: '#059669',
-          shadow: 'rgba(16, 185, 129, 0.45)'
+          shadow: 'rgba(168, 185, 129, 0.45)'
         },
         {
           id: 'sudoku',
@@ -1731,7 +1758,7 @@
           speed: '8–15 MINS',
           speedType: 'MINDFUL LOGIC',
           icon: '🔢',
-          path: 'sudoku/www/',
+          path: 'sudoku/www/index.html',
           appId: 'com.gamingempire.classicsudoku',
           scheme: 'classicsudoku://',
           glow: '#38bdf8',
@@ -1748,7 +1775,7 @@
           speed: '8–18 MINS',
           speedType: 'PIXEL ART',
           icon: '🖼️',
-          path: 'nonogram/www/',
+          path: 'nonogram/www/index.html',
           appId: 'com.gamingempire.zennonogram',
           scheme: 'zennonogram://',
           glow: '#ec4899',
@@ -1765,7 +1792,7 @@
           speed: '10–20 MINS',
           speedType: 'TACTICAL DECK',
           icon: '🕷️',
-          path: 'spidersolitaire/www/',
+          path: 'spidersolitaire/www/index.html',
           appId: 'com.gamingempire.spidersolitaire',
           scheme: 'spidersolitaire://',
           glow: '#a855f7',
@@ -1782,7 +1809,7 @@
           speed: '15–25 MINS',
           speedType: 'CARD ROOM',
           icon: '♠️',
-          path: 'spades/www/',
+          path: 'spades/www/index.html',
           appId: 'com.gamingempire.spades',
           scheme: 'royalspades://',
           glow: '#3b82f6',
@@ -1799,7 +1826,7 @@
           speed: '10–20 MINS',
           speedType: 'MEDITATIVE',
           icon: '🀄',
-          path: 'mahjong/www/',
+          path: 'mahjong/www/index.html',
           appId: 'com.gamingempire.celestialjade',
           scheme: 'celestialjade://',
           glow: '#34d399',
@@ -1966,8 +1993,10 @@
 
         STATE.selectedIndex = index;
         const game = visible[index];
-
-        if (playAudio) sfx.play('clack');
+        if (playAudio) {
+          sfx.play('clack');
+          if (navigator.vibrate) navigator.vibrate(10);
+        }
 
         // Update Theme Accent Variables
         document.documentElement.style.setProperty('--active-glow', game.glow);
@@ -2042,6 +2071,10 @@
         }
         STATE.sessions += 1;
         localStorage.setItem('arcade_play_count', STATE.sessions.toString());
+        if (window.ArcadePassport) {
+          const gameObj = ARCADE_GAMES.find(g => g.id === gameId);
+          window.ArcadePassport.recordPlay(gameId, 60, 0, false, gameObj ? gameObj.vibe : null);
+        }
         updateStats();
       }
 
@@ -2217,31 +2250,105 @@
 
       document.getElementById('btn-roulette').addEventListener('click', spinRoulette);
 
-      // 8. STANDALONE APP MODAL
+      // 8. STANDALONE APP MODAL WITH SMART PLATFORM DETECTION
+      function detectMobilePlatform() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+        if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return 'ios';
+        if (/android/i.test(ua)) return 'android';
+        return 'desktop';
+      }
+
       function openCartModal(game) {
+        if (!game) {
+          const visible = getVisibleGames();
+          game = visible[STATE.selectedIndex] || ARCADE_GAMES[0];
+        }
         const modal = document.getElementById('modal-cart-info');
         document.getElementById('cart-modal-title').textContent = `${game.title} (ROM EDITION)`;
         document.getElementById('cart-modal-icon').textContent = game.icon;
         document.getElementById('cart-modal-name').textContent = game.title;
         document.getElementById('cart-modal-pkg').textContent = game.appId;
 
+        const platform = detectMobilePlatform();
+        const banner = document.getElementById('cart-platform-banner');
+        const appStoreBtn = document.getElementById('btn-cart-appstore');
+        const playStoreBtn = document.getElementById('btn-cart-playstore');
         const deepBtn = document.getElementById('btn-cart-deep');
+
+        if (platform === 'ios') {
+          banner.style.display = 'block';
+          banner.style.background = 'rgba(6, 182, 212, 0.15)';
+          banner.style.border = '1.5px solid var(--neon-cyan)';
+          banner.style.color = 'var(--neon-cyan)';
+          banner.innerHTML = '📱 <strong>IPHONE DETECTED</strong>: Launching directly or via Apple App Store';
+          
+          appStoreBtn.style.borderColor = 'var(--neon-cyan)';
+          appStoreBtn.style.color = '#ffffff';
+          appStoreBtn.style.background = 'rgba(6, 182, 212, 0.2)';
+          appStoreBtn.style.boxShadow = '0 0 12px rgba(6, 182, 212, 0.35)';
+          playStoreBtn.style.opacity = '0.65';
+          deepBtn.innerHTML = `<span>📲</span> LAUNCH ${game.title.toUpperCase()} (iOS)`;
+        } else if (platform === 'android') {
+          banner.style.display = 'block';
+          banner.style.background = 'rgba(16, 185, 129, 0.15)';
+          banner.style.border = '1.5px solid var(--neon-green)';
+          banner.style.color = 'var(--neon-green)';
+          banner.innerHTML = '🤖 <strong>ANDROID DETECTED</strong>: Launching directly or via Google Play';
+          
+          playStoreBtn.style.borderColor = 'var(--neon-green)';
+          playStoreBtn.style.color = '#ffffff';
+          playStoreBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+          playStoreBtn.style.boxShadow = '0 0 12px rgba(16, 185, 129, 0.35)';
+          appStoreBtn.style.opacity = '0.65';
+          deepBtn.innerHTML = `<span>📲</span> LAUNCH ${game.title.toUpperCase()} (ANDROID)`;
+        } else {
+          banner.style.display = 'block';
+          banner.style.background = 'rgba(250, 204, 21, 0.12)';
+          banner.style.border = '1.5px solid var(--neon-yellow)';
+          banner.style.color = 'var(--neon-yellow)';
+          banner.innerHTML = '💻 <strong>CROSS-PLATFORM HUB</strong>: Universal deep-links for iPhone, Android & Web';
+          appStoreBtn.style.opacity = '1';
+          playStoreBtn.style.opacity = '1';
+          deepBtn.innerHTML = '<span>📲</span> LAUNCH INSTALLED APP (DEEP LINK)';
+        }
+
         deepBtn.onclick = () => {
           sfx.play('coin');
-          showToast(`LAUNCHING ${game.scheme}...`);
-          window.location.href = `${game.scheme}play`;
-          setTimeout(() => showToast('IF APP DID NOT OPEN, INSTALL BELOW!'), 2200);
+          if (navigator.vibrate) navigator.vibrate(15);
+          showToast(`LAUNCHING ${game.title.toUpperCase()}...`);
+
+          if (platform === 'android') {
+            // Android Intent URI: Launches installed native APK, or Android system offers Play Store
+            const cleanScheme = game.scheme.replace('://', '');
+            const intentUri = `intent://play#Intent;scheme=${cleanScheme};package=${game.appId};end`;
+            window.location.href = intentUri;
+          } else {
+            // iOS Custom URL Scheme with timeout fallback to App Store
+            const appStoreUrl = `https://apps.apple.com/us/app/${encodeURIComponent(game.title.toLowerCase().replace(/[^a-z0-9]/g, '-'))}/id123456789`;
+            const startTime = Date.now();
+            window.location.href = `${game.scheme}play`;
+            setTimeout(() => {
+              if (Date.now() - startTime < 1800) {
+                showToast('APP NOT FOUND — OPENING APP STORE...');
+                window.location.href = platform === 'ios' ? appStoreUrl : `https://play.google.com/store/apps/details?id=${game.appId}`;
+              }
+            }, 1200);
+          }
         };
 
-        document.getElementById('btn-cart-playstore').href = `https://play.google.com/store/apps/details?id=${game.appId}`;
-        document.getElementById('btn-cart-appstore').href = `https://apps.apple.com/us/app/${encodeURIComponent(game.title.toLowerCase().replace(/[^a-z0-9]/g, '-'))}/id123456789`;
+        playStoreBtn.href = `https://play.google.com/store/apps/details?id=${game.appId}`;
+        appStoreBtn.href = `https://apps.apple.com/us/app/${encodeURIComponent(game.title.toLowerCase().replace(/[^a-z0-9]/g, '-'))}/id123456789`;
         
         const webBtn = document.getElementById('btn-cart-web');
         webBtn.href = game.path;
-        webBtn.onclick = () => recordLaunch(game.id);
+        webBtn.onclick = () => {
+          if (navigator.vibrate) navigator.vibrate(10);
+          recordLaunch(game.id);
+        };
 
         modal.showModal();
       }
+      window.openCartModal = openCartModal;
 
       // 9. CONTROLS & EVENT BINDINGS
       // Ghost Cabinet Clicks
@@ -2263,7 +2370,11 @@
       // Coin Slot Click
       document.getElementById('coin-slot-btn').addEventListener('click', () => {
         sfx.play('coin');
+        if (navigator.vibrate) navigator.vibrate([25, 40, 25]);
         showToast('COIN INSERTED! FREE PLAY EXTENDED 🪙');
+        if (window.ArcadePassport) {
+          window.ArcadePassport.unlockAchievement('first_coin');
+        }
       });
 
       // Keyboard Controls
@@ -2555,12 +2666,23 @@
           setViewMode('wall');
         } else if (window.location.hash === '#daily') {
           openDailyModal();
+        } else if (window.location.hash === '#dev') {
+          if (window.ArcadeInspector) window.ArcadeInspector.open();
+        } else if (window.location.hash === '#passport') {
+          const m = document.getElementById('modal-passport');
+          if (m && window.ArcadePassport) {
+            window.ArcadePassport.renderModalContent();
+            m.showModal();
+          }
+        } else if (window.location.hash === '#cart' || window.location.hash === '#app') {
+          const visible = getVisibleGames();
+          openCartModal(visible[STATE.selectedIndex]);
         }
       }
       window.addEventListener('hashchange', checkHash);
 
       // INITIALIZE
-      document.addEventListener('DOMContentLoaded', () => {
+      function initArcade() {
         applyBrand(STATE.brand);
         updateStreak();
         updateStats();
@@ -2571,7 +2693,13 @@
         updateDailyUI();
         updateDailyCountdown();
         checkHash();
-      });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initArcade);
+      } else {
+        initArcade();
+      }
     })();
   </script>
 </body>

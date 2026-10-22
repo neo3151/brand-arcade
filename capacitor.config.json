@@ -1,0 +1,9 @@
+{
+  "appId": "com.gamingempire.benchmarkarcade",
+  "appName": "Benchmark Arcade",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  }
+}

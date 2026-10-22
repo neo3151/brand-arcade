@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Timber Block Blast</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+  <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+  <div class="device-wrapper">
+    <div class="device-shell">
+      <!-- Status Bar -->
+      <div class="device-status-bar">
+        <span id="device-clock">12:00</span>
+        <div class="device-camera-cutout"></div>
+        <div class="device-status-icons">
+          <button id="sound-toggle-btn" class="sound-toggle-btn" aria-label="Toggle Sound">🔊</button>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <!-- Main Game Viewport -->
+      <div class="device-screen">
+        <div class="game-viewport" id="game-viewport">
+          <!-- Top HUD Scoreboard -->
+          <header class="game-top-bar">
+            <div class="score-box">
+              <span class="score-label">Score</span>
+              <span class="score-val" id="hud-score">0</span>
+            </div>
+
+            <div class="hud-center">
+              <div class="combo-pill" id="hud-combo-pill">
+                <span>🔥</span>
+                <span id="hud-combo-text">COMBO x2</span>
+              </div>
+              <div class="best-pill">
+                👑 Best: <span id="hud-best-score">0</span>
+              </div>
+            </div>
+
+            <div class="hud-actions">
+              <button id="pause-btn" class="hud-icon-btn" title="Pause Game">⏸</button>
+              <a href="index.html" class="hud-icon-btn" title="Main Menu" style="text-decoration:none;">✕</a>
+            </div>
+          </header>
+
+          <!-- 8x8 Board Container -->
+          <main class="board-wrapper" id="board-wrapper">
+            <div class="board-frame">
+              <div class="board-grid" id="board-grid">
+                <!-- 64 cells generated dynamically -->
+              </div>
+            </div>
+          </main>
+
+          <!-- Power-ups Bar -->
+          <div class="powerups-bar">
+            <button id="powerup-rotate-btn" class="powerup-btn" title="Rotate selected piece 90°">
+              <span>🔄</span> Rotate <span class="powerup-badge" id="badge-rotate">2</span>
+            </button>
+            <button id="powerup-hammer-btn" class="powerup-btn" title="Hammer clears a 3x3 block">
+              <span>🔨</span> Hammer <span class="powerup-badge" id="badge-hammer">2</span>
+            </button>
+            <button id="powerup-reroll-btn" class="powerup-btn" title="Reroll tray pieces">
+              <span>🎲</span> Reroll <span class="powerup-badge" id="badge-reroll">2</span>
+            </button>
+          </div>
+
+          <!-- 3-Piece Tray -->
+          <footer class="tray-container" id="tray-container">
+            <div class="tray-slot" id="tray-slot-0" data-slot="0"></div>
+            <div class="tray-slot" id="tray-slot-1" data-slot="1"></div>
+            <div class="tray-slot" id="tray-slot-2" data-slot="2"></div>
+          </footer>
+        </div>
+      </div><!-- /.device-screen -->
+
+      <!-- Home Indicator -->
+      <div class="device-home-indicator">
+        <div class="device-home-pill"></div>
+      </div>
+    </div><!-- /.device-shell -->
+  </div><!-- /.device-wrapper -->
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Pause Modal -->
+  <div id="pause-modal" class="modal-backdrop">
+    <div class="modal-card" style="text-align:center;">
+      <h2 style="font-family:var(--font-title);color:var(--amber-light);font-size:1.4rem;margin-bottom:0.5rem;">
+        Game Paused
+      </h2>
+      <p style="font-size:0.8rem;color:#d97706;margin-bottom:1.25rem;">
+        Take your time to plan your next moves!
+      </p>
+      <div style="display:flex;flex-direction:column;gap:0.6rem;">
+        <button id="resume-btn" class="btn btn--primary btn--full">
+          ▶ Resume Run
+        </button>
+        <button id="restart-pause-btn" class="btn btn--secondary btn--full">
+          🔄 Restart Run
+        </button>
+        <a href="index.html" class="btn btn--secondary btn--full">
+          🏠 Main Menu
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div id="gameover-modal" class="modal-backdrop">
+    <div class="modal-card" style="text-align:center;">
+      <div style="font-size:2.8rem;margin-bottom:0.35rem;" id="gameover-icon">🪵</div>
+      <h2 style="font-family:var(--font-title);color:var(--amber-light);font-size:1.5rem;font-weight:900;margin-bottom:0.25rem;">
+        Run Complete
+      </h2>
+      <p id="gameover-subtitle" style="font-size:0.8rem;color:#d97706;margin-bottom:1.1rem;">
+        No remaining pieces can fit on the board!
+      </p>
+
+      <div style="background:rgba(0,0,0,0.4);border:1px solid var(--amber-gold);border-radius:14px;padding:0.75rem;margin-bottom:1.2rem;display:flex;justify-content:space-around;">
+        <div>
+          <div style="font-size:0.65rem;color:#d97706;font-weight:700;">FINAL SCORE</div>
+          <div id="final-score" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:800;color:#fff;">0</div>
+        </div>
+        <div>
+          <div style="font-size:0.65rem;color:#d97706;font-weight:700;">BEST SCORE</div>
+          <div id="final-best" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:800;color:var(--amber-light);">0</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:0.55rem;">
+        <button id="revive-btn" class="btn btn--primary btn--full">
+          ❤️ Revive (100 Coins)
+        </button>
+        <button id="play-again-btn" class="btn btn--secondary btn--full">
+          ⚡ Play Again
+        </button>
+        <a href="index.html" class="btn btn--secondary btn--full">
+          Main Menu
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/block-engine.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { continue: isContinue } = window.Utils.getQueryParams();
+
+      let engine = null;
+      let selectedSlotIndex = null;
+      let activeHammerMode = false;
+      let activeDrag = null;
+
+      // Initialize Engine
+      if (isContinue) {
+        const saved = window.Progress.getActiveGame();
+        if (saved && !saved.isGameOver) {
+          engine = window.BlockEngine.fromJSON(saved);
+        }
+      }
+
+      if (!engine) {
+        engine = new window.BlockEngine();
+      }
+
+      // UI Elements
+      const hudScoreEl = document.getElementById('hud-score');
+      const hudBestScoreEl = document.getElementById('hud-best-score');
+      const hudComboPill = document.getElementById('hud-combo-pill');
+      const hudComboText = document.getElementById('hud-combo-text');
+      const boardGridEl = document.getElementById('board-grid');
+      const boardWrapperEl = document.getElementById('board-wrapper');
+      const traySlots = [
+        document.getElementById('tray-slot-0'),
+        document.getElementById('tray-slot-1'),
+        document.getElementById('tray-slot-2')
+      ];
+
+      const badgeRotate = document.getElementById('badge-rotate');
+      const badgeHammer = document.getElementById('badge-hammer');
+      const badgeReroll = document.getElementById('badge-reroll');
+
+      // Persistence helper
+      function persist() {
+        if (engine.isGameOver) {
+          window.Progress.clearActiveGame();
+        } else {
+          window.Progress.saveActiveGame(engine.toJSON());
+        }
+      }
+
+      window.addEventListener('pagehide', persist);
+      window.addEventListener('beforeunload', persist);
+
+      // Create 8x8 Grid Cells
+      const cellElements = [];
+      boardGridEl.innerHTML = '';
+      for (let r = 0; r < 8; r++) {
+        cellElements[r] = [];
+        for (let c = 0; c < 8; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'grid-cell';
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+
+          // Click handler for Tap-to-Place or Hammer Mode
+          cell.addEventListener('click', () => handleCellClick(r, c));
+          boardGridEl.appendChild(cell);
+          cellElements[r][c] = cell;
+        }
+      }
+
+      // Render Board Cells from engine
+      function renderBoard() {
+        for (let r = 0; r < 8; r++) {
+          for (let c = 0; c < 8; c++) {
+            const cell = cellElements[r][c];
+            const val = engine.grid[r][c];
+            if (val !== 0) {
+              cell.className = 'grid-cell filled';
+              cell.style.backgroundColor = val;
+            } else {
+              cell.className = 'grid-cell';
+              cell.style.backgroundColor = '';
+            }
+          }
+        }
+      }
+
+      // Render Top HUD & Powerup Badges
+      function updateHUD() {
+        hudScoreEl.textContent = engine.score;
+        hudBestScoreEl.textContent = Math.max(engine.score, window.Progress.getHighScore());
+
+        if (engine.combo > 1) {
+          hudComboPill.classList.add('active');
+          hudComboText.textContent = `COMBO x${engine.combo}`;
+        } else {
+          hudComboPill.classList.remove('active');
+        }
+
+        const inv = window.Progress.getPowerups();
+        badgeRotate.textContent = inv.rotate || 0;
+        badgeHammer.textContent = inv.hammer || 0;
+        badgeReroll.textContent = inv.reroll || 0;
+        document.getElementById('powerup-rotate-btn').classList.toggle('depleted', !inv.rotate);
+        document.getElementById('powerup-hammer-btn').classList.toggle('depleted', !inv.hammer);
+        document.getElementById('powerup-reroll-btn').classList.toggle('depleted', !inv.reroll);
+      }
+
+      // Render Tray Pieces
+      function renderTray() {
+        traySlots.forEach((slot, idx) => {
+          slot.innerHTML = '';
+          const piece = engine.trayPieces[idx];
+          if (!piece) return;
+
+          const pieceEl = document.createElement('div');
+          pieceEl.className = 'tray-piece';
+          if (selectedSlotIndex === idx) {
+            pieceEl.classList.add('selected');
+          }
+
+          // Check if piece can fit anywhere on board
+          const canFit = engine.canFitOnBoard(piece.matrix);
+          if (!canFit) {
+            pieceEl.classList.add('disabled');
+          }
+
+          pieceEl.style.gridTemplateRows = `repeat(${piece.rows}, 1fr)`;
+          pieceEl.style.gridTemplateColumns = `repeat(${piece.cols}, 1fr)`;
+
+          for (let r = 0; r < piece.rows; r++) {
+            for (let c = 0; c < piece.cols; c++) {
+              const tile = document.createElement('div');
+              tile.className = 'piece-tile';
+              if (piece.matrix[r][c] === 1) {
+                tile.style.backgroundColor = piece.color;
+              } else {
+                tile.style.visibility = 'hidden';
+              }
+              pieceEl.appendChild(tile);
+            }
+          }
+
+          // Attach Drag & Tap listeners
+          setupPieceInteraction(pieceEl, idx);
+          slot.appendChild(pieceEl);
+        });
+      }
+
+      // Unified Best Placement Search (Centered continuous anchor with tap-to-place fallback)
+      function findBestPlacement(piece, hoverR, hoverC, fracR = 0.5, fracC = 0.5) {
+        // Continuous center anchor
+        const contStartR = hoverR + fracR - (piece.rows / 2);
+        const contStartC = hoverC + fracC - (piece.cols / 2);
+
+        let idealR = Math.max(0, Math.min(8 - piece.rows, Math.round(contStartR)));
+        let idealC = Math.max(0, Math.min(8 - piece.cols, Math.round(contStartC)));
+
+        // 1. Try that ideal center anchor spot
+        if (engine.canPlace(piece.matrix, idealR, idealC)) {
+          return { r: idealR, c: idealC };
+        }
+
+        // 2. If blocked, search candidate alignments around (hoverR, hoverC) like tap-to-place
+        // Try top-left
+        if (engine.canPlace(piece.matrix, hoverR, hoverC)) {
+          return { r: hoverR, c: hoverC };
+        }
+
+        // Try aligning any filled block of the piece onto (hoverR, hoverC), nearest first
+        let fallback = null;
+        let bestDist = Infinity;
+        for (let pr = 0; pr < piece.rows; pr++) {
+          for (let pc = 0; pc < piece.cols; pc++) {
+            if (piece.matrix[pr][pc] === 1) {
+              const candR = hoverR - pr;
+              const candC = hoverC - pc;
+              if (engine.canPlace(piece.matrix, candR, candC)) {
+                const dist = Math.hypot(candR - contStartR, candC - contStartC);
+                if (dist < bestDist) {
+                  bestDist = dist;
+                  fallback = { r: candR, c: candC };
+                }
+              }
+            }
+          }
+        }
+
+        return fallback;
+      }
+
+      // Predict which rows & cols would clear if piece is placed at (placement.r, placement.c)
+      function getPendingClears(piece, placement) {
+        const placed = new Set();
+        for (let r = 0; r < piece.rows; r++) {
+          for (let c = 0; c < piece.cols; c++) {
+            if (piece.matrix[r][c] === 1) {
+              placed.add(`${placement.r + r},${placement.c + c}`);
+            }
+          }
+        }
+
+        const isFilled = (r, c) => engine.grid[r][c] !== 0 || placed.has(`${r},${c}`);
+        const rows = [];
+        const cols = [];
+
+        for (let r = 0; r < 8; r++) {
+          let full = true;
+          for (let c = 0; c < 8; c++) { if (!isFilled(r, c)) { full = false; break; } }
+          if (full) rows.push(r);
+        }
+        for (let c = 0; c < 8; c++) {
+          let full = true;
+          for (let r = 0; r < 8; r++) { if (!isFilled(r, c)) { full = false; break; } }
+          if (full) cols.push(c);
+        }
+        return { rows, cols };
+      }
+
+      // Handle Cell Click (Tap-to-Place or Hammer Mode)
+      function handleCellClick(r, c) {
+        // Hammer Mode check
+        if (activeHammerMode) {
+          // Check if there is at least 1 filled block in the 3x3 area
+          let hasBlocks = false;
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              const gr = r + dr;
+              const gc = c + dc;
+              if (gr >= 0 && gr < 8 && gc >= 0 && gc < 8 && engine.grid[gr][gc] !== 0) {
+                hasBlocks = true;
+                break;
+              }
+            }
+            if (hasBlocks) break;
+          }
+
+          if (!hasBlocks) {
+            window.Utils.showToast('No blocks to clear in this 3×3 area!', 'warning');
+            return;
+          }
+
+          if (!window.Progress.usePowerup('hammer')) {
+            activeHammerMode = false;
+            boardGridEl.style.cursor = '';
+            boardGridEl.classList.remove('hammer-mode');
+            window.Utils.showToast('No Hammers remaining!', 'warning');
+            updateHUD();
+            return;
+          }
+
+          const cleared = engine.useHammer(r, c);
+          activeHammerMode = false;
+          boardGridEl.style.cursor = '';
+          boardGridEl.classList.remove('hammer-mode');
+          if (window.SoundFX) window.SoundFX.playBomb();
+
+          cleared.forEach(pt => {
+            const el = cellElements[pt.r][pt.c];
+            el.classList.add('blast-pop');
+            setTimeout(() => {
+              el.classList.remove('blast-pop');
+              renderBoard();
+            }, 320);
+          });
+
+          window.Utils.showToast(`Hammer cleared ${cleared.length} blocks!`, 'success');
+          persist();
+          updateHUD();
+          renderTray();
+
+          if (engine.isGameOver) handleGameOver();
+          return;
+        }
+
+        // Tap-to-Place check
+        if (selectedSlotIndex !== null) {
+          const piece = engine.trayPieces[selectedSlotIndex];
+          if (!piece) return;
+
+          const validStart = findBestPlacement(piece, r, c, 0.5, 0.5);
+
+          if (validStart) {
+            const slotIdx = selectedSlotIndex;
+            selectedSlotIndex = null;
+            executePlacement(slotIdx, validStart.r, validStart.c);
+          } else {
+            window.Utils.showToast('Piece does not fit here!', 'warning');
+          }
+        }
+      }
+
+      // Setup Drag & Tap Interaction on a Tray Piece
+      function setupPieceInteraction(pieceEl, slotIdx) {
+        let isPointerDown = false;
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        let floatingEl = null;
+
+        const onDown = (e) => {
+          if (engine.isGameOver || activeHammerMode) return;
+          const piece = engine.trayPieces[slotIdx];
+          if (!piece) return;
+
+          isPointerDown = true;
+          isDragging = false;
+          startX = e.clientX;
+          startY = e.clientY;
+
+          if (window.SoundFX) window.SoundFX.playPickUp();
+
+          window.addEventListener('pointermove', onMove);
+          window.addEventListener('pointerup', onUp);
+        };
+
+        const onMove = (e) => {
+          if (!isPointerDown) return;
+
+          const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
+          if (dist > 8 && !isDragging) {
+            isDragging = true;
+            pieceEl.style.opacity = '0.3';
+
+            // Create floating drag clone
+            const piece = engine.trayPieces[slotIdx];
+            floatingEl = document.createElement('div');
+            floatingEl.className = 'drag-floating-piece';
+            floatingEl.style.gridTemplateRows = `repeat(${piece.rows}, 1fr)`;
+            floatingEl.style.gridTemplateColumns = `repeat(${piece.cols}, 1fr)`;
+
+            for (let r = 0; r < piece.rows; r++) {
+              for (let c = 0; c < piece.cols; c++) {
+                const t = document.createElement('div');
+                t.className = 'piece-tile';
+                if (piece.matrix[r][c] === 1) {
+                  t.style.backgroundColor = piece.color;
+                } else {
+                  t.style.visibility = 'hidden';
+                }
+                floatingEl.appendChild(t);
+              }
+            }
+            document.body.appendChild(floatingEl);
+          }
+
+          if (isDragging && floatingEl) {
+            e.preventDefault();
+            // Vertical offset on mobile so finger doesn't block view of placement
+            const offsetY = e.pointerType === 'touch' ? -70 : 0;
+
+            const posX = e.clientX;
+            const posY = e.clientY + offsetY;
+
+            floatingEl.style.left = `${posX}px`;
+            floatingEl.style.top = `${posY}px`;
+
+            // Calculate ghost preview under pointer
+            updateGhostPreview(posX, posY, slotIdx, () => floatingEl !== null);
+          }
+        };
+
+        const onUp = (e) => {
+          if (!isPointerDown) return;
+          isPointerDown = false;
+          pieceEl.style.opacity = '1';
+
+          window.removeEventListener('pointermove', onMove);
+          window.removeEventListener('pointerup', onUp);
+
+          clearGhostHighlights();
+
+          if (isDragging) {
+            const offsetY = e.pointerType === 'touch' ? -70 : 0;
+            const targetPos = getAnchorFromCoords(e.clientX, e.clientY + offsetY, slotIdx);
+
+            if (targetPos) {
+              if (floatingEl) { floatingEl.remove(); floatingEl = null; }
+              executePlacement(slotIdx, targetPos.r, targetPos.c);
+            } else if (floatingEl) {
+              // Snap back to the tray slot so a failed drop reads clearly
+              const slotRect = traySlots[slotIdx].getBoundingClientRect();
+              floatingEl.style.transition = 'left 0.18s ease, top 0.18s ease';
+              floatingEl.style.left = `${slotRect.left + slotRect.width / 2}px`;
+              floatingEl.style.top = `${slotRect.top + slotRect.height / 2}px`;
+              const el = floatingEl;
+              floatingEl = null;
+              setTimeout(() => el.remove(), 190);
+
+              // Only warn if the pointer was actually over the board
+              const targetEl = document.elementFromPoint(e.clientX, e.clientY + offsetY);
+              if (targetEl && targetEl.closest('.grid-cell')) {
+                window.Utils.showToast('Piece does not fit there!', 'warning');
+              }
+            }
+          } else {
+            // It was a tap! Toggle selection for Tap-to-Place
+            if (selectedSlotIndex === slotIdx) {
+              selectedSlotIndex = null;
+            } else {
+              selectedSlotIndex = slotIdx;
+            }
+            renderTray();
+          }
+        };
+
+        pieceEl.addEventListener('pointerdown', onDown);
+      }
+
+      // Calculate board anchor (r, c) from screen coords
+      function getAnchorFromCoords(x, y, slotIdx) {
+        const piece = engine.trayPieces[slotIdx];
+        if (!piece) return null;
+
+        const targetEl = document.elementFromPoint(x, y);
+        const cellEl = targetEl ? targetEl.closest('.grid-cell') : null;
+        if (!cellEl) return null;
+
+        const hoverR = parseInt(cellEl.dataset.row, 10);
+        const hoverC = parseInt(cellEl.dataset.col, 10);
+        const rect = cellEl.getBoundingClientRect();
+        const fracR = rect.height > 0 ? (y - rect.top) / rect.height : 0.5;
+        const fracC = rect.width > 0 ? (x - rect.left) / rect.width : 0.5;
+
+        return findBestPlacement(piece, hoverR, hoverC, fracR, fracC);
+      }
+
+      // Ghost preview update (throttled to one render per animation frame)
+      let ghostRafPending = false;
+      function updateGhostPreview(x, y, slotIdx, liveCheck) {
+        if (ghostRafPending) return;
+        ghostRafPending = true;
+        requestAnimationFrame(() => {
+          ghostRafPending = false;
+          // Skip stale frames fired after the drop completed
+          if (liveCheck && !liveCheck()) return;
+          renderGhostPreview(x, y, slotIdx);
+        });
+      }
+
+      function renderGhostPreview(x, y, slotIdx) {
+        clearGhostHighlights();
+        const piece = engine.trayPieces[slotIdx];
+        if (!piece) return;
+
+        const targetEl = document.elementFromPoint(x, y);
+        const cellEl = targetEl ? targetEl.closest('.grid-cell') : null;
+        if (!cellEl) return;
+
+        const hoverR = parseInt(cellEl.dataset.row, 10);
+        const hoverC = parseInt(cellEl.dataset.col, 10);
+        const rect = cellEl.getBoundingClientRect();
+        const fracR = rect.height > 0 ? (y - rect.top) / rect.height : 0.5;
+        const fracC = rect.width > 0 ? (x - rect.left) / rect.width : 0.5;
+
+        const placement = findBestPlacement(piece, hoverR, hoverC, fracR, fracC);
+
+        if (placement) {
+          for (let r = 0; r < piece.rows; r++) {
+            for (let c = 0; c < piece.cols; c++) {
+              if (piece.matrix[r][c] === 1) {
+                const gr = placement.r + r;
+                const gc = placement.c + c;
+                if (gr >= 0 && gr < 8 && gc >= 0 && gc < 8) {
+                  cellElements[gr][gc].classList.add('ghost-valid');
+                }
+              }
+            }
+          }
+
+          // Highlight any rows/cols this placement would complete
+          const clears = getPendingClears(piece, placement);
+          clears.rows.forEach(r => {
+            for (let c = 0; c < 8; c++) cellElements[r][c].classList.add('ghost-clear');
+          });
+          clears.cols.forEach(c => {
+            for (let r = 0; r < 8; r++) cellElements[r][c].classList.add('ghost-clear');
+          });
+        } else {
+          // If no legal placement, show red invalid ghost at continuous center
+          const contStartR = hoverR + fracR - (piece.rows / 2);
+          const contStartC = hoverC + fracC - (piece.cols / 2);
+          const startR = Math.max(0, Math.min(8 - piece.rows, Math.round(contStartR)));
+          const startC = Math.max(0, Math.min(8 - piece.cols, Math.round(contStartC)));
+
+          for (let r = 0; r < piece.rows; r++) {
+            for (let c = 0; c < piece.cols; c++) {
+              if (piece.matrix[r][c] === 1) {
+                const gr = startR + r;
+                const gc = startC + c;
+                if (gr >= 0 && gr < 8 && gc >= 0 && gc < 8) {
+                  cellElements[gr][gc].classList.add('ghost-invalid');
+                }
+              }
+            }
+          }
+        }
+      }
+
+      function clearGhostHighlights() {
+        for (let r = 0; r < 8; r++) {
+          for (let c = 0; c < 8; c++) {
+            cellElements[r][c].classList.remove('ghost-valid', 'ghost-invalid', 'ghost-clear');
+          }
+        }
+      }
+
+      // Execute a validated placement
+      function executePlacement(slotIdx, startR, startC) {
+        const prevCombo = engine.combo;
+        const res = engine.placePiece(slotIdx, startR, startC);
+        if (!res.success) return;
+
+        selectedSlotIndex = null;
+        renderBoard();
+        updateHUD();
+        persist();
+
+        if (res.totalLines > 0) {
+          // Play escalating combo line blast audio
+          if (window.SoundFX) {
+            if (res.totalLines >= 2) {
+              window.SoundFX.playMultiBlast(res.totalLines);
+            } else {
+              window.SoundFX.playLineBlast(res.combo);
+            }
+          }
+
+          // Trigger blast animations on cleared cells
+          res.clearedCells.forEach(pt => {
+            const el = cellElements[pt.r][pt.c];
+            el.classList.add('blast-pop');
+            setTimeout(() => {
+              el.classList.remove('blast-pop');
+              renderBoard();
+            }, 320);
+          });
+
+          // Floating score popup: show actual points added!
+          spawnFloatingText(`+${res.pointsAdded}`, startR, startC);
+          if (res.combo > 1) {
+            setTimeout(() => spawnFloatingText(`COMBO x${res.combo}!`, 3, 3), 150);
+          }
+
+          // Coin reward
+          window.Progress.addCoins(res.totalLines);
+        } else {
+          spawnFloatingText(`+${res.pointsAdded}`, startR, startC);
+          if (prevCombo > 1) {
+            spawnFloatingText('COMBO LOST', Math.min(startR + 1, 7), startC, 'combo-lost');
+          }
+          if (window.SoundFX) window.SoundFX.playPlace();
+        }
+
+        renderTray();
+
+        // Check if High Score beaten
+        if (engine.score > window.Progress.getHighScore()) {
+          const isNewRecord = window.Progress.setHighScore(engine.score);
+          if (isNewRecord && window.SoundFX) {
+            window.SoundFX.playNewRecord();
+            window.Utils.showToast('🎉 NEW HIGH SCORE RECORD!', 'success');
+          }
+        }
+
+        // Check Game Over
+        if (res.isGameOver) {
+          handleGameOver();
+        }
+      }
+
+      // Spawn floating score/combo popup
+      function spawnFloatingText(text, r, c, cssClass) {
+        const popup = document.createElement('div');
+        popup.className = 'floating-popup' + (cssClass ? ` ${cssClass}` : '');
+        popup.textContent = text;
+        if (!cssClass) popup.style.fontSize = '1.3rem';
+
+        const cell = cellElements[Math.max(0, Math.min(7, r))][Math.max(0, Math.min(7, c))];
+        const rect = cell.getBoundingClientRect();
+        popup.style.left = `${rect.left + rect.width / 2}px`;
+        popup.style.top = `${rect.top}px`;
+
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 900);
+      }
+
+      // Handle Game Over
+      function handleGameOver() {
+        if (window.SoundFX) window.SoundFX.playGameOver();
+        window.Progress.clearActiveGame();
+        window.Progress.recordGameEnd(engine.score, engine.linesClearedThisGame, engine.maxCombo);
+
+        document.getElementById('final-score').textContent = engine.score;
+        document.getElementById('final-best').textContent = window.Progress.getHighScore();
+        window.Utils.openModal('gameover-modal');
+      }
+
+      // Revive Button
+      document.getElementById('revive-btn').addEventListener('click', () => {
+        if (!window.Progress.spendCoins(100)) {
+          window.Utils.showToast('Need 100 coins to revive!', 'warning');
+          return;
+        }
+
+        const cleared = engine.revive();
+        if (engine.isGameOver) {
+          // If still dead, do not take coins and keep modal open!
+          window.Progress.addCoins(100);
+          window.Utils.showToast('Could not revive — 100 coins refunded!', 'error');
+          return;
+        }
+
+        window.Utils.closeModal('gameover-modal');
+        if (window.SoundFX) window.SoundFX.playBomb();
+        renderBoard();
+        renderTray();
+        updateHUD();
+        persist();
+        window.Utils.showToast(`Revived! Cleared ${cleared.length} blocks!`, 'success');
+      });
+
+      // Play Again Button
+      document.getElementById('play-again-btn').addEventListener('click', () => {
+        window.Utils.closeModal('gameover-modal');
+        engine = new window.BlockEngine();
+        persist();
+        renderBoard();
+        renderTray();
+        updateHUD();
+      });
+
+      // Pause & Resume
+      document.getElementById('pause-btn').addEventListener('click', () => {
+        window.Utils.openModal('pause-modal');
+      });
+      document.getElementById('resume-btn').addEventListener('click', () => {
+        window.Utils.closeModal('pause-modal');
+      });
+      document.getElementById('restart-pause-btn').addEventListener('click', () => {
+        window.Utils.closeModal('pause-modal');
+        engine = new window.BlockEngine();
+        persist();
+        renderBoard();
+        renderTray();
+        updateHUD();
+      });
+
+      // Power-up Buttons
+      document.getElementById('powerup-rotate-btn').addEventListener('click', () => {
+        if (selectedSlotIndex === null) {
+          window.Utils.showToast('Select a piece in the tray first!', 'info');
+          return;
+        }
+        if (window.Progress.getPowerups().rotate <= 0) {
+          window.Utils.showToast('No Rotates left! Visit the Shop.', 'warning');
+          return;
+        }
+        if (!engine.rotatePiece(selectedSlotIndex)) {
+          window.Utils.showToast('Rotating would leave no valid placement!', 'warning');
+          return;
+        }
+        window.Progress.usePowerup('rotate');
+        if (window.SoundFX) window.SoundFX.playRotate();
+        renderTray();
+        updateHUD();
+        persist();
+        if (engine.isGameOver) {
+          handleGameOver();
+        }
+      });
+
+      document.getElementById('powerup-hammer-btn').addEventListener('click', () => {
+        if (window.Progress.getPowerups().hammer <= 0) {
+          window.Utils.showToast('No Hammers left! Visit the Shop.', 'warning');
+          return;
+        }
+        activeHammerMode = !activeHammerMode;
+        if (activeHammerMode) {
+          boardGridEl.style.cursor = 'crosshair';
+          boardGridEl.classList.add('hammer-mode');
+          window.Utils.showToast('Hammer active: Tap any cell to clear 3x3!', 'info');
+        } else {
+          boardGridEl.style.cursor = '';
+          boardGridEl.classList.remove('hammer-mode');
+          window.Utils.showToast('Hammer mode canceled', 'info');
+        }
+      });
+
+      document.getElementById('powerup-reroll-btn').addEventListener('click', () => {
+        if (window.Progress.usePowerup('reroll')) {
+          engine.rerollTray();
+          if (window.SoundFX) window.SoundFX.playRotate();
+          renderTray();
+          updateHUD();
+          persist();
+          if (engine.isGameOver) {
+            handleGameOver();
+          } else {
+            window.Utils.showToast('New pieces dealt!', 'success');
+          }
+        } else {
+          window.Utils.showToast('No Rerolls left! Visit the Shop.', 'warning');
+        }
+      });
+
+      // Initial Render
+      renderBoard();
+      renderTray();
+      updateHUD();
+    });
+  </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

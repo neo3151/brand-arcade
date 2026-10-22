@@ -1,0 +1,2706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Retro Arcade Hub — 10 Classic Casual Games with Free Play, Zero Ads, and Quick Sessions.">
+  <meta name="theme-color" content="#050811">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>RETRO ARCADE — 100% Free Play • Zero Ads</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/arcade-icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Chakra+Petch:ital,wght@0,500;0,600;0,700;0,800;1,700&family=Outfit:wght@600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
+  <script src="assets/arcade-daily.js"></script>
+  <script src="assets/arcade-inspector.js"></script>
+  <script src="assets/arcade-passport.js"></script>
+
+  <style>
+    :root {
+      --neon-cyan: #06b6d4;
+      --neon-green: #10b981;
+      --neon-pink: #ec4899;
+      --neon-yellow: #facc15;
+      --neon-orange: #f97316;
+      --neon-purple: #a855f7;
+      --neon-blue: #3b82f6;
+
+      --active-glow: #f59e0b;
+      --active-border: #d97706;
+      --active-shadow: rgba(245, 158, 11, 0.45);
+      
+      --arcade-dark: #050811;
+      --arcade-cabinet: #0d1322;
+      --arcade-bezel: #162035;
+      --arcade-border: #1e2d4a;
+      
+      --font-pixel: 'Press Start 2P', monospace;
+      --font-arcade: 'Chakra Petch', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+      --font-terminal: 'Space Mono', monospace;
+      --font-retro: 'Chakra Petch', sans-serif;
+      --font-display: 'Outfit', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--arcade-dark);
+      background-image: 
+        radial-gradient(circle at 50% 15%, var(--active-shadow) 0%, transparent 55%),
+        radial-gradient(circle at 85% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 15% 85%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+      background-attachment: fixed;
+      color: #e2e8f0;
+      font-family: var(--font-retro);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      overflow-x: hidden;
+      line-height: 1.4;
+      transition: background-image 0.4s ease;
+    }
+
+    /* CRT Scanline Shader Overlay */
+    .crt-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+      background-size: 100% 4px;
+      opacity: 0.65;
+      transition: opacity 0.2s ease;
+    }
+
+    .crt-flicker {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.7) 100%);
+    }
+
+    body.scanlines-off .crt-overlay {
+      opacity: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1220px;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ARCADE MARQUEE TOP HEADER */
+    .arcade-header {
+      width: 100%;
+      padding: max(16px, env(safe-area-inset-top)) 0 14px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 2px solid var(--arcade-border);
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .marquee-chase-lights {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .chase-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #334155;
+      animation: chaseBlink 1.4s infinite;
+    }
+
+    .chase-dot:nth-child(2n) { animation-delay: 0.2s; }
+    .chase-dot:nth-child(3n) { animation-delay: 0.4s; }
+    .chase-dot:nth-child(4n) { animation-delay: 0.6s; }
+
+    @keyframes chaseBlink {
+      0%, 100% { background: #334155; box-shadow: none; }
+      50% { background: var(--neon-yellow); box-shadow: 0 0 10px var(--neon-yellow); }
+    }
+
+    .marquee-title-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+    }
+
+    .marquee-badge {
+      font-family: var(--font-arcade);
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(236, 72, 153, 0.15);
+      border: 1px solid var(--neon-pink);
+      color: var(--neon-pink);
+      padding: 5px 14px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      box-shadow: 0 0 14px rgba(236, 72, 153, 0.35);
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.85; }
+      50% { opacity: 1; filter: drop-shadow(0 0 8px var(--neon-pink)); }
+    }
+
+    .marquee-title {
+      font-family: var(--font-pixel);
+      font-size: 1.85rem;
+      font-weight: 400;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      line-height: 1.35;
+      text-shadow: 
+        0 0 10px rgba(6, 182, 212, 0.7),
+        0 0 24px rgba(6, 182, 212, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    @media (max-width: 640px) {
+      .marquee-title { font-size: 1.15rem; gap: 8px; }
+    }
+
+    .marquee-title span.neon-glow {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 15px var(--neon-cyan);
+    }
+
+    .marquee-title span.neon-yellow {
+      color: var(--neon-yellow);
+      text-shadow: 0 0 15px var(--neon-yellow);
+    }
+
+    /* TOP STATUS STRIP (CREDITS / STREAK / CONTROLS) */
+    .arcade-status-strip {
+      width: 100%;
+      background: #090e1a;
+      border: 1.5px solid var(--arcade-border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-arcade);
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    .status-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-item strong {
+      color: var(--neon-yellow);
+      letter-spacing: 0.06em;
+    }
+
+    .status-blink {
+      color: var(--neon-green);
+      font-weight: 700;
+      animation: blinkText 1.2s infinite steps(1);
+    }
+
+    @keyframes blinkText {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    .btn-toggle-arcade {
+      background: #162035;
+      border: 1px solid #2d3f66;
+      color: #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-family: var(--font-arcade);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.2;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-toggle-arcade:hover {
+      background: #223254;
+      color: #ffffff;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+    }
+
+    /* QUICK SESSION VIBE SELECTOR BAR */
+    .session-vibe-bar {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      background: rgba(13, 19, 34, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid var(--arcade-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    .vibe-buttons-group {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+
+    .vibe-buttons-group::-webkit-scrollbar { display: none; }
+
+    .btn-vibe {
+      background: #090e1a;
+      border: 1.5px solid #2a3955;
+      border-radius: 6px;
+      color: #cbd5e1;
+      padding: 8px 14px;
+      font-family: var(--font-arcade);
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.2;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      text-transform: uppercase;
+    }
+
+    .btn-vibe:hover {
+      color: #ffffff;
+      border-color: var(--neon-cyan);
+      transform: translateY(-2px);
+    }
+
+    .btn-vibe.active {
+      background: #1e293b;
+      color: var(--neon-yellow);
+      border-color: var(--neon-yellow);
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.35), inset 0 0 6px rgba(250, 204, 21, 0.15);
+    }
+
+    .btn-vibe-roulette {
+      background: linear-gradient(135deg, rgba(236,72,153,0.2) 0%, rgba(168,85,247,0.2) 100%);
+      border-color: var(--neon-pink);
+      color: #f472b6;
+    }
+
+    .btn-vibe-roulette:hover {
+      background: linear-gradient(135deg, rgba(236,72,153,0.35) 0%, rgba(168,85,247,0.35) 100%);
+      border-color: var(--neon-pink);
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(236,72,153,0.45);
+    }
+
+    .btn-vibe-daily {
+      background: linear-gradient(135deg, rgba(250, 204, 21, 0.18) 0%, rgba(245, 158, 11, 0.18) 100%);
+      border-color: var(--neon-yellow);
+      color: var(--neon-yellow);
+      animation: pulseDaily 2.4s infinite ease-in-out;
+    }
+
+    .btn-vibe-daily:hover {
+      background: linear-gradient(135deg, rgba(250, 204, 21, 0.35) 0%, rgba(245, 158, 11, 0.35) 100%);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(250, 204, 21, 0.55);
+    }
+
+    @keyframes pulseDaily {
+      0%, 100% { box-shadow: 0 0 8px rgba(250, 204, 21, 0.25); }
+      50% { box-shadow: 0 0 16px rgba(250, 204, 21, 0.6); }
+    }
+
+    .vibe-view-toggles {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .retro-search-box {
+      position: relative;
+      min-width: 220px;
+    }
+
+    .retro-search-input {
+      width: 100%;
+      background: #090e1a;
+      border: 1.5px solid var(--arcade-border);
+      border-radius: 6px;
+      padding: 7px 10px 7px 32px;
+      color: var(--neon-green);
+      font-family: var(--font-arcade);
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .retro-search-input:focus {
+      border-color: var(--neon-green);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+
+    .retro-search-prompt {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--neon-green);
+      font-family: var(--font-arcade);
+      font-size: 1rem;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .btn-toggle-view {
+      background: #162035;
+      border: 1px solid #2d3f66;
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: var(--font-arcade);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.2;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-toggle-view:hover {
+      border-color: var(--neon-cyan);
+      color: #ffffff;
+    }
+
+    .btn-toggle-view.active {
+      background: #1e293b;
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+    }
+
+    /* ======================================================== */
+    /* 3D ARCADE STAGE & PHYSICAL CABINET HERO                  */
+    /* ======================================================== */
+    .arcade-stage-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .stage-perspective-wrap {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      perspective: 1200px;
+      min-height: 480px;
+      padding: 10px 0;
+      touch-action: pan-y;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Flanking Ghost Cabinets (3D Perspective) */
+    .ghost-cabinet {
+      position: absolute;
+      width: 220px;
+      height: 380px;
+      background: linear-gradient(180deg, #0b111e 0%, #060911 100%);
+      border: 2px solid #1e293b;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0.45;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      user-select: none;
+      z-index: 1;
+    }
+
+    .ghost-cabinet:hover {
+      opacity: 0.75;
+      transform: scale(1.04);
+    }
+
+    .ghost-cabinet.left {
+      left: 0;
+      transform: rotateY(25deg) scale(0.85);
+      transform-origin: left center;
+    }
+
+    .ghost-cabinet.right {
+      right: 0;
+      transform: rotateY(-25deg) scale(0.85);
+      transform-origin: right center;
+    }
+
+    @media (max-width: 820px) {
+      .ghost-cabinet { display: none; }
+    }
+
+    .ghost-marquee-title {
+      font-family: var(--font-arcade);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      text-align: center;
+      margin-top: 10px;
+      text-transform: uppercase;
+    }
+
+    .ghost-icon {
+      font-size: 3rem;
+      filter: grayscale(0.5);
+    }
+
+    /* Center Stage Active Arcade Cabinet */
+    .hero-center-cabinet {
+      width: 100%;
+      max-width: 660px;
+      background: linear-gradient(180deg, #101726 0%, #080d18 100%);
+      border: 3px solid var(--active-border);
+      border-radius: 16px;
+      box-shadow: 
+        0 16px 48px rgba(0, 0, 0, 0.85),
+        0 0 35px var(--active-shadow),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      z-index: 5;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Physical Cabinet Marquee (Top Lightbox) */
+    .cabinet-marquee-head {
+      background: linear-gradient(90deg, #090e1a 0%, #172033 50%, #090e1a 100%);
+      border-bottom: 3px solid var(--active-border);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+    }
+
+    .cabinet-marquee-head::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .marquee-cabinet-id {
+      font-family: var(--font-arcade);
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--active-glow);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 8px var(--active-glow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .marquee-chase-mini {
+      display: flex;
+      gap: 6px;
+    }
+
+    .chase-mini-bulb {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--active-glow);
+      box-shadow: 0 0 6px var(--active-glow);
+      animation: pulseGlow 1.5s infinite;
+    }
+
+    .marquee-genre-pill {
+      font-family: var(--font-arcade);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #ffffff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    /* Cabinet CRT Bezel Screen Area */
+    .cabinet-crt-chamber {
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 22px;
+      align-items: center;
+      background: #050811;
+      border-bottom: 3px solid #162035;
+      position: relative;
+    }
+
+    @media (max-width: 620px) {
+      .cabinet-crt-chamber {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 14px;
+        text-align: center;
+      }
+    }
+
+    .crt-monitor-frame {
+      background: radial-gradient(circle at center, #0e172a 0%, #03060d 100%);
+      border: 3px solid #1e293b;
+      border-radius: 12px;
+      padding: 18px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 
+        inset 0 0 25px rgba(0,0,0,0.95),
+        0 4px 12px rgba(0,0,0,0.6);
+      min-height: 180px;
+    }
+
+    .crt-screen-reflection {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 55%);
+      pointer-events: none;
+      border-radius: 9px;
+    }
+
+    .crt-game-emblem {
+      font-size: 5rem;
+      filter: drop-shadow(0 0 20px var(--active-glow));
+      animation: floatEmblem 3s infinite ease-in-out;
+      margin-bottom: 8px;
+      user-select: none;
+    }
+
+    @keyframes floatEmblem {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-6px) scale(1.05); }
+    }
+
+    .crt-speed-tag {
+      font-family: var(--font-arcade);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--neon-yellow);
+      background: rgba(0,0,0,0.6);
+      padding: 3px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      white-space: nowrap;
+    }
+
+    /* Screen Meta & Details */
+    .crt-game-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hero-game-title {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-game-subtitle {
+      font-family: var(--font-arcade);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--active-glow);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .hero-game-desc {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .hero-stats-strip {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-family: var(--font-arcade);
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #cbd5e1;
+      margin-top: 4px;
+    }
+
+    .hero-stats-strip span strong {
+      color: var(--neon-green);
+      letter-spacing: 0.05em;
+    }
+
+    /* Cabinet Control Panel Deck */
+    .cabinet-control-deck {
+      background: linear-gradient(180deg, #111a2e 0%, #090e1a 100%);
+      padding: 16px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      box-shadow: inset 0 2px 6px rgba(255,255,255,0.06);
+    }
+
+    .deck-joystick-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .deck-nav-btn {
+      background: #162035;
+      border: 2px solid #2d3f66;
+      color: #ffffff;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 0 #0b111e;
+      transition: all 0.1s ease;
+      user-select: none;
+    }
+
+    .deck-nav-btn:hover {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 4px 0 #0b111e, 0 0 10px rgba(6, 182, 212, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .deck-nav-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #0b111e;
+    }
+
+    .deck-action-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      flex: 1;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 620px) {
+      .deck-action-buttons {
+        justify-content: center;
+        width: 100%;
+      }
+      .deck-joystick-wrap {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .btn-push-play {
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      border: 2px solid #34d399;
+      color: #050811;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-family: var(--font-arcade);
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 
+        0 6px 0 #047857,
+        0 8px 20px rgba(16, 185, 129, 0.4);
+      transition: all 0.1s ease;
+      text-transform: uppercase;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn-push-play:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 8px 0 #047857,
+        0 12px 24px rgba(16, 185, 129, 0.6);
+      filter: brightness(1.1);
+    }
+
+    .btn-push-play:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #047857;
+    }
+
+    .btn-push-sub {
+      background: #162035;
+      border: 2px solid #2d3f66;
+      color: #cbd5e1;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-family: var(--font-arcade);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      line-height: 1.2;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      box-shadow: 0 4px 0 #0b111e;
+      transition: all 0.1s ease;
+      text-transform: uppercase;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn-push-sub:hover {
+      border-color: var(--neon-cyan);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #0b111e, 0 0 10px rgba(6, 182, 212, 0.35);
+    }
+
+    .btn-push-sub:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #0b111e;
+    }
+
+    /* Cabinet Base Coin Door Strip */
+    .cabinet-coin-door {
+      background: #070b13;
+      border-top: 2px solid #162035;
+      padding: 8px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-arcade);
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: #64748b;
+    }
+
+    .coin-slot-lit {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--neon-orange);
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .coin-slot-lit:hover {
+      color: #ffffff;
+      background: rgba(249, 115, 22, 0.25);
+    }
+
+    /* ======================================================== */
+    /* HORIZONTAL MARQUEE WHEEL / CARTRIDGE SELECTOR RIBBON     */
+    /* ======================================================== */
+    .marquee-wheel-container {
+      width: 100%;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .wheel-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-arcade);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.06em;
+    }
+
+    .wheel-track-scroller {
+      width: 100%;
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 8px 4px 14px 4px;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--arcade-border) #090e1a;
+    }
+
+    .wheel-track-scroller::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .wheel-track-scroller::-webkit-scrollbar-track {
+      background: #090e1a;
+      border-radius: 4px;
+    }
+
+    .wheel-track-scroller::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+
+    .wheel-cart-slot {
+      flex: 0 0 160px;
+      background: #0c1220;
+      border: 2px solid var(--cart-border, #1e293b);
+      border-radius: 8px;
+      padding: 10px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+
+    .wheel-cart-slot:hover {
+      transform: translateY(-4px);
+      border-color: var(--cart-glow, #38bdf8);
+      background: #131d33;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 14px var(--cart-shadow, rgba(6, 182, 212, 0.25));
+    }
+
+    .wheel-cart-slot.active {
+      border-color: var(--cart-glow, var(--neon-yellow));
+      background: #15223c;
+      transform: translateY(-6px);
+      box-shadow: 
+        0 10px 24px rgba(0,0,0,0.7),
+        0 0 18px var(--cart-shadow, rgba(250, 204, 21, 0.45)),
+        inset 0 0 8px var(--cart-shadow, rgba(250, 204, 21, 0.2));
+    }
+
+    .wheel-cart-slot.active::after {
+      content: '▲';
+      position: absolute;
+      top: -12px;
+      font-size: 0.65rem;
+      color: var(--cart-glow, var(--neon-yellow));
+      text-shadow: 0 0 8px var(--cart-glow);
+    }
+
+    .cart-slot-icon {
+      font-size: 2.2rem;
+      margin-bottom: 2px;
+    }
+
+    .cart-slot-title {
+      font-family: var(--font-retro);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+
+    .cart-slot-time {
+      font-family: var(--font-arcade);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--cart-glow, #94a3b8);
+      text-transform: uppercase;
+      background: rgba(0,0,0,0.5);
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.08);
+      letter-spacing: 0.04em;
+    }
+
+    /* ======================================================== */
+    /* CABINET WALL MATRIX VIEW (TOGGLEABLE)                    */
+    /* ======================================================== */
+    .cabinet-wall-section {
+      width: 100%;
+      display: none;
+      margin-bottom: 30px;
+    }
+
+    .cabinet-wall-section.show {
+      display: block;
+    }
+
+    .wall-cabinets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+
+    .wall-card {
+      background: var(--arcade-cabinet);
+      border: 2px solid var(--cabinet-border, var(--arcade-border));
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.15s ease;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .wall-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--cabinet-glow, #38bdf8);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6), 0 0 16px var(--cabinet-shadow, rgba(6, 182, 212, 0.35));
+      background: #111a30;
+    }
+
+    .wall-card.selected {
+      border-color: var(--neon-yellow);
+      box-shadow: 0 0 18px rgba(250, 204, 21, 0.45);
+    }
+
+    .wall-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .wall-tag {
+      font-family: var(--font-arcade);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      background: #162035;
+      color: var(--cabinet-glow, #38bdf8);
+      border: 1px solid var(--cabinet-border, #2d3f66);
+      padding: 3px 8px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .wall-speed {
+      font-family: var(--font-arcade);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--neon-yellow);
+    }
+
+    .wall-card-body {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .wall-card-icon {
+      font-size: 2.2rem;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #090e1a;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .wall-card-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.15;
+    }
+
+    .wall-card-sub {
+      font-size: 0.8rem;
+      color: var(--cabinet-glow, #38bdf8);
+    }
+
+    .wall-card-desc {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      line-height: 1.4;
+      margin-bottom: 12px;
+      flex: 1;
+    }
+
+    .wall-card-footer {
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid var(--arcade-border);
+      padding-top: 10px;
+    }
+
+    /* MODAL POPUPS */
+    .retro-modal {
+      background: #0d1322;
+      border: 2px solid var(--neon-cyan);
+      border-radius: 12px;
+      color: #e2e8f0;
+      padding: 20px;
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      max-width: 480px;
+      max-height: 88vh;
+      max-height: 88dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 90%;
+      margin: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(6, 182, 212, 0.4);
+    }
+
+    .retro-modal::backdrop {
+      background: rgba(5, 8, 17, 0.85);
+      backdrop-filter: blur(6px);
+    }
+
+    .modal-head-retro {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid var(--arcade-border);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+    }
+
+    .modal-title-retro {
+      font-family: var(--font-arcade);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close-retro {
+      background: #162035;
+      border: 1px solid #2d3f66;
+      color: #cbd5e1;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close-retro:hover {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #ef4444;
+    }
+
+    /* RETRO TOAST NOTIFICATIONS */
+    .retro-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #090e1a;
+      border: 2px solid var(--neon-green);
+      color: var(--neon-green);
+      font-family: var(--font-arcade);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 10px 20px;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.8), 0 0 16px rgba(16, 185, 129, 0.4);
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .retro-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- CRT Shaders -->
+  <div class="crt-overlay" id="crt-overlay"></div>
+  <div class="crt-flicker"></div>
+
+  <div class="container">
+    <!-- ARCADE MARQUEE TOP -->
+    <header class="arcade-header">
+      <div class="marquee-chase-lights">
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+        <div class="chase-dot"></div>
+      </div>
+
+      <div class="marquee-title-wrap">
+        <div class="marquee-badge">★ NO COMMERCIALS • UNLIMITED FREE PLAY ★</div>
+        <h1 class="marquee-title">
+          <span id="brand-header-title">BRAND</span>
+          <span class="neon-glow">RETRO</span>
+          <span class="neon-yellow">ARCADE</span>
+        </h1>
+      </div>
+
+      <!-- ARCADE STATUS STRIP -->
+      <div class="arcade-status-strip">
+        <div class="status-group">
+          <div class="status-item">
+            <span>CREDITS:</span>
+            <strong class="status-blink">FREE PLAY</strong>
+          </div>
+          <div class="status-item">
+            <span>ADS:</span>
+            <strong style="color: var(--neon-green);">0 (NEVER)</strong>
+          </div>
+          <div class="status-item">
+            <span>STREAK:</span>
+            <strong id="arcade-streak-val" style="color: var(--neon-yellow);">DAY 1</strong>
+          </div>
+          <div class="status-item">
+            <span>PLAYED:</span>
+            <strong id="arcade-sessions-val" style="color: var(--neon-cyan);">0 SESSIONS</strong>
+          </div>
+        </div>
+
+        <div class="status-group">
+          <button type="button" id="btn-open-daily" class="btn-toggle-arcade" style="color: var(--neon-yellow); border-color: rgba(250,204,21,0.5);" title="Today's Universal Daily Challenge">
+            📅 DAILY RUN
+          </button>
+          <button type="button" id="btn-open-passport" class="btn-toggle-arcade" style="color: var(--neon-yellow); border-color: rgba(250,204,21,0.5);" title="Open Arcade Passport & Cross-Game Trophy Room">
+            🏆 PASSPORT (<span id="passport-trophy-count">0/8</span>)
+          </button>
+          <button type="button" id="btn-toggle-crt" class="btn-toggle-arcade" title="Toggle CRT scanlines">
+            📺 CRT: ON
+          </button>
+          <button type="button" id="btn-toggle-sound" class="btn-toggle-arcade" title="Toggle 8-bit sound fx">
+            🔊 SFX: ON
+          </button>
+          <button type="button" id="btn-open-settings" class="btn-toggle-arcade" title="Custom brand and settings">
+            ⚙️ SETUP
+          </button>
+          <button type="button" id="btn-open-pledge" class="btn-toggle-arcade" style="color: var(--neon-pink); border-color: rgba(236,72,153,0.4);" title="Why zero ads?">
+            🛡️ MANIFESTO
+          </button>
+          <button type="button" id="btn-hub-dev-inspector" class="btn-toggle-arcade" style="color: var(--neon-cyan); border-color: rgba(6,182,212,0.4);" title="Open 'Behind the Build' Developer Telemetry & Architecture HUD (Hotkey: ~ or D)">
+            🛠️ DEV HUD
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- QUICK SESSION VIBE BAR (MODE & TIME FILTERS) -->
+    <nav class="session-vibe-bar">
+      <div class="vibe-buttons-group">
+        <button class="btn-vibe btn-vibe-daily" id="btn-vibe-daily" title="Jump to today's featured daily challenge machine!">
+          📅 DAILY RUN (<span id="daily-vibe-streak">1🔥</span>)
+        </button>
+        <button class="btn-vibe active" data-vibe="all">
+          🕹️ ALL 10 CARTS
+        </button>
+        <button class="btn-vibe" data-vibe="blitz">
+          ⚡ 2-4m BLITZ
+        </button>
+        <button class="btn-vibe" data-vibe="coffee">
+          ☕ 5-10m BREAK
+        </button>
+        <button class="btn-vibe" data-vibe="deep">
+          🌙 10-20m DEEP
+        </button>
+        <button class="btn-vibe" data-vibe="favorites">
+          ⭐ SAVED (<span id="fav-badge-count">0</span>)
+        </button>
+        <button class="btn-vibe btn-vibe-roulette" id="btn-roulette" title="Spin the wheel for a random quick session!">
+          🎲 RANDOM DROP
+        </button>
+      </div>
+
+      <div class="vibe-view-toggles">
+        <div class="retro-search-box">
+          <span class="retro-search-prompt">&gt;</span>
+          <input type="text" id="arcade-search" class="retro-search-input" placeholder="FIND ROM..." autocomplete="off">
+        </div>
+        <button type="button" id="btn-view-stage" class="btn-toggle-view active" title="3D Arcade Cabinet Stage">
+          🕹️ STAGE
+        </button>
+        <button type="button" id="btn-view-wall" class="btn-toggle-view" title="Grid Wall Matrix Overview">
+          🗂️ WALL
+        </button>
+      </div>
+    </nav>
+
+    <!-- 3D ARCADE STAGE & CABINET SHOWCASE -->
+    <section class="arcade-stage-section" id="stage-section">
+      <div class="stage-perspective-wrap">
+        <!-- Left Ghost Cabinet -->
+        <div class="ghost-cabinet left" id="ghost-left" title="Previous Cabinet (Press Left Arrow)">
+          <div class="ghost-icon" id="ghost-left-icon">💣</div>
+          <div class="ghost-marquee-title" id="ghost-left-title">Inferno Sweeper</div>
+        </div>
+
+        <!-- Center Stage Main Physical Cabinet -->
+        <div class="hero-center-cabinet" id="hero-cabinet">
+          <!-- Marquee Lightbox Header -->
+          <div class="cabinet-marquee-head">
+            <div class="marquee-cabinet-id">
+              <span id="cabinet-num-badge">CABINET #01</span>
+              <div class="marquee-chase-mini">
+                <div class="chase-mini-bulb"></div>
+                <div class="chase-mini-bulb"></div>
+              </div>
+            </div>
+            <div class="marquee-genre-pill" id="hero-genre-badge">QUICK BLITZ</div>
+          </div>
+
+          <!-- CRT Monitor Frame -->
+          <div class="cabinet-crt-chamber">
+            <div class="crt-monitor-frame">
+              <div class="crt-screen-reflection"></div>
+              <div class="crt-game-emblem" id="hero-avatar">🧱</div>
+              <div class="crt-speed-tag" id="hero-speed-tag">⚡ 2–4 MINS</div>
+            </div>
+
+            <div class="crt-game-details">
+              <h2 class="hero-game-title" id="hero-title">Timber Block Blast</h2>
+              <div class="hero-game-subtitle" id="hero-sub">8×8 Tactical Wood Block Puzzle</div>
+              <p class="hero-game-desc" id="hero-desc">
+                High-speed wooden block dropper. Drop shapes into rows & columns to trigger chain combos with satisfying wood haptics.
+              </p>
+              <div class="hero-stats-strip">
+                <span>SESSION: <strong id="hero-stat-speed">⚡ ULTRA FAST</strong></span>
+                <span>OFFLINE: <strong>100% READY</strong></span>
+                <span>ADS: <strong>ZERO</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Physical Control Deck -->
+          <div class="cabinet-control-deck">
+            <div class="deck-joystick-wrap">
+              <button type="button" id="btn-prev-cabinet" class="deck-nav-btn" title="Previous Cabinet (A / Left Arrow)">◀</button>
+              <button type="button" id="btn-next-cabinet" class="deck-nav-btn" title="Next Cabinet (D / Right Arrow)">▶</button>
+            </div>
+
+            <div class="deck-action-buttons">
+              <button type="button" id="hero-btn-daily" class="btn-push-sub" style="color: var(--neon-yellow); border-color: rgba(250,204,21,0.5);" title="Today's Universal Daily Mission">
+                <span>📅</span> DAILY RUN
+              </button>
+              <button type="button" id="hero-btn-fav" class="btn-push-sub" title="Save Cartridge">
+                <span id="hero-fav-star">☆</span> SAVE
+              </button>
+              <button type="button" id="hero-btn-app" class="btn-push-sub" title="Standalone App Store & Deep Links">
+                <span>📲</span> STORE APP
+              </button>
+              <a href="blockblast/www/index.html" id="hero-btn-play" class="btn-push-play">
+                <span>🕹️</span> PUSH START (PLAY)
+              </a>
+            </div>
+          </div>
+
+          <!-- Cabinet Coin Door -->
+          <div class="cabinet-coin-door">
+            <span>KEYBOARD: [← / →] SELECT • [ENTER] PLAY • [R] ROULETTE</span>
+            <div class="coin-slot-lit" id="coin-slot-btn" title="Insert Virtual Coin for SFX!">
+              <span>🪙</span> 25¢ INSERT COIN
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Ghost Cabinet -->
+        <div class="ghost-cabinet right" id="ghost-right" title="Next Cabinet (Press Right Arrow)">
+          <div class="ghost-icon" id="ghost-right-icon">🔐</div>
+          <div class="ghost-marquee-title" id="ghost-right-title">Black Vault</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HORIZONTAL MARQUEE / CARTRIDGE RIBBON SELECTOR -->
+    <section class="marquee-wheel-container" id="wheel-container">
+      <div class="wheel-header-row">
+        <span>QUICK SESSION ROM RACK (CLICK ANY CART TO LOAD)</span>
+        <span id="wheel-count-label">10 MACHINES ONLINE</span>
+      </div>
+
+      <div class="wheel-track-scroller" id="wheel-scroller">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- ALTERNATE CABINET WALL MATRIX SECTION (TOGGLED) -->
+    <section class="cabinet-wall-section" id="wall-section">
+      <div class="wall-cabinets-grid" id="wall-grid">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+  </div>
+
+  <!-- UNIVERSAL DAILY CHALLENGE MODAL (WORDLE-STYLE VIRAL LOOP) -->
+  <dialog id="modal-daily-challenge" class="retro-modal" style="max-width: 530px;">
+    <div class="modal-head-retro">
+      <div class="modal-title-retro" style="color: var(--neon-yellow);">
+        <span>📅</span> <span id="daily-modal-heading">DAILY RUN — DAY #42</span>
+      </div>
+      <button class="modal-close-retro" type="button" data-close="modal-daily-challenge">✕</button>
+    </div>
+    
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <!-- Daily Mission Banner -->
+      <div style="background: #090e1a; border: 2px solid var(--neon-yellow); border-radius: 8px; padding: 14px; display: flex; gap: 14px; align-items: center; box-shadow: 0 0 20px rgba(250, 204, 21, 0.25);">
+        <div id="daily-game-avatar" style="font-size: 3rem; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; background: #162035; border: 1.5px solid #2d3f66; border-radius: 8px; flex-shrink: 0;">
+          🧱
+        </div>
+        <div style="flex: 1;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div id="daily-game-name" style="font-family: var(--font-display); font-weight: 900; font-size: 1.35rem; color: #ffffff; letter-spacing: -0.01em;">Timber Block Blast</div>
+            <span id="daily-pill-badge" style="font-family: var(--font-arcade); font-size: 0.76rem; background: var(--neon-yellow); color: #050811; padding: 3px 8px; border-radius: 4px; font-weight: 800; letter-spacing: 0.06em;">DAY #42</span>
+          </div>
+          <div id="daily-mission-goal" style="font-family: var(--font-retro); font-size: 0.95rem; color: #e2e8f0; margin-top: 5px; line-height: 1.45; font-weight: 500;">
+            Clear 6 double-lines & reach 3,500+ pts
+          </div>
+          <div style="display: flex; gap: 16px; margin-top: 6px; font-family: var(--font-arcade); font-size: 0.92rem; color: #94a3b8; letter-spacing: 0.04em;">
+            <span>SEED: <strong id="daily-seed-badge" style="color: var(--neon-cyan); letter-spacing: 0.06em;">#89231</strong></span>
+            <span>PAR TIME: <strong id="daily-par-time" style="color: var(--neon-green); letter-spacing: 0.06em;">2m 30s</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Streak & Reset Ticker -->
+      <div style="display: flex; justify-content: space-between; align-items: center; background: #0c1220; border: 1.5px solid var(--arcade-border); border-radius: 6px; padding: 10px 14px; font-family: var(--font-arcade); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.05em;">
+        <div>
+          <span>DAILY STREAK: </span>
+          <strong id="daily-streak-count" style="color: var(--neon-yellow); letter-spacing: 0.06em;">🔥 1 DAY</strong>
+        </div>
+        <div>
+          <span>NEXT RESET: </span>
+          <strong id="daily-countdown-clock" style="color: var(--neon-cyan); letter-spacing: 0.08em;">16:21:40</strong>
+        </div>
+      </div>
+
+      <!-- Actions Strip -->
+      <div style="display: flex; gap: 10px;">
+        <a id="btn-launch-daily" href="blockblast/www/index.html?daily=1" class="btn-push-play" style="flex: 1.5; justify-content: center; font-size: 0.92rem;">
+          <span>🕹️</span> LAUNCH MISSION
+        </a>
+        <button type="button" id="btn-simulate-daily" class="btn-push-sub" style="flex: 1; font-size: 0.85rem; justify-content: center; white-space: nowrap;" title="Simulate completion to test the Wordle share card">
+          <span>⚡</span> SIMULATE RUN
+        </button>
+      </div>
+
+      <!-- Wordle-Style Emoji Share Output -->
+      <div style="border-top: 1.5px solid var(--arcade-border); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-family: var(--font-arcade); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+          <span>WORDLE-STYLE EMOJI SHARE CARD:</span>
+          <span style="color: var(--neon-green); font-size: 0.72rem; letter-spacing: 0.04em;">1-CLICK VIRAL COPY</span>
+        </div>
+        
+        <pre id="daily-share-preview" style="background: #060911; border: 1.5px solid #1e293b; border-radius: 6px; padding: 12px; font-family: var(--font-mono); font-size: 0.88rem; color: #a7f3d0; line-height: 1.55; letter-spacing: 0.02em; white-space: pre-wrap; word-break: break-word; user-select: all;"></pre>
+
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="btn-copy-daily-card" class="btn-push-play" style="flex: 1; justify-content: center; font-size: 0.88rem; padding: 10px 14px;">
+            <span>📋</span> COPY EMOJI SHARE CARD
+          </button>
+          <button type="button" id="btn-tweet-daily-card" class="btn-push-sub" style="justify-content: center; font-size: 0.88rem; padding: 10px 14px;" title="Share on Twitter / X">
+            <span>🐦</span> SHARE
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ROM / CARTRIDGE APP STORE MODAL -->
+  <dialog id="modal-cart-info" class="retro-modal">
+    <div class="modal-head-retro">
+      <div class="modal-title-retro">
+        <span>📲</span> <span id="cart-modal-title">STANDALONE APP EDITION</span>
+      </div>
+      <button class="modal-close-retro" type="button" data-close="modal-cart-info">✕</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      
+      <!-- Platform Detection Banner -->
+      <div id="cart-platform-banner" style="display: none; padding: 10px 14px; border-radius: 6px; font-family: var(--font-arcade); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.05em; text-align: center; line-height: 1.45;">
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: center; background: #090e1a; padding: 12px; border: 1.5px solid var(--arcade-border); border-radius: 6px;">
+        <div id="cart-modal-icon" style="font-size: 2.8rem; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; background: #162035; border-radius: 6px; flex-shrink: 0;">
+          🎮
+        </div>
+        <div>
+          <div id="cart-modal-name" style="font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; color: #ffffff;">Game Title</div>
+          <div id="cart-modal-pkg" style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--neon-cyan); letter-spacing: 0.04em; margin-top: 2px;">com.gamingempire.game</div>
+          <div style="font-family: var(--font-arcade); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; color: var(--neon-green); margin-top: 4px;">✓ INDIVIDUAL APP STORE EDITION • 100% AD-FREE</div>
+        </div>
+      </div>
+
+      <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.45;">
+        You can launch this title instantly right here in the hub, or download it as an <strong>individual standalone app</strong> from Google Play and the Apple App Store for dedicated offline play!
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" id="btn-cart-deep" class="btn-push-play" style="justify-content: center; min-height: 48px; font-size: 0.8rem; padding: 10px 12px; text-align: center; line-height: 1.3;">
+          <span>📲</span> LAUNCH INSTALLED APP (DEEP LINK)
+        </button>
+        <div id="cart-store-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <a id="btn-cart-appstore" href="#" target="_blank" class="btn-push-sub" style="justify-content: center; min-height: 44px; font-size: 0.78rem; padding: 8px 10px;">
+            <span>🍎</span> APP STORE (iOS)
+          </a>
+          <a id="btn-cart-playstore" href="#" target="_blank" class="btn-push-sub" style="justify-content: center; min-height: 44px; font-size: 0.78rem; padding: 8px 10px;">
+            <span>🤖</span> GOOGLE PLAY
+          </a>
+        </div>
+        <a id="btn-cart-web" href="#" class="btn-push-sub" style="justify-content: center; color: #94a3b8; min-height: 44px;">
+          <span>🌐</span> PLAY INSTANT WEB EDITION
+        </a>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ZERO-AD MANIFESTO MODAL -->
+  <dialog id="modal-pledge" class="retro-modal">
+    <div class="modal-head-retro">
+      <div class="modal-title-retro">
+        <span>🛡️</span> ZERO-AD ARCADE PLEDGE
+      </div>
+      <button class="modal-close-retro" type="button" data-close="modal-pledge">✕</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.88rem; line-height: 1.5; color: #cbd5e1;">
+      <p style="color: var(--neon-yellow); font-weight: 700;">
+        "Arcade gaming was built for pure skill and quick fun — not 30-second casino video ads."
+      </p>
+      <p>
+        At <strong id="pledge-brand-name">Brand</strong>, we built this 10-game retro collection as a gift for our community. Every game features:
+      </p>
+      <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--neon-green); padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.6; letter-spacing: 0.02em; color: #a7f3d0;">
+        • 0 Third-Party Advertisements (Forever)<br>
+        • 0 Forced Subscriptions or In-App Purchases<br>
+        • 100% Offline Capability (Airplane & Subway Friendly)
+      </div>
+      <p>
+        <strong>Spread the word:</strong> Tell your friends, share the link, or install our standalone releases on the App Store and Google Play!
+      </p>
+      <button type="button" id="btn-share-retro" class="btn-push-sub" style="justify-content: center; width: 100%;">
+        🔗 COPY ARCADE LINK TO SHARE
+      </button>
+    </div>
+  </dialog>
+
+  <!-- SETUP / BRAND SETTINGS MODAL -->
+  <dialog id="modal-setup" class="retro-modal">
+    <div class="modal-head-retro">
+      <div class="modal-title-retro">
+        <span>⚙️</span> ARCADE CABINET SETUP
+      </div>
+      <button class="modal-close-retro" type="button" data-close="modal-setup">✕</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div>
+        <label for="input-setup-brand" style="font-family: var(--font-arcade); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; color: #ffffff;">CUSTOM BRAND MARQUEE NAME:</label>
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+          <input type="text" id="input-setup-brand" class="retro-search-input" style="padding-left: 12px;" placeholder="e.g. ACME, APEX">
+          <button type="button" id="btn-save-brand" class="btn-push-play" style="padding: 8px 16px; font-size: 0.82rem;">SAVE</button>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid var(--arcade-border); padding-top: 12px;">
+        <div style="font-family: var(--font-arcade); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; color: #ffffff; margin-bottom: 4px;">PWA OFFLINE INSTALL:</div>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">Install this Arcade Hub to your dock or home screen.</p>
+        <button type="button" id="btn-install-pwa" class="btn-push-sub" style="width: 100%; justify-content: center;">
+          📲 INSTALL ARCADE APP
+        </button>
+      </div>
+
+      <div style="border-top: 1px solid var(--arcade-border); padding-top: 12px;">
+        <button type="button" id="btn-reset-arcade" class="btn-push-sub" style="width: 100%; justify-content: center; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">
+          🗑️ RESET COIN CREDITS & STATS
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ARCADE PASSPORT & TROPHY ROOM MODAL -->
+  <dialog id="modal-passport" class="retro-modal" style="max-width: 720px; width: 95%;">
+    <!-- Dynamically populated by window.ArcadePassport.renderModalContent() -->
+  </dialog>
+
+  <!-- RETRO SOUND TOAST -->
+  <div id="retro-toast" class="retro-toast">
+    <span id="toast-icon">★</span>
+    <span id="toast-text">COIN INSERTED!</span>
+  </div>
+
+  <!-- RETRO ARCADE SCRIPT -->
+  <script>
+    (function() {
+      // 1. 10-GAME RETRO CATALOG
+      const ARCADE_GAMES = [
+        {
+          id: 'blockblast',
+          number: '01',
+          title: 'Timber Block Blast',
+          subtitle: '8×8 Tactical Wood Block Puzzle',
+          desc: 'High-speed wooden block dropper. Drop shapes into rows & columns to trigger chain combos with satisfying wood haptics.',
+          vibe: 'blitz',
+          speed: '2–4 MINS',
+          speedType: 'ULTRA FAST',
+          icon: '🧱',
+          path: 'blockblast/www/index.html',
+          appId: 'com.gamingempire.blockblast',
+          scheme: 'blockblast://',
+          glow: '#f59e0b',
+          border: '#d97706',
+          shadow: 'rgba(245, 158, 11, 0.45)'
+        },
+        {
+          id: 'minesweeper',
+          number: '02',
+          title: 'Inferno Sweeper',
+          subtitle: 'Demonic Plasma Grid Sweeper',
+          desc: 'Fast-paced tactical minesweeper across Phobos & Deimos warzones. Neutralize plasma hazards with rapid EMP clicks.',
+          vibe: 'blitz',
+          speed: '3–5 MINS',
+          speedType: 'ULTRA FAST',
+          icon: '💣',
+          path: 'minesweeper/www/index.html',
+          appId: 'com.gamingempire.infernosweeper',
+          scheme: 'infernosweeper://',
+          glow: '#f97316',
+          border: '#ea580c',
+          shadow: 'rgba(249, 115, 22, 0.45)'
+        },
+        {
+          id: 'codebreaker',
+          number: '03',
+          title: 'Black Vault',
+          subtitle: 'Cyber Heist Deductive Terminal',
+          desc: 'Console terminal cipher cracking. Crack 4-digit security codes using pure deductive logic before the alarms trip.',
+          vibe: 'blitz',
+          speed: '3–6 MINS',
+          speedType: 'FAST BURST',
+          icon: '🔐',
+          path: 'codebreaker/www/index.html',
+          appId: 'com.gamingempire.blackvault',
+          scheme: 'blackvault://',
+          glow: '#06b6d4',
+          border: '#0891b2',
+          shadow: 'rgba(6, 182, 212, 0.45)'
+        },
+        {
+          id: 'wordsearch',
+          number: '04',
+          title: 'Word Search Classic',
+          subtitle: 'Artisan Coffee Parchment Hunt',
+          desc: 'High-speed word finder. Trace hidden words multi-directionally across literature, nature, and science packs.',
+          vibe: 'blitz',
+          speed: '4–8 MINS',
+          speedType: 'FAST BURST',
+          icon: '🔤',
+          path: 'wordsearch/www/index.html',
+          appId: 'com.gamingempire.wordsearch',
+          scheme: 'wordsearch://',
+          glow: '#eab308',
+          border: '#ca8a04',
+          shadow: 'rgba(234, 179, 8, 0.45)'
+        },
+        {
+          id: 'solitaire',
+          number: '05',
+          title: 'Curious Solitaire',
+          subtitle: 'Wonderland Klondike Garden',
+          desc: 'Classic Klondike cards in the Queen of Hearts royal garden. 1,000 numbered deals, Turn 1 or Turn 3.',
+          vibe: 'coffee',
+          speed: '5–10 MINS',
+          speedType: 'DAILY HABIT',
+          icon: '🃏',
+          path: 'solitaire/www/index.html',
+          appId: 'com.gamingempire.curioussolitaire',
+          scheme: 'curioussolitaire://',
+          glow: '#10b981',
+          border: '#059669',
+          shadow: 'rgba(168, 185, 129, 0.45)'
+        },
+        {
+          id: 'sudoku',
+          number: '06',
+          title: 'Classic Sudoku',
+          subtitle: 'Japanese Ink Grid Deduction',
+          desc: 'Pure number deduction across 5 skill tiers. Pencil notes, intelligent hints, and clean mindful zen focus.',
+          vibe: 'coffee',
+          speed: '8–15 MINS',
+          speedType: 'MINDFUL LOGIC',
+          icon: '🔢',
+          path: 'sudoku/www/index.html',
+          appId: 'com.gamingempire.classicsudoku',
+          scheme: 'classicsudoku://',
+          glow: '#38bdf8',
+          border: '#0284c7',
+          shadow: 'rgba(56, 189, 248, 0.45)'
+        },
+        {
+          id: 'nonogram',
+          number: '07',
+          title: 'Zen Nonogram',
+          subtitle: 'Pixel Tapestry Picross',
+          desc: 'Reveal retro pixel art tapestry illustrations using row and column deduction across 5,000 hand-crafted grids.',
+          vibe: 'coffee',
+          speed: '8–18 MINS',
+          speedType: 'PIXEL ART',
+          icon: '🖼️',
+          path: 'nonogram/www/index.html',
+          appId: 'com.gamingempire.zennonogram',
+          scheme: 'zennonogram://',
+          glow: '#ec4899',
+          border: '#db2777',
+          shadow: 'rgba(236, 72, 153, 0.45)'
+        },
+        {
+          id: 'spidersolitaire',
+          number: '08',
+          title: 'Spider Solitaire',
+          subtitle: 'Cobweb Manor Royal Flushes',
+          desc: 'High-stakes card sequencing across 1, 2, or 4 suits. Build full royal descending columns with zero undo limits.',
+          vibe: 'deep',
+          speed: '10–20 MINS',
+          speedType: 'TACTICAL DECK',
+          icon: '🕷️',
+          path: 'spidersolitaire/www/index.html',
+          appId: 'com.gamingempire.spidersolitaire',
+          scheme: 'spidersolitaire://',
+          glow: '#a855f7',
+          border: '#9333ea',
+          shadow: 'rgba(168, 85, 247, 0.45)'
+        },
+        {
+          id: 'spades',
+          number: '09',
+          title: 'Royal Spades',
+          subtitle: '4-Player AI & 2\'s Wild Parlor',
+          desc: 'Strategic contract card bidding. Play partner nil bids, track sandbags, and master trick-taking card rooms.',
+          vibe: 'deep',
+          speed: '15–25 MINS',
+          speedType: 'CARD ROOM',
+          icon: '♠️',
+          path: 'spades/www/index.html',
+          appId: 'com.gamingempire.spades',
+          scheme: 'royalspades://',
+          glow: '#3b82f6',
+          border: '#2563eb',
+          shadow: 'rgba(59, 130, 246, 0.45)'
+        },
+        {
+          id: 'mahjong',
+          number: '10',
+          title: 'Celestial Jade',
+          subtitle: 'Imperial Tile Sanctuary',
+          desc: 'Relaxing 3D layered tile matching with traditional imperial suites and calming authentic soundscapes.',
+          vibe: 'deep',
+          speed: '10–20 MINS',
+          speedType: 'MEDITATIVE',
+          icon: '🀄',
+          path: 'mahjong/www/index.html',
+          appId: 'com.gamingempire.celestialjade',
+          scheme: 'celestialjade://',
+          glow: '#34d399',
+          border: '#10b981',
+          shadow: 'rgba(52, 211, 153, 0.45)'
+        }
+      ];
+
+      // 2. 8-BIT PROCEDURAL WEB AUDIO ENGINE
+      class RetroAudio {
+        constructor() {
+          this.enabled = localStorage.getItem('arcade_retro_sfx') !== 'false';
+          this.ctx = null;
+        }
+
+        init() {
+          if (!this.ctx && typeof AudioContext !== 'undefined') {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+          }
+        }
+
+        play(sfx) {
+          if (!this.enabled) return;
+          try {
+            this.init();
+            if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+            if (!this.ctx) return;
+
+            const t = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            if (sfx === 'coin') {
+              // Arcade Coin Insert (B5 -> E6 jump)
+              osc.type = 'square';
+              osc.frequency.setValueAtTime(987.77, t);
+              osc.frequency.setValueAtTime(1318.51, t + 0.08);
+              gain.gain.setValueAtTime(0.09, t);
+              gain.gain.linearRampToValueAtTime(0.09, t + 0.2);
+              gain.gain.linearRampToValueAtTime(0.001, t + 0.35);
+              osc.start(t);
+              osc.stop(t + 0.35);
+            } else if (sfx === 'clack') {
+              // Microswitch Cabinet Relay Clack
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(320, t);
+              osc.frequency.exponentialRampToValueAtTime(120, t + 0.06);
+              gain.gain.setValueAtTime(0.12, t);
+              gain.gain.linearRampToValueAtTime(0.001, t + 0.06);
+              osc.start(t);
+              osc.stop(t + 0.06);
+            } else if (sfx === 'roulette') {
+              // Slot Roulette tick
+              osc.type = 'sawtooth';
+              osc.frequency.setValueAtTime(600 + Math.random() * 400, t);
+              gain.gain.setValueAtTime(0.05, t);
+              gain.gain.linearRampToValueAtTime(0.001, t + 0.04);
+              osc.start(t);
+              osc.stop(t + 0.04);
+            } else if (sfx === 'select') {
+              // Station select chirp
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(523.25, t);
+              osc.frequency.setValueAtTime(659.25, t + 0.05);
+              gain.gain.setValueAtTime(0.07, t);
+              gain.gain.linearRampToValueAtTime(0.001, t + 0.12);
+              osc.start(t);
+              osc.stop(t + 0.12);
+            }
+          } catch(e) {}
+        }
+
+        toggle() {
+          this.enabled = !this.enabled;
+          localStorage.setItem('arcade_retro_sfx', this.enabled ? 'true' : 'false');
+          return this.enabled;
+        }
+      }
+
+      const sfx = new RetroAudio();
+
+      // 3. RETRO ARCADE STATE
+      const STATE = {
+        brand: localStorage.getItem('arcade_brand_name') || 'BRAND',
+        vibe: 'all',
+        query: '',
+        selectedIndex: 0,
+        favorites: JSON.parse(localStorage.getItem('arcade_favorites') || '[]'),
+        playedGames: JSON.parse(localStorage.getItem('arcade_played_games') || '[]'),
+        sessions: parseInt(localStorage.getItem('arcade_play_count') || '0', 10),
+        crtEnabled: localStorage.getItem('arcade_crt_enabled') !== 'false',
+        viewMode: 'stage' // 'stage' or 'wall'
+      };
+
+      function updateStreak() {
+        const today = new Date().toISOString().slice(0, 10);
+        const lastVisit = localStorage.getItem('arcade_last_visit_date');
+        let streak = parseInt(localStorage.getItem('arcade_streak_days') || '1', 10);
+
+        if (!lastVisit) {
+          streak = 1;
+        } else if (lastVisit !== today) {
+          const lastDate = new Date(lastVisit);
+          const currDate = new Date(today);
+          const diffDays = Math.round((currDate - lastDate) / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) streak += 1;
+          else if (diffDays > 1) streak = 1;
+        }
+
+        localStorage.setItem('arcade_last_visit_date', today);
+        localStorage.setItem('arcade_streak_days', streak.toString());
+
+        document.getElementById('arcade-streak-val').textContent = `DAY ${streak}`;
+      }
+
+      function updateStats() {
+        document.getElementById('arcade-sessions-val').textContent = `${STATE.sessions} SESSIONS`;
+        document.getElementById('fav-badge-count').textContent = STATE.favorites.length.toString();
+      }
+
+      function applyBrand(name) {
+        STATE.brand = name || 'BRAND';
+        localStorage.setItem('arcade_brand_name', STATE.brand);
+        document.getElementById('brand-header-title').textContent = STATE.brand;
+        document.getElementById('pledge-brand-name').textContent = STATE.brand;
+        document.title = `${STATE.brand} RETRO ARCADE — 100% Free Play`;
+      }
+
+      function showToast(txt) {
+        const t = document.getElementById('retro-toast');
+        const m = document.getElementById('toast-text');
+        m.textContent = txt;
+        t.classList.add('show');
+        clearTimeout(window.__toastTimer);
+        window.__toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+      }
+
+      function getVisibleGames() {
+        const q = STATE.query.toLowerCase().trim();
+        return ARCADE_GAMES.filter(g => {
+          if (STATE.vibe === 'blitz' && g.vibe !== 'blitz') return false;
+          if (STATE.vibe === 'coffee' && g.vibe !== 'coffee') return false;
+          if (STATE.vibe === 'deep' && g.vibe !== 'deep') return false;
+          if (STATE.vibe === 'favorites' && !STATE.favorites.includes(g.id)) return false;
+
+          if (q) {
+            return g.title.toLowerCase().includes(q) || 
+                   g.subtitle.toLowerCase().includes(q) || 
+                   g.desc.toLowerCase().includes(q);
+          }
+          return true;
+        });
+      }
+
+      // 4. MAIN STAGE ACTIVE CABINET SELECTION
+      function selectGameByIndex(index, playAudio = true) {
+        const visible = getVisibleGames();
+        if (visible.length === 0) return;
+
+        if (index < 0) index = visible.length - 1;
+        if (index >= visible.length) index = 0;
+
+        STATE.selectedIndex = index;
+        const game = visible[index];
+        if (playAudio) {
+          sfx.play('clack');
+          if (navigator.vibrate) navigator.vibrate(10);
+        }
+
+        // Update Theme Accent Variables
+        document.documentElement.style.setProperty('--active-glow', game.glow);
+        document.documentElement.style.setProperty('--active-border', game.border);
+        document.documentElement.style.setProperty('--active-shadow', game.shadow);
+
+        // Update Hero Cabinet UI
+        document.getElementById('cabinet-num-badge').textContent = `CABINET #${game.number}`;
+        document.getElementById('hero-genre-badge').textContent = game.vibe === 'blitz' ? '⚡ QUICK BLITZ' : (game.vibe === 'coffee' ? '☕ COFFEE BREAK' : '🌙 DEEP DIVE');
+        document.getElementById('hero-avatar').textContent = game.icon;
+        document.getElementById('hero-speed-tag').textContent = `⚡ ${game.speed}`;
+        document.getElementById('hero-title').textContent = game.title;
+        document.getElementById('hero-sub').textContent = game.subtitle;
+        document.getElementById('hero-desc').textContent = game.desc;
+        document.getElementById('hero-stat-speed').textContent = game.speedType;
+
+        const playBtn = document.getElementById('hero-btn-play');
+        playBtn.href = game.path;
+        playBtn.onclick = () => {
+          sfx.play('coin');
+          recordLaunch(game.id);
+        };
+
+        const appBtn = document.getElementById('hero-btn-app');
+        appBtn.onclick = () => openCartModal(game);
+
+        const favBtn = document.getElementById('hero-btn-fav');
+        const isFav = STATE.favorites.includes(game.id);
+        document.getElementById('hero-fav-star').textContent = isFav ? '★' : '☆';
+        favBtn.onclick = () => toggleFav(game.id);
+
+        // Update Left & Right Ghost Cabinets
+        const prevIndex = (index - 1 + visible.length) % visible.length;
+        const nextIndex = (index + 1) % visible.length;
+        const prevGame = visible[prevIndex];
+        const nextGame = visible[nextIndex];
+
+        const ghostLeft = document.getElementById('ghost-left');
+        const ghostRight = document.getElementById('ghost-right');
+
+        if (visible.length > 1) {
+          ghostLeft.style.display = 'flex';
+          ghostRight.style.display = 'flex';
+          document.getElementById('ghost-left-icon').textContent = prevGame.icon;
+          document.getElementById('ghost-left-title').textContent = prevGame.title;
+          document.getElementById('ghost-right-icon').textContent = nextGame.icon;
+          document.getElementById('ghost-right-title').textContent = nextGame.title;
+        } else {
+          ghostLeft.style.display = 'none';
+          ghostRight.style.display = 'none';
+        }
+
+        // Highlight active slot in the horizontal scroller ribbon
+        document.querySelectorAll('.wheel-cart-slot').forEach(s => {
+          const isActive = s.getAttribute('data-id') === game.id;
+          s.classList.toggle('active', isActive);
+          if (isActive) {
+            s.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          }
+        });
+
+        // Highlight in wall grid
+        document.querySelectorAll('.wall-card').forEach(w => {
+          w.classList.toggle('selected', w.getAttribute('data-id') === game.id);
+        });
+      }
+
+      function recordLaunch(gameId) {
+        if (!STATE.playedGames.includes(gameId)) {
+          STATE.playedGames.push(gameId);
+          localStorage.setItem('arcade_played_games', JSON.stringify(STATE.playedGames));
+        }
+        STATE.sessions += 1;
+        localStorage.setItem('arcade_play_count', STATE.sessions.toString());
+        if (window.ArcadePassport) {
+          const gameObj = ARCADE_GAMES.find(g => g.id === gameId);
+          window.ArcadePassport.recordPlay(gameId, 60, 0, false, gameObj ? gameObj.vibe : null);
+        }
+        updateStats();
+      }
+
+      function toggleFav(gameId) {
+        sfx.play('select');
+        const idx = STATE.favorites.indexOf(gameId);
+        if (idx >= 0) {
+          STATE.favorites.splice(idx, 1);
+          showToast('REMOVED FROM SAVED');
+        } else {
+          STATE.favorites.push(gameId);
+          showToast('SAVED CARTRIDGE! ★');
+        }
+        localStorage.setItem('arcade_favorites', JSON.stringify(STATE.favorites));
+        updateStats();
+        selectGameByIndex(STATE.selectedIndex, false);
+        renderWheelRibbon();
+        renderWallGrid();
+      }
+
+      // 5. RENDER HORIZONTAL MARQUEE WHEEL RIBBON
+      function renderWheelRibbon() {
+        const scroller = document.getElementById('wheel-scroller');
+        const visible = getVisibleGames();
+        scroller.innerHTML = '';
+
+        document.getElementById('wheel-count-label').textContent = `${visible.length} MACHINES ONLINE`;
+
+        visible.forEach((game, idx) => {
+          const slot = document.createElement('div');
+          slot.className = `wheel-cart-slot ${idx === STATE.selectedIndex ? 'active' : ''}`;
+          slot.setAttribute('data-id', game.id);
+          slot.style.setProperty('--cart-glow', game.glow);
+          slot.style.setProperty('--cart-border', game.border);
+          slot.style.setProperty('--cart-shadow', game.shadow);
+
+          slot.innerHTML = `
+            <div class="cart-slot-icon">${game.icon}</div>
+            <div class="cart-slot-title">${game.title}</div>
+            <span class="cart-slot-time">⚡ ${game.speed}</span>
+          `;
+
+          slot.addEventListener('click', () => {
+            selectGameByIndex(idx);
+          });
+
+          scroller.appendChild(slot);
+        });
+      }
+
+      // 6. RENDER WALL MATRIX GRID
+      function renderWallGrid() {
+        const wall = document.getElementById('wall-grid');
+        const visible = getVisibleGames();
+        wall.innerHTML = '';
+
+        visible.forEach(game => {
+          const card = document.createElement('div');
+          card.className = 'wall-card';
+          card.setAttribute('data-id', game.id);
+          card.style.setProperty('--cabinet-glow', game.glow);
+          card.style.setProperty('--cabinet-border', game.border);
+          card.style.setProperty('--cabinet-shadow', game.shadow);
+
+          card.innerHTML = `
+            <div class="wall-card-top">
+              <span class="wall-tag">${game.vibe.toUpperCase()}</span>
+              <span class="wall-speed">⚡ ${game.speed}</span>
+            </div>
+            <div class="wall-card-body">
+              <div class="wall-card-icon">${game.icon}</div>
+              <div>
+                <div class="wall-card-title">${game.title}</div>
+                <div class="wall-card-sub">${game.subtitle}</div>
+              </div>
+            </div>
+            <div class="wall-card-desc">${game.desc}</div>
+            <div class="wall-card-footer">
+              <button type="button" class="btn-push-sub" style="flex: 1; justify-content: center; font-size: 0.6rem; padding: 8px 10px;" data-app-id="${game.id}">
+                📲 APP
+              </button>
+              <a href="${game.path}" class="btn-push-play" style="flex: 1.5; justify-content: center; font-size: 0.68rem; padding: 8px 10px;" data-play-id="${game.id}">
+                PLAY NOW →
+              </a>
+            </div>
+          `;
+
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('[data-app-id]') || e.target.closest('[data-play-id]')) return;
+            const idx = visible.findIndex(g => g.id === game.id);
+            if (idx >= 0) {
+              selectGameByIndex(idx);
+              // Switch to stage view to inspect
+              setViewMode('stage');
+            }
+          });
+
+          card.querySelector('[data-app-id]').addEventListener('click', (e) => {
+            e.stopPropagation();
+            sfx.play('select');
+            openCartModal(game);
+          });
+
+          card.querySelector('[data-play-id]').addEventListener('click', () => {
+            sfx.play('coin');
+            recordLaunch(game.id);
+          });
+
+          wall.appendChild(card);
+        });
+      }
+
+      // VIEW MODE TOGGLE (STAGE vs WALL)
+      function setViewMode(mode) {
+        STATE.viewMode = mode;
+        const stageSec = document.getElementById('stage-section');
+        const wallSec = document.getElementById('wall-section');
+        const btnStage = document.getElementById('btn-view-stage');
+        const btnWall = document.getElementById('btn-view-wall');
+
+        if (mode === 'stage') {
+          stageSec.style.display = 'flex';
+          wallSec.classList.remove('show');
+          btnStage.classList.add('active');
+          btnWall.classList.remove('active');
+        } else {
+          stageSec.style.display = 'none';
+          wallSec.classList.add('show');
+          btnStage.classList.remove('active');
+          btnWall.classList.add('active');
+        }
+      }
+
+      document.getElementById('btn-view-stage').addEventListener('click', () => {
+        sfx.play('clack');
+        setViewMode('stage');
+      });
+
+      document.getElementById('btn-view-wall').addEventListener('click', () => {
+        sfx.play('clack');
+        setViewMode('wall');
+      });
+
+      // 7. RANDOM QUICK SESSION ROULETTE
+      let isSpinning = false;
+      function spinRoulette() {
+        if (isSpinning) return;
+        isSpinning = true;
+        const visible = getVisibleGames();
+        if (visible.length === 0) { isSpinning = false; return; }
+
+        let ticks = 0;
+        const totalTicks = 16 + Math.floor(Math.random() * 8);
+        let speed = 60;
+
+        function tick() {
+          ticks++;
+          sfx.play('roulette');
+          const next = (STATE.selectedIndex + 1) % visible.length;
+          selectGameByIndex(next, false);
+
+          if (ticks < totalTicks) {
+            speed += 14;
+            setTimeout(tick, speed);
+          } else {
+            isSpinning = false;
+            sfx.play('coin');
+            showToast(`★ SELECTED: ${visible[STATE.selectedIndex].title.toUpperCase()}!`);
+          }
+        }
+        tick();
+      }
+
+      document.getElementById('btn-roulette').addEventListener('click', spinRoulette);
+
+      // 8. STANDALONE APP MODAL WITH SMART PLATFORM DETECTION
+      function detectMobilePlatform() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+        if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return 'ios';
+        if (/android/i.test(ua)) return 'android';
+        return 'desktop';
+      }
+
+      function openCartModal(game) {
+        if (!game) {
+          const visible = getVisibleGames();
+          game = visible[STATE.selectedIndex] || ARCADE_GAMES[0];
+        }
+        const modal = document.getElementById('modal-cart-info');
+        document.getElementById('cart-modal-title').textContent = `${game.title} (ROM EDITION)`;
+        document.getElementById('cart-modal-icon').textContent = game.icon;
+        document.getElementById('cart-modal-name').textContent = game.title;
+        document.getElementById('cart-modal-pkg').textContent = game.appId;
+
+        const platform = detectMobilePlatform();
+        const banner = document.getElementById('cart-platform-banner');
+        const appStoreBtn = document.getElementById('btn-cart-appstore');
+        const playStoreBtn = document.getElementById('btn-cart-playstore');
+        const deepBtn = document.getElementById('btn-cart-deep');
+
+        if (platform === 'ios') {
+          banner.style.display = 'block';
+          banner.style.background = 'rgba(6, 182, 212, 0.15)';
+          banner.style.border = '1.5px solid var(--neon-cyan)';
+          banner.style.color = 'var(--neon-cyan)';
+          banner.innerHTML = '📱 <strong>IPHONE DETECTED</strong>: Launching directly or via Apple App Store';
+          
+          appStoreBtn.style.borderColor = 'var(--neon-cyan)';
+          appStoreBtn.style.color = '#ffffff';
+          appStoreBtn.style.background = 'rgba(6, 182, 212, 0.2)';
+          appStoreBtn.style.boxShadow = '0 0 12px rgba(6, 182, 212, 0.35)';
+          playStoreBtn.style.opacity = '0.65';
+          deepBtn.innerHTML = `<span>📲</span> LAUNCH ${game.title.toUpperCase()} (iOS)`;
+        } else if (platform === 'android') {
+          banner.style.display = 'block';
+          banner.style.background = 'rgba(16, 185, 129, 0.15)';
+          banner.style.border = '1.5px solid var(--neon-green)';
+          banner.style.color = 'var(--neon-green)';
+          banner.innerHTML = '🤖 <strong>ANDROID DETECTED</strong>: Launching directly or via Google Play';
+          
+          playStoreBtn.style.borderColor = 'var(--neon-green)';
+          playStoreBtn.style.color = '#ffffff';
+          playStoreBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+          playStoreBtn.style.boxShadow = '0 0 12px rgba(16, 185, 129, 0.35)';
+          appStoreBtn.style.opacity = '0.65';
+          deepBtn.innerHTML = `<span>📲</span> LAUNCH ${game.title.toUpperCase()} (ANDROID)`;
+        } else {
+          banner.style.display = 'block';
+          banner.style.background = 'rgba(250, 204, 21, 0.12)';
+          banner.style.border = '1.5px solid var(--neon-yellow)';
+          banner.style.color = 'var(--neon-yellow)';
+          banner.innerHTML = '💻 <strong>CROSS-PLATFORM HUB</strong>: Universal deep-links for iPhone, Android & Web';
+          appStoreBtn.style.opacity = '1';
+          playStoreBtn.style.opacity = '1';
+          deepBtn.innerHTML = '<span>📲</span> LAUNCH INSTALLED APP (DEEP LINK)';
+        }
+
+        deepBtn.onclick = () => {
+          sfx.play('coin');
+          if (navigator.vibrate) navigator.vibrate(15);
+          showToast(`LAUNCHING ${game.title.toUpperCase()}...`);
+
+          if (platform === 'android') {
+            // Android Intent URI: Launches installed native APK, or Android system offers Play Store
+            const cleanScheme = game.scheme.replace('://', '');
+            const intentUri = `intent://play#Intent;scheme=${cleanScheme};package=${game.appId};end`;
+            window.location.href = intentUri;
+          } else {
+            // iOS Custom URL Scheme with timeout fallback to App Store
+            const appStoreUrl = `https://apps.apple.com/us/app/${encodeURIComponent(game.title.toLowerCase().replace(/[^a-z0-9]/g, '-'))}/id123456789`;
+            const startTime = Date.now();
+            window.location.href = `${game.scheme}play`;
+            setTimeout(() => {
+              if (Date.now() - startTime < 1800) {
+                showToast('APP NOT FOUND — OPENING APP STORE...');
+                window.location.href = platform === 'ios' ? appStoreUrl : `https://play.google.com/store/apps/details?id=${game.appId}`;
+              }
+            }, 1200);
+          }
+        };
+
+        playStoreBtn.href = `https://play.google.com/store/apps/details?id=${game.appId}`;
+        appStoreBtn.href = `https://apps.apple.com/us/app/${encodeURIComponent(game.title.toLowerCase().replace(/[^a-z0-9]/g, '-'))}/id123456789`;
+        
+        const webBtn = document.getElementById('btn-cart-web');
+        webBtn.href = game.path;
+        webBtn.onclick = () => {
+          if (navigator.vibrate) navigator.vibrate(10);
+          recordLaunch(game.id);
+        };
+
+        modal.showModal();
+      }
+      window.openCartModal = openCartModal;
+
+      // 9. CONTROLS & EVENT BINDINGS
+      // Ghost Cabinet Clicks
+      document.getElementById('ghost-left').addEventListener('click', () => {
+        selectGameByIndex(STATE.selectedIndex - 1);
+      });
+      document.getElementById('ghost-right').addEventListener('click', () => {
+        selectGameByIndex(STATE.selectedIndex + 1);
+      });
+
+      // Deck Nav Buttons
+      document.getElementById('btn-prev-cabinet').addEventListener('click', () => {
+        selectGameByIndex(STATE.selectedIndex - 1);
+      });
+      document.getElementById('btn-next-cabinet').addEventListener('click', () => {
+        selectGameByIndex(STATE.selectedIndex + 1);
+      });
+
+      // Coin Slot Click
+      document.getElementById('coin-slot-btn').addEventListener('click', () => {
+        sfx.play('coin');
+        if (navigator.vibrate) navigator.vibrate([25, 40, 25]);
+        showToast('COIN INSERTED! FREE PLAY EXTENDED 🪙');
+        if (window.ArcadePassport) {
+          window.ArcadePassport.unlockAchievement('first_coin');
+        }
+      });
+
+      // Keyboard Controls
+      window.addEventListener('keydown', (e) => {
+        if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+          e.preventDefault();
+          selectGameByIndex(STATE.selectedIndex + 1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+          e.preventDefault();
+          selectGameByIndex(STATE.selectedIndex - 1);
+        } else if (e.key === 'r' || e.key === 'R') {
+          e.preventDefault();
+          spinRoulette();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const visible = getVisibleGames();
+          const game = visible[STATE.selectedIndex];
+          if (game) {
+            sfx.play('coin');
+            recordLaunch(game.id);
+            window.location.href = game.path;
+          }
+        }
+      });
+
+      // Vibe Filter Buttons
+      document.querySelectorAll('.btn-vibe[data-vibe]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          sfx.play('clack');
+          document.querySelectorAll('.btn-vibe[data-vibe]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          STATE.vibe = btn.getAttribute('data-vibe');
+          STATE.selectedIndex = 0;
+          renderWheelRibbon();
+          renderWallGrid();
+          selectGameByIndex(0, false);
+        });
+      });
+
+      // Search
+      const searchInput = document.getElementById('arcade-search');
+      searchInput.addEventListener('input', (e) => {
+        STATE.query = e.target.value;
+        STATE.selectedIndex = 0;
+        renderWheelRibbon();
+        renderWallGrid();
+        selectGameByIndex(0, false);
+      });
+
+      // CRT Toggle
+      const crtBtn = document.getElementById('btn-toggle-crt');
+      function updateCrtState() {
+        document.body.classList.toggle('scanlines-off', !STATE.crtEnabled);
+        crtBtn.textContent = STATE.crtEnabled ? '📺 CRT: ON' : '📺 CRT: OFF';
+      }
+      crtBtn.addEventListener('click', () => {
+        STATE.crtEnabled = !STATE.crtEnabled;
+        localStorage.setItem('arcade_crt_enabled', STATE.crtEnabled ? 'true' : 'false');
+        updateCrtState();
+        sfx.play('select');
+        showToast(STATE.crtEnabled ? 'CRT SCANLINES ENABLED' : 'CRT SCANLINES DISABLED');
+      });
+
+      // Sound Toggle
+      const sfxBtn = document.getElementById('btn-toggle-sound');
+      sfxBtn.addEventListener('click', () => {
+        const on = sfx.toggle();
+        sfxBtn.textContent = on ? '🔊 SFX: ON' : '🔇 SFX: OFF';
+        sfx.play('coin');
+        showToast(on ? '8-BIT SFX ON 🔊' : 'SFX MUTED 🔇');
+      });
+
+      // Modals
+      const pledgeModal = document.getElementById('modal-pledge');
+      const setupModal = document.getElementById('modal-setup');
+
+      document.getElementById('btn-open-pledge').addEventListener('click', () => {
+        sfx.play('select');
+        pledgeModal.showModal();
+      });
+
+      document.getElementById('btn-open-settings').addEventListener('click', () => {
+        sfx.play('select');
+        document.getElementById('input-setup-brand').value = STATE.brand;
+        setupModal.showModal();
+      });
+
+      document.querySelectorAll('[data-close]').forEach(b => {
+        b.addEventListener('click', () => {
+          sfx.play('select');
+          const target = document.getElementById(b.getAttribute('data-close'));
+          if (target) target.close();
+        });
+      });
+
+      // Light dismiss for dialogs
+      [pledgeModal, setupModal, document.getElementById('modal-cart-info'), document.getElementById('modal-daily-challenge')].forEach(m => {
+        if (!m) return;
+        m.addEventListener('click', (e) => {
+          const rect = m.getBoundingClientRect();
+          const inDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height && rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+          if (!inDialog) {
+            sfx.play('select');
+            m.close();
+          }
+        });
+      });
+
+      // 10. UNIVERSAL DAILY CHALLENGE SYSTEM (P1)
+      const dailyModal = document.getElementById('modal-daily-challenge');
+      let countdownInterval = null;
+
+      function updateDailyUI() {
+        if (!window.ArcadeDaily) return;
+        const mission = window.ArcadeDaily.getTodayMission();
+        const streak = window.ArcadeDaily.getDailyStreak();
+        const isDone = window.ArcadeDaily.isTodayCompleted();
+
+        // Update header & vibe button
+        const openDailyBtn = document.getElementById('btn-open-daily');
+        if (openDailyBtn) {
+          openDailyBtn.innerHTML = `📅 DAILY: #${mission.dayNumber}`;
+        }
+        const dailyStreakPill = document.getElementById('daily-vibe-streak');
+        if (dailyStreakPill) {
+          dailyStreakPill.textContent = `${streak}🔥`;
+        }
+
+        // Modal Content
+        document.getElementById('daily-modal-heading').textContent = `DAILY RUN — DAY #${mission.dayNumber}`;
+        document.getElementById('daily-game-avatar').textContent = mission.game.icon;
+        document.getElementById('daily-game-name').textContent = mission.game.title;
+        document.getElementById('daily-pill-badge').textContent = `DAY #${mission.dayNumber}`;
+        document.getElementById('daily-mission-goal').textContent = `${mission.targetDesc} • [${mission.modifier}]`;
+        document.getElementById('daily-seed-badge').textContent = `#${mission.seed.toString().slice(0, 6)}`;
+        document.getElementById('daily-par-time').textContent = mission.parTime;
+        document.getElementById('daily-streak-count').textContent = `🔥 ${streak} DAY${streak === 1 ? '' : 'S'}`;
+        
+        const launchBtn = document.getElementById('btn-launch-daily');
+        launchBtn.href = mission.launchUrl;
+        launchBtn.onclick = () => {
+          sfx.play('coin');
+          recordLaunch(mission.game.id);
+        };
+
+        // Render Wordle Share Card
+        updateSharePreview();
+      }
+
+      function updateSharePreview(customRecord = null) {
+        if (!window.ArcadeDaily) return;
+        const shareText = window.ArcadeDaily.generateShareCard(undefined, customRecord);
+        const previewEl = document.getElementById('daily-share-preview');
+        if (previewEl) {
+          previewEl.textContent = shareText;
+        }
+      }
+
+      function updateDailyCountdown() {
+        if (!window.ArcadeDaily) return;
+        const time = window.ArcadeDaily.getTimeToNextReset();
+        const clockEl = document.getElementById('daily-countdown-clock');
+        if (clockEl) {
+          clockEl.textContent = `${time.hours}:${time.mins}:${time.secs}`;
+        }
+      }
+
+      function openDailyModal() {
+        sfx.play('select');
+        updateDailyUI();
+        updateDailyCountdown();
+        clearInterval(countdownInterval);
+        countdownInterval = setInterval(updateDailyCountdown, 1000);
+        dailyModal.showModal();
+      }
+
+      // Event bindings for Daily
+      document.getElementById('btn-open-daily').addEventListener('click', openDailyModal);
+      
+      const heroDailyBtn = document.getElementById('hero-btn-daily');
+      if (heroDailyBtn) heroDailyBtn.addEventListener('click', openDailyModal);
+
+      // Daily Vibe filter button jump
+      document.getElementById('btn-vibe-daily').addEventListener('click', () => {
+        sfx.play('clack');
+        if (window.ArcadeDaily) {
+          const mission = window.ArcadeDaily.getTodayMission();
+          const targetIndex = ARCADE_GAMES.findIndex(g => g.id === mission.game.id);
+          if (targetIndex >= 0) {
+            setViewMode('stage');
+            selectGameByIndex(targetIndex);
+            showToast(`★ LOADED TODAY'S DAILY RUN: ${mission.game.title.toUpperCase()}!`);
+          }
+        }
+      });
+
+      // Copy Share Card
+      document.getElementById('btn-copy-daily-card').addEventListener('click', () => {
+        sfx.play('coin');
+        const text = document.getElementById('daily-share-preview').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('WORDLE SHARE CARD COPIED! 📋');
+        });
+      });
+
+      // Tweet / Share button
+      document.getElementById('btn-tweet-daily-card').addEventListener('click', () => {
+        sfx.play('coin');
+        const text = document.getElementById('daily-share-preview').textContent;
+        if (navigator.share) {
+          navigator.share({ text }).catch(() => {});
+        } else {
+          const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+          window.open(url, '_blank');
+        }
+      });
+
+      // Simulate Daily Completion (for testing / portfolio demo)
+      document.getElementById('btn-simulate-daily').addEventListener('click', () => {
+        sfx.play('coin');
+        if (window.ArcadeDaily) {
+          const mission = window.ArcadeDaily.getTodayMission();
+          const simulatedScore = mission.targetScore + Math.floor(Math.random() * 800);
+          const simulatedSeconds = 120 + Math.floor(Math.random() * 45);
+          const record = window.ArcadeDaily.recordCompletion(simulatedScore, simulatedSeconds, 3);
+          updateDailyUI();
+          updateSharePreview(record);
+          showToast('★ MISSION COMPLETE! SHARE CARD GENERATED!');
+        }
+      });
+
+      // Save brand
+      document.getElementById('btn-save-brand').addEventListener('click', () => {
+        const val = document.getElementById('input-setup-brand').value.trim();
+        if (val) {
+          applyBrand(val);
+          setupModal.close();
+          sfx.play('coin');
+          showToast(`BRAND UPDATED: ${val}`);
+        }
+      });
+
+      // Reset stats
+      document.getElementById('btn-reset-arcade').addEventListener('click', () => {
+        if (confirm('RESET ALL RETRO STATS & PLAY COUNTERS?')) {
+          localStorage.removeItem('arcade_play_count');
+          localStorage.removeItem('arcade_played_games');
+          localStorage.removeItem('arcade_daily_history');
+          localStorage.removeItem('arcade_daily_streak');
+          STATE.sessions = 0;
+          STATE.playedGames = [];
+          updateStats();
+          updateDailyUI();
+          setupModal.close();
+          showToast('CREDITS & DAILY RUNS RESET');
+        }
+      });
+
+      // Share Link
+      document.getElementById('btn-share-retro').addEventListener('click', () => {
+        sfx.play('coin');
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          showToast('LINK COPIED TO CLIPBOARD! 📋');
+        });
+      });
+
+      // Touch Swipe Controls for Mobile Cabinets
+      let touchStartX = 0;
+      let touchEndX = 0;
+      const stageWrap = document.querySelector('.stage-perspective-wrap');
+      if (stageWrap) {
+        stageWrap.addEventListener('touchstart', (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        stageWrap.addEventListener('touchend', (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          const diff = touchStartX - touchEndX;
+          if (Math.abs(diff) > 45) {
+            if (diff > 0) selectGameByIndex(STATE.selectedIndex + 1);
+            else selectGameByIndex(STATE.selectedIndex - 1);
+          }
+        }, { passive: true });
+      }
+
+      function checkHash() {
+        if (window.location.hash === '#wall') {
+          setViewMode('wall');
+        } else if (window.location.hash === '#daily') {
+          openDailyModal();
+        } else if (window.location.hash === '#dev') {
+          if (window.ArcadeInspector) window.ArcadeInspector.open();
+        } else if (window.location.hash === '#passport') {
+          const m = document.getElementById('modal-passport');
+          if (m && window.ArcadePassport) {
+            window.ArcadePassport.renderModalContent();
+            m.showModal();
+          }
+        } else if (window.location.hash === '#cart' || window.location.hash === '#app') {
+          const visible = getVisibleGames();
+          openCartModal(visible[STATE.selectedIndex]);
+        }
+      }
+      window.addEventListener('hashchange', checkHash);
+
+      // INITIALIZE
+      function initArcade() {
+        applyBrand(STATE.brand);
+        updateStreak();
+        updateStats();
+        updateCrtState();
+        renderWheelRibbon();
+        renderWallGrid();
+        selectGameByIndex(0, false);
+        updateDailyUI();
+        updateDailyCountdown();
+        checkHash();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initArcade);
+      } else {
+        initArcade();
+      }
+    })();
+  </script>
+</body>
+</html>

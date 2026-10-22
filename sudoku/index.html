@@ -119,8 +119,16 @@
     <span class="menu-footer__copy">© 2026 Puzzle Labs. Free to play.</span>
   </footer>
 
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
   <!-- ======================================================
-       Difficulty Modal
+       Difficulty Modal (Direct Body Child for Native iOS Gestures)
        ====================================================== -->
   <div class="modal-overlay" id="difficulty-modal" role="dialog" aria-modal="true" aria-labelledby="diff-modal-title">
     <div class="modal">
@@ -157,7 +165,7 @@
             <span class="diff-btn__icon">🧩</span>
             <div>
               <div class="diff-btn__name">Medium</div>
-              <div class="diff-btn__sub">4 mistakes allowed</div>
+              <div class="diff-btn__sub">3 mistakes allowed</div>
             </div>
           </div>
           <span class="badge badge--gold diff-btn__badge">Balanced</span>
@@ -209,14 +217,6 @@
       </button>
     </div>
   </div>
-
-    </div><!-- /.device-screen -->
-
-    <!-- Virtual Home Indicator -->
-    <div class="device-home-indicator">
-      <div class="device-home-pill"></div>
-    </div>
-  </div><!-- /.device-shell -->
 
   <!-- ======================================================
        Scripts
@@ -298,6 +298,8 @@
       }
 
       function showDifficultyList() {
+        document.getElementById('diff-modal-title').style.display = 'block';
+        modal.querySelector('.modal__subtitle').style.display = 'block';
         diffGrid.style.display   = 'flex';
         levelPicker.classList.remove('visible');
         selectedDiff = null;
@@ -353,6 +355,8 @@
       }
 
       function showLevelPicker(difficulty) {
+        document.getElementById('diff-modal-title').style.display = 'none';
+        modal.querySelector('.modal__subtitle').style.display = 'none';
         const unlocked = getUnlockedLevel(difficulty);
         // Default to page containing player's current unlocked level
         currentPage = Math.max(1, Math.min(20, Math.ceil(unlocked / LEVELS_PER_PAGE)));
@@ -392,5 +396,6 @@
       }
     });
   </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
 </body>
 </html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="Buy hint packs for Sudoku. Get expert move suggestions with plain-English explanations. No subscription required." />
+  <title>Hint Store — Sudoku</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/store.css" />
+  <link rel="stylesheet" href="css/mobile-simulator.css" />
+</head>
+<body class="store-page">
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <span>📶</span>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+
+  <!-- ======================================================
+       Header
+       ====================================================== -->
+  <header class="store-header">
+    <button class="btn btn--ghost btn--sm" id="back-btn" aria-label="Back to main menu">
+      ← Back
+    </button>
+    <div class="store-header__title">
+      <span>💡</span> Hint Store
+    </div>
+    <div class="store-balance" aria-label="Current hint balance">
+      <span aria-hidden="true">💡</span>
+      <span id="hint-balance" aria-live="polite">0</span>
+      <span>left</span>
+    </div>
+  </header>
+
+  <!-- ======================================================
+       Hero
+       ====================================================== -->
+  <section class="store-hero">
+    <span class="store-hero__emoji" aria-hidden="true">🧠</span>
+    <h1 class="store-hero__title">Get Expert Hints</h1>
+    <p class="store-hero__subtitle">
+      Each hint reveals the best available move and teaches you <em>why</em> it works — no guessing required.
+    </p>
+  </section>
+
+  <!-- ======================================================
+       How hints work
+       ====================================================== -->
+  <div class="hint-explainer" aria-label="How hints work">
+    <div class="hint-explainer__title">
+      <span aria-hidden="true">ℹ️</span> How Hints Work
+    </div>
+    <ul class="hint-explainer__steps" role="list">
+      <li>
+        <span class="step-num" aria-hidden="true">1</span>
+        <span>Tap <strong>💡 Hint</strong> — we highlight the most useful region of the board.</span>
+      </li>
+      <li>
+        <span class="step-num" aria-hidden="true">2</span>
+        <span>Read the plain-English explanation of <em>why</em> this region is important.</span>
+      </li>
+      <li>
+        <span class="step-num" aria-hidden="true">3</span>
+        <span>Tap <strong>Reveal the Move</strong> to see the exact cell and number to fill in.</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ======================================================
+       Hint Pack Cards (rendered by store.js)
+       ====================================================== -->
+  <div id="pack-grid" role="list" aria-label="Hint packs available for purchase">
+    <!-- Populated by store.js -->
+  </div>
+
+  <!-- ======================================================
+       Footer
+       ====================================================== -->
+  <footer class="store-footer">
+    <button id="restore-btn" aria-label="Restore previous purchases">Restore Purchases</button>
+    <p class="store-legal">
+      Hints are stored locally on this device. Demo store simulation mode — no real charges are made.
+    </p>
+  </footer>
+
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <!-- ======================================================
+       Scripts
+       ====================================================== -->
+  <script src="js/progress.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/mobile-shell.js"></script>
+
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

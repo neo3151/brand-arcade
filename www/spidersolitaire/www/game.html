@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="Play Spider Solitaire: Cobweb Manor — 10-column card cascades, stock deals, and smart hints." />
+  <title>Play — Spider Solitaire</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="stylesheet" href="css/mobile-simulator.css" />
+</head>
+<body>
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-controls">
+    <span class="simulator-badge">GOOGLE PLAY READY</span>
+    <button id="btn-toggle-sim" class="simulator-toggle-btn" type="button">🖥️ Full Window</button>
+  </div>
+
+  <!-- Outer Smartphone Shell -->
+  <div class="device-shell">
+    <!-- Virtual Mobile Status Bar -->
+    <div class="device-status-bar">
+      <span id="device-clock">9:41</span>
+      <div class="device-island">
+        <div class="device-camera-lens"></div>
+      </div>
+      <div class="device-status-icons">
+        <span>5G</span>
+        <button id="sound-toggle-btn" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:0.75rem;">🔊</button>
+        <span>100% 🔋</span>
+      </div>
+    </div>
+
+    <!-- Mobile Viewport Screen -->
+    <div class="device-screen">
+      <div class="game-page">
+        <!-- Top Nav -->
+        <header class="game-header">
+          <button id="back-btn" class="btn btn--ghost btn--sm" aria-label="Back to Menu">
+            ← Menu
+          </button>
+          <div class="level-badge">
+            <span id="header-mode-tag" class="mode-tag">1 SUIT</span>
+            <span id="header-deal-num">Deal 1</span>
+          </div>
+          <div class="game-stats-bar">
+            <div title="Elapsed Time">
+              <span>⏱️</span>
+              <span id="timer-val">00:00</span>
+            </div>
+            <div title="Move Count">
+              <span>🔄</span>
+              <span id="moves-val">0</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Top Area: Stock Pile & 8 Foundation Slots -->
+        <section class="top-deck-area">
+          <!-- Stock Pile -->
+          <div class="stock-pile-container" id="stock-pile" title="Deal 10 cards to tableau">
+            <div class="stock-card-slot" id="stock-card-slot">
+              <span style="font-size:1.1rem;color:#f59e0b;">🕸️</span>
+            </div>
+            <div class="stock-deals-badge" id="stock-deals-count">5 left</div>
+          </div>
+
+          <!-- 8 Foundation Slots -->
+          <div class="foundation-container" id="foundation-container" title="Complete 8 King-to-Ace runs">
+            <!-- 8 Slots populated by JS -->
+          </div>
+        </section>
+
+        <!-- 10 Tableau Columns Viewport -->
+        <main class="tableau-viewport" id="tableau-viewport">
+          <div class="tableau-container" id="tableau-container">
+            <!-- 10 Columns populated by JS -->
+          </div>
+        </main>
+
+        <!-- Bottom Controls & Power-up Toolbar -->
+        <footer class="game-bottom-panel">
+          <div class="powerups-bar">
+            <button id="pwr-hint-btn" class="powerup-btn" aria-label="Smart Hint">
+              <span class="powerup-icon">💡</span>
+              <span class="powerup-name">HINT</span>
+              <span class="powerup-badge" id="badge-hints">5</span>
+            </button>
+
+            <button id="pwr-lantern-btn" class="powerup-btn" aria-label="Lantern Reveal">
+              <span class="powerup-icon">🏮</span>
+              <span class="powerup-name">LANTERN</span>
+              <span class="powerup-badge" id="badge-lanterns">3</span>
+            </button>
+
+            <button id="pwr-magnet-btn" class="powerup-btn" aria-label="Spiderweb Magnet">
+              <span class="powerup-icon">🕸️</span>
+              <span class="powerup-name">MAGNET</span>
+              <span class="powerup-badge" id="badge-magnets">2</span>
+            </button>
+
+            <button id="btn-undo" class="powerup-btn" aria-label="Undo move">
+              <span class="powerup-icon">↩️</span>
+              <span class="powerup-name">UNDO</span>
+            </button>
+          </div>
+        </footer>
+      </div>
+
+      <!-- Smart Hint Modal -->
+      <div id="hint-modal" class="modal-backdrop">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h2 class="modal-title" style="color:var(--gold-candle);">💡 Strategic Advice</h2>
+            <button class="modal-close-btn" id="hint-close-btn">&times;</button>
+          </div>
+          <p id="hint-text" style="font-size:0.95rem;line-height:1.6;color:#e2e8f0;margin-bottom:1.25rem;">
+            <!-- Populated by JS -->
+          </p>
+          <button id="hint-apply-btn" class="btn btn--gold btn--full">
+            Make Move
+          </button>
+        </div>
+      </div>
+
+      <!-- Victory Reveal Modal -->
+      <div id="victory-modal" class="modal-backdrop">
+        <div class="modal-card victory-card">
+          <div class="victory-manor-icon">🏰</div>
+          <div class="victory-title">MANOR CONQUERED!</div>
+          <p class="victory-subtitle">All 8 King-to-Ace runs woven and laid to rest.</p>
+
+          <div class="victory-stats">
+            <div>
+              <div style="font-size:0.75rem;color:#94a3b8;font-weight:700;">TIME</div>
+              <div id="victory-time" style="font-family:var(--font-mono);font-size:1.1rem;font-weight:800;color:#ffffff;">04:32</div>
+            </div>
+            <div>
+              <div style="font-size:0.75rem;color:#94a3b8;font-weight:700;">MOVES</div>
+              <div id="victory-moves" style="font-family:var(--font-mono);font-size:1.1rem;font-weight:800;color:#c084fc;">86</div>
+            </div>
+            <div>
+              <div style="font-size:0.75rem;color:#94a3b8;font-weight:700;">REWARD</div>
+              <div style="font-family:var(--font-mono);font-size:1.1rem;font-weight:800;color:var(--gold-candle);">+30 🪙</div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:0.6rem;">
+            <button id="next-deal-btn" class="btn btn--primary btn--full">
+              Next Deal ▶
+            </button>
+            <button id="victory-menu-btn" class="btn btn--secondary btn--full">
+              Main Menu
+            </button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/deck-generator.js"></script>
+  <script src="js/spider-engine.js"></script>
+  <script src="js/hint-engine.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { difficulty, level, continue: isContinue } = window.Utils.getQueryParams();
+
+      // UI Headers
+      const modeTag = document.getElementById('header-mode-tag');
+      const dealNum = document.getElementById('header-deal-num');
+      modeTag.textContent = difficulty === '1suit' ? '1 SUIT' : (difficulty === '2suit' ? '2 SUITS' : '4 SUITS');
+      dealNum.textContent = `Deal ${level}`;
+
+      // Initialize Deal & Engine
+      const dealData = window.DeckGenerator.dealGame(difficulty, level);
+      const engine = new window.SpiderEngine(dealData);
+
+      let lastTouchTime = 0;
+      let activeHintData = null;
+      let lanternActiveUntil = 0;
+
+      // Timer & Moves
+      let elapsedSeconds = 0;
+      const timerValEl = document.getElementById('timer-val');
+      const movesValEl = document.getElementById('moves-val');
+      let timerInterval = null;
+
+      function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          if (!engine.isSolved) {
+            elapsedSeconds++;
+            timerValEl.textContent = window.Utils.formatTime(elapsedSeconds);
+          }
+        }, 1000);
+      }
+
+      function rehydrateUndoStack(stack) {
+        if (!Array.isArray(stack)) return [];
+        return stack.map(act => {
+          if (!act) return act;
+          if (act.type === 'move') {
+            const copy = { ...act };
+            if (copy.assembledRun && Array.isArray(copy.assembledRun.cards)) {
+              copy.assembledRun = {
+                ...copy.assembledRun,
+                cards: copy.assembledRun.cards.map(c => (c instanceof window.Card ? c : window.Card.fromJSON(c)))
+              };
+            }
+            return copy;
+          }
+          if (act.type === 'deal') {
+            const copy = { ...act };
+            if (Array.isArray(copy.dealt)) {
+              copy.dealt = copy.dealt.map(item => ({
+                col: item.col,
+                card: item.card ? (item.card instanceof window.Card ? item.card : window.Card.fromJSON(item.card)) : null
+              }));
+            }
+            if (Array.isArray(copy.assembledRuns)) {
+              copy.assembledRuns = copy.assembledRuns.map(run => ({
+                ...run,
+                cards: Array.isArray(run.cards)
+                  ? run.cards.map(c => (c instanceof window.Card ? c : window.Card.fromJSON(c)))
+                  : []
+              }));
+            }
+            return copy;
+          }
+          return act;
+        });
+      }
+
+      function serializeUndoStack(stack) {
+        if (!Array.isArray(stack)) return [];
+        return stack.map(act => {
+          if (!act) return act;
+          if (act.type === 'move') {
+            return {
+              ...act,
+              assembledRun: act.assembledRun ? {
+                ...act.assembledRun,
+                cards: (act.assembledRun.cards || []).map(c => (c && typeof c.toJSON === 'function' ? c.toJSON() : c))
+              } : null
+            };
+          }
+          if (act.type === 'deal') {
+            return {
+              ...act,
+              dealt: (act.dealt || []).map(d => ({
+                col: d.col,
+                card: d.card && typeof d.card.toJSON === 'function' ? d.card.toJSON() : d.card
+              })),
+              assembledRuns: (act.assembledRuns || []).map(run => ({
+                ...run,
+                cards: (run.cards || []).map(c => (c && typeof c.toJSON === 'function' ? c.toJSON() : c))
+              }))
+            };
+          }
+          return act;
+        });
+      }
+
+      function persistActiveGame() {
+        if (engine.isSolved) return;
+        window.Progress.saveActiveGame({
+          difficulty,
+          level,
+          tableau: engine.tableau.map(col => col.map(c => c.toJSON())),
+          stock: engine.stock.map(c => c.toJSON()),
+          completedRuns: [...engine.completedRuns],
+          elapsed: elapsedSeconds,
+          moves: engine.movesCount,
+          undoStack: serializeUndoStack(engine.undoStack)
+        });
+      }
+
+      // Check for Continue Active Game
+      if (isContinue) {
+        const active = window.Progress.getActiveGame();
+        if (active && active.difficulty === difficulty && active.level === level) {
+          if (Array.isArray(active.tableau)) {
+            engine.tableau = active.tableau.map(col => col.map(c => window.Card.fromJSON(c)));
+          }
+          if (Array.isArray(active.stock)) {
+            engine.stock = active.stock.map(c => window.Card.fromJSON(c));
+          }
+          if (Array.isArray(active.completedRuns)) {
+            engine.completedRuns = [...active.completedRuns];
+          }
+          if (typeof active.moves === 'number') {
+            engine.movesCount = active.moves;
+            movesValEl.textContent = engine.movesCount;
+          }
+          if (Array.isArray(active.undoStack)) {
+            engine.undoStack = rehydrateUndoStack(active.undoStack);
+          }
+          if (typeof active.elapsed === 'number') {
+            elapsedSeconds = active.elapsed;
+            timerValEl.textContent = window.Utils.formatTime(elapsedSeconds);
+          }
+        }
+      }
+
+      startTimer();
+
+      window.addEventListener('pagehide', persistActiveGame);
+      window.addEventListener('beforeunload', persistActiveGame);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') persistActiveGame();
+      });
+
+      // Update Inventory Badges
+      function updateInventoryBadges() {
+        const inv = window.Progress.getInventory();
+        document.getElementById('badge-hints').textContent = inv.hints;
+        document.getElementById('badge-lanterns').textContent = inv.lanterns;
+        document.getElementById('badge-magnets').textContent = inv.magnets;
+      }
+      updateInventoryBadges();
+
+      // Setup 8 Foundation Slots
+      const foundationContainer = document.getElementById('foundation-container');
+      const foundationSlots = [];
+      for (let i = 0; i < 8; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'foundation-slot';
+        slot.id = `found-slot-${i}`;
+        slot.textContent = '♠';
+        foundationContainer.appendChild(slot);
+        foundationSlots.push(slot);
+      }
+
+      function updateFoundationUI() {
+        for (let i = 0; i < 8; i++) {
+          const slot = foundationSlots[i];
+          if (i < engine.completedRuns.length) {
+            slot.classList.add('completed');
+            const suit = engine.completedRuns[i];
+            const sym = window.SUITS[suit] ? window.SUITS[suit].symbol : '♠';
+            slot.textContent = sym;
+            slot.title = `Completed ${suit.toUpperCase()} Run`;
+          } else {
+            slot.classList.remove('completed');
+            slot.textContent = '♠';
+            slot.title = 'Empty Foundation';
+          }
+        }
+      }
+
+      // Setup Stock Pile UI
+      const stockSlot = document.getElementById('stock-card-slot');
+      const stockCountEl = document.getElementById('stock-deals-count');
+
+      function updateStockUI() {
+        const remainingDeals = Math.floor(engine.stock.length / 10);
+        stockCountEl.textContent = `${remainingDeals} left`;
+        if (remainingDeals === 0) {
+          stockSlot.classList.add('empty');
+          stockSlot.innerHTML = '';
+        } else {
+          stockSlot.classList.remove('empty');
+          stockSlot.innerHTML = '<span style="font-size:1.1rem;color:#f59e0b;">🕸️</span>';
+        }
+      }
+
+      stockSlot.addEventListener('click', () => {
+        if (engine.isSolved || engine.stock.length < 10) return;
+
+        // Standard Spider Solitaire rule: Cannot deal while any column is empty
+        if (engine.hasEmptyColumn()) {
+          window.Utils.showToast('Cannot deal from stock while any column is empty! Place cards into empty spaces first.', 'warning');
+          return;
+        }
+
+        const res = engine.dealFromStock();
+        if (res.success) {
+          clearSelection();
+          if (window.SoundFX) window.SoundFX.playDealWhoosh();
+          movesValEl.textContent = engine.movesCount;
+          renderTableau();
+          updateStockUI();
+          updateFoundationUI();
+          persistActiveGame();
+
+          if (res.assembledRuns && res.assembledRuns.length > 0) {
+            if (window.SoundFX) window.SoundFX.playRunComplete();
+            window.Utils.showToast('Full King-to-Ace Run Assembled!', 'success');
+          }
+
+          if (res.isSolved) handleVictory();
+        } else if (res.reason === 'empty_column') {
+          window.Utils.showToast('Cannot deal from stock while any column is empty! Place cards into empty spaces first.', 'warning');
+        }
+      });
+
+      // Setup 10 Tableau Columns
+      const tableauContainer = document.getElementById('tableau-container');
+      const columnElements = [];
+
+      for (let i = 0; i < 10; i++) {
+        const colEl = document.createElement('div');
+        colEl.className = 'tableau-column';
+        colEl.dataset.col = i;
+        colEl.id = `col-${i}`;
+        colEl.addEventListener('click', (e) => {
+          if (e.target === colEl || colEl.classList.contains('empty-slot')) {
+            handleColumnTap(i);
+          }
+        });
+        tableauContainer.appendChild(colEl);
+        columnElements.push(colEl);
+      }
+
+      tableauContainer.addEventListener('click', (e) => {
+        if (e.target === tableauContainer) {
+          clearSelection();
+        }
+      });
+
+      // Selection & Drag State
+      let selectedStack = null; // { colIdx, startIdx }
+      let pointerState = null;
+
+      function clearSelection() {
+        selectedStack = null;
+        document.querySelectorAll('.card.selected-card').forEach(el => el.classList.remove('selected-card'));
+        columnElements.forEach(colEl => {
+          colEl.classList.remove('selected-source');
+          colEl.classList.remove('col-legal-target');
+        });
+      }
+
+      function selectStack(colIdx, startIdx) {
+        clearSelection();
+        selectedStack = { colIdx, startIdx };
+
+        // Mark source column
+        columnElements[colIdx].classList.add('selected-source');
+
+        // Mark selected cards
+        const cards = engine.tableau[colIdx];
+        for (let i = startIdx; i < cards.length; i++) {
+          const el = document.getElementById(`card-${colIdx}-${i}`);
+          if (el) el.classList.add('selected-card');
+        }
+
+        // Highlight legal target columns
+        for (let t = 0; t < 10; t++) {
+          if (t !== colIdx && engine.canDropStack(colIdx, startIdx, t)) {
+            columnElements[t].classList.add('col-legal-target');
+          }
+        }
+      }
+
+      function handleCardTap(colIdx, cardIdx) {
+        if (engine.isSolved) return;
+
+        // If a stack is already selected:
+        if (selectedStack) {
+          // If tapping inside the same column:
+          if (selectedStack.colIdx === colIdx) {
+            if (selectedStack.startIdx === cardIdx) {
+              // Tapped the exact same card: toggle deselect!
+              clearSelection();
+              return;
+            }
+            // Tapped a different card in the same column
+            const movable = engine.getMovableStack(colIdx, cardIdx);
+            if (movable) {
+              selectStack(colIdx, cardIdx);
+            } else {
+              clearSelection();
+              cardElShake(colIdx, cardIdx);
+            }
+            return;
+          }
+
+          // Tapping a card in a DIFFERENT column:
+          // Check if this column is a legal target for the selected stack
+          if (engine.canDropStack(selectedStack.colIdx, selectedStack.startIdx, colIdx)) {
+            const fromCol = selectedStack.colIdx;
+            const fromIdx = selectedStack.startIdx;
+            clearSelection();
+            executeMove(fromCol, fromIdx, colIdx);
+            return;
+          }
+
+          // Not a legal target: maybe player wants to select THIS card instead?
+          const movable = engine.getMovableStack(colIdx, cardIdx);
+          if (movable) {
+            selectStack(colIdx, cardIdx);
+          } else {
+            clearSelection();
+            cardElShake(colIdx, cardIdx);
+          }
+          return;
+        }
+
+        // No stack currently selected: try to select this card
+        const movable = engine.getMovableStack(colIdx, cardIdx);
+        if (movable) {
+          selectStack(colIdx, cardIdx);
+        } else {
+          cardElShake(colIdx, cardIdx);
+        }
+      }
+
+      function handleColumnTap(colIdx) {
+        if (engine.isSolved) return;
+        if (!selectedStack) return;
+
+        if (engine.canDropStack(selectedStack.colIdx, selectedStack.startIdx, colIdx)) {
+          const fromCol = selectedStack.colIdx;
+          const fromIdx = selectedStack.startIdx;
+          clearSelection();
+          executeMove(fromCol, fromIdx, colIdx);
+        } else {
+          clearSelection();
+        }
+      }
+
+      function executeMove(fromCol, startIdx, toCol) {
+        clearSelection();
+        const res = engine.moveStack(fromCol, startIdx, toCol);
+        if (res.success) {
+          if (window.SoundFX) window.SoundFX.playCardSnap();
+          movesValEl.textContent = engine.movesCount;
+          renderTableau();
+          updateFoundationUI();
+          persistActiveGame();
+
+          if (res.assembledRun) {
+            if (window.SoundFX) window.SoundFX.playRunComplete();
+            window.Utils.showToast('Full King-to-Ace Run Assembled!', 'success');
+          }
+
+          if (res.isSolved) handleVictory();
+        }
+      }
+
+      function cardElShake(colIdx, cardIdx) {
+        const el = document.getElementById(`card-${colIdx}-${cardIdx}`);
+        if (!el) return;
+        el.style.transform = 'translateX(-4px)';
+        setTimeout(() => {
+          el.style.transform = 'translateX(4px)';
+          setTimeout(() => el.style.transform = 'none', 80);
+        }, 80);
+      }
+
+      // Render Tableau Columns
+      function renderTableau() {
+        const isLanternActive = Date.now() < lanternActiveUntil;
+
+        for (let colIdx = 0; colIdx < 10; colIdx++) {
+          const colEl = columnElements[colIdx];
+          colEl.innerHTML = '';
+          const cards = engine.tableau[colIdx];
+
+          if (cards.length === 0) {
+            colEl.classList.add('empty-slot');
+          } else {
+            colEl.classList.remove('empty-slot');
+          }
+
+          let topOffset = 0;
+          for (let cardIdx = 0; cardIdx < cards.length; cardIdx++) {
+            const card = cards[cardIdx];
+            const cardEl = document.createElement('div');
+            cardEl.className = `card ${card.faceUp ? 'face-up' : 'face-down'} suit-${card.suit}`;
+            cardEl.dataset.col = colIdx;
+            cardEl.dataset.idx = cardIdx;
+            cardEl.id = `card-${colIdx}-${cardIdx}`;
+
+            // Calculate vertical cascading offset
+            cardEl.style.top = `${topOffset}px`;
+            topOffset += card.faceUp ? 22 : 14;
+
+            if (card.faceUp) {
+              cardEl.innerHTML = `
+                <div class="card-corner-top">
+                  <span>${card.rankStr}</span>
+                  <span class="card-corner-suit">${card.suitSymbol}</span>
+                </div>
+                <div class="card-center-suit">${card.suitSymbol}</div>
+              `;
+            } else {
+              // If lantern is active, reveal peeking rank
+              if (isLanternActive) {
+                cardEl.classList.add('lantern-peek');
+                cardEl.setAttribute('data-peek-rank', card.rankStr);
+              }
+            }
+
+            // Bind Drag & Tap Handlers
+            bindCardEvents(cardEl, colIdx, cardIdx);
+
+            colEl.appendChild(cardEl);
+          }
+        }
+      }
+
+      function bindCardEvents(cardEl, colIdx, cardIdx) {
+        cardEl.addEventListener('pointerdown', (e) => {
+          if (engine.isSolved) return;
+          if (e.button !== undefined && e.button !== 0) return;
+
+          pointerState = {
+            colIdx,
+            cardIdx,
+            startX: e.clientX,
+            startY: e.clientY,
+            isDragging: false,
+            ghostEl: null,
+            pointerId: e.pointerId
+          };
+          try { cardEl.setPointerCapture(e.pointerId); } catch (_) {}
+        });
+
+        cardEl.addEventListener('pointermove', (e) => {
+          if (!pointerState || pointerState.pointerId !== e.pointerId) return;
+
+          const dx = e.clientX - pointerState.startX;
+          const dy = e.clientY - pointerState.startY;
+
+          if (!pointerState.isDragging && (dx * dx + dy * dy > 64)) {
+            const movable = engine.getMovableStack(pointerState.colIdx, pointerState.cardIdx);
+            if (!movable) {
+              return;
+            }
+
+            pointerState.isDragging = true;
+            selectStack(pointerState.colIdx, pointerState.cardIdx);
+
+            const ghost = document.createElement('div');
+            ghost.className = 'drag-ghost-container';
+            ghost.style.position = 'fixed';
+            ghost.style.left = `${e.clientX - 20}px`;
+            ghost.style.top = `${e.clientY - 20}px`;
+            ghost.style.width = `${cardEl.offsetWidth}px`;
+            ghost.style.pointerEvents = 'none';
+            ghost.style.zIndex = '99999';
+
+            const cardsInCol = engine.tableau[pointerState.colIdx];
+            let topOffset = 0;
+            for (let i = pointerState.cardIdx; i < cardsInCol.length; i++) {
+              const c = cardsInCol[i];
+              const clone = document.createElement('div');
+              clone.className = `card face-up suit-${c.suit} dragging`;
+              clone.style.position = 'absolute';
+              clone.style.top = `${topOffset}px`;
+              clone.style.left = '0';
+              clone.style.width = '100%';
+              clone.innerHTML = `
+                <div class="card-corner-top">
+                  <span>${c.rankStr}</span>
+                  <span class="card-corner-suit">${c.suitSymbol}</span>
+                </div>
+                <div class="card-center-suit">${c.suitSymbol}</div>
+              `;
+              ghost.appendChild(clone);
+              topOffset += 22;
+            }
+
+            document.body.appendChild(ghost);
+            pointerState.ghostEl = ghost;
+          }
+
+          if (pointerState.isDragging && pointerState.ghostEl) {
+            pointerState.ghostEl.style.left = `${e.clientX - 20}px`;
+            pointerState.ghostEl.style.top = `${e.clientY - 20}px`;
+          }
+        });
+
+        cardEl.addEventListener('pointerup', (e) => {
+          if (!pointerState || pointerState.pointerId !== e.pointerId) return;
+
+          try { cardEl.releasePointerCapture(e.pointerId); } catch (_) {}
+
+          if (pointerState.isDragging) {
+            if (pointerState.ghostEl) {
+              pointerState.ghostEl.remove();
+            }
+
+            const hit = document.elementFromPoint(e.clientX, e.clientY);
+            const targetColEl = hit ? hit.closest('.tableau-column') : null;
+
+            if (targetColEl) {
+              const toCol = parseInt(targetColEl.dataset.col, 10);
+              if (engine.canDropStack(pointerState.colIdx, pointerState.cardIdx, toCol)) {
+                const fromCol = pointerState.colIdx;
+                const fromIdx = pointerState.cardIdx;
+                clearSelection();
+                executeMove(fromCol, fromIdx, toCol);
+                pointerState = null;
+                return;
+              }
+            }
+
+            clearSelection();
+            pointerState = null;
+            return;
+          }
+
+          const fromCol = pointerState.colIdx;
+          const fromIdx = pointerState.cardIdx;
+          pointerState = null;
+          handleCardTap(fromCol, fromIdx);
+        });
+
+        cardEl.addEventListener('pointercancel', (e) => {
+          if (!pointerState) return;
+          if (pointerState.ghostEl) pointerState.ghostEl.remove();
+          clearSelection();
+          pointerState = null;
+        });
+      }
+
+      // Initial Render
+      renderTableau();
+      updateFoundationUI();
+      updateStockUI();
+
+      // Undo button
+      document.getElementById('btn-undo').addEventListener('click', () => {
+        clearSelection();
+        const act = engine.undo();
+        if (act) {
+          if (window.SoundFX) window.SoundFX.playCardSnap();
+          movesValEl.textContent = engine.movesCount;
+          renderTableau();
+          updateFoundationUI();
+          updateStockUI();
+          persistActiveGame();
+        } else {
+          window.Utils.showToast('Nothing to undo', 'info');
+        }
+      });
+
+      // Smart Hint button
+      const hintBtn = document.getElementById('pwr-hint-btn');
+      hintBtn.addEventListener('click', () => {
+        const inv = window.Progress.getInventory();
+        if (inv.hints <= 0) {
+          window.Utils.showToast('Out of hints! Visit store to refill.', 'warning');
+          return;
+        }
+
+        const hint = window.HintEngine.findBestMove(engine);
+        if (!hint || hint.type === 'none') {
+          window.Utils.showToast('No moves available right now.', 'info');
+          return;
+        }
+
+        if (hint.type === 'deal') {
+          window.Utils.showToast(hint.reason, 'info');
+          return;
+        }
+
+        activeHintData = hint;
+        document.getElementById('hint-text').textContent = hint.reason;
+
+        // Highlight cards on board
+        const cardEl = document.getElementById(`card-${hint.fromCol}-${hint.startIdx}`);
+        if (cardEl) cardEl.classList.add('hint-glow');
+
+        const colEl = columnElements[hint.toCol];
+        if (colEl) colEl.classList.add('highlight-target');
+
+        window.Utils.openModal('hint-modal');
+      });
+
+      document.getElementById('hint-close-btn').addEventListener('click', () => {
+        clearHintHighlights();
+        window.Utils.closeModal('hint-modal');
+      });
+
+      document.getElementById('hint-apply-btn').addEventListener('click', () => {
+        if (!activeHintData || activeHintData.type !== 'move') return;
+        window.Progress.modifyItem('hints', -1);
+        updateInventoryBadges();
+
+        clearHintHighlights();
+        window.Utils.closeModal('hint-modal');
+        executeMove(activeHintData.fromCol, activeHintData.startIdx, activeHintData.toCol);
+        activeHintData = null;
+      });
+
+      function clearHintHighlights() {
+        document.querySelectorAll('.hint-glow').forEach(el => el.classList.remove('hint-glow'));
+        document.querySelectorAll('.highlight-target').forEach(el => el.classList.remove('highlight-target'));
+      }
+
+      // Lantern Reveal button
+      document.getElementById('pwr-lantern-btn').addEventListener('click', () => {
+        const inv = window.Progress.getInventory();
+        if (inv.lanterns <= 0) {
+          window.Utils.showToast('Out of Lanterns! Visit store to refill.', 'warning');
+          return;
+        }
+
+        window.Progress.modifyItem('lanterns', -1);
+        updateInventoryBadges();
+        if (window.SoundFX) window.SoundFX.playPowerup();
+
+        lanternActiveUntil = Date.now() + 10000;
+        renderTableau();
+        window.Utils.showToast('Crypt Lantern illuminated hidden cards for 10s!', 'warning');
+
+        setTimeout(() => {
+          renderTableau();
+        }, 10000);
+      });
+
+      // Spiderweb Magnet button
+      document.getElementById('pwr-magnet-btn').addEventListener('click', () => {
+        clearSelection();
+        const inv = window.Progress.getInventory();
+        if (inv.magnets <= 0) {
+          window.Utils.showToast('Out of Spider Magnets! Visit store to refill.', 'warning');
+          return;
+        }
+
+        const res = engine.applySpiderMagnet();
+        if (res && res.success) {
+          window.Progress.modifyItem('magnets', -1);
+          updateInventoryBadges();
+          if (window.SoundFX) window.SoundFX.playPowerup();
+
+          movesValEl.textContent = engine.movesCount;
+          renderTableau();
+          updateFoundationUI();
+          persistActiveGame();
+          window.Utils.showToast('Spiderweb Magnet consolidated a suit sequence!', 'success');
+
+          if (res.assembledRun) {
+            if (window.SoundFX) window.SoundFX.playRunComplete();
+            window.Utils.showToast('Full King-to-Ace Run Assembled!', 'success');
+          }
+
+          if (res.isSolved) handleVictory();
+        } else {
+          window.Utils.showToast('No matching suit sequences can be pulled right now.', 'info');
+        }
+      });
+
+      // Victory Handler
+      function handleVictory() {
+        clearInterval(timerInterval);
+        if (window.SoundFX) window.SoundFX.playVictory();
+
+        window.Progress.clearActiveGame();
+        const res = window.Progress.completeLevel(difficulty, level, elapsedSeconds, engine.movesCount);
+
+        document.getElementById('victory-time').textContent = window.Utils.formatTime(elapsedSeconds);
+        document.getElementById('victory-moves').textContent = engine.movesCount;
+
+        window.Utils.openModal('victory-modal');
+      }
+
+      document.getElementById('next-deal-btn').addEventListener('click', () => {
+        const nextLvl = Math.min(1000, level + 1);
+        window.location.href = `game.html?difficulty=${difficulty}&level=${nextLvl}`;
+      });
+
+      document.getElementById('victory-menu-btn').addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+
+      document.getElementById('back-btn').addEventListener('click', () => {
+        persistActiveGame();
+        window.location.href = 'index.html';
+      });
+    });
+  </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

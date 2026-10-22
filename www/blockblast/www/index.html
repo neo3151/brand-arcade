@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Timber Block Blast</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+  <link rel="stylesheet" href="css/menu.css">
+</head>
+<body>
+  <div class="device-wrapper">
+    <div class="device-shell">
+      <!-- Status Bar -->
+      <div class="device-status-bar">
+        <span id="device-clock">12:00</span>
+        <div class="device-camera-cutout"></div>
+        <div class="device-status-icons">
+          <button id="sound-toggle-btn" class="sound-toggle-btn" aria-label="Toggle Sound">🔊</button>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <!-- Main Screen Content -->
+      <div class="device-screen">
+        <div class="menu-viewport">
+          <!-- Logo & Header -->
+          <header class="menu-header">
+            <div class="menu-wood-badge">🪵 Natural Wood Edition</div>
+            <h1 class="menu-title">TIMBER<br>BLOCK BLAST</h1>
+            <p class="menu-subtitle">Clear Lines • Chain Combos • Reach Glory</p>
+          </header>
+
+          <!-- Best Score Card -->
+          <section class="best-score-card">
+            <div class="best-score-left">
+              <span class="crown-icon">👑</span>
+              <div>
+                <div class="best-score-label">Personal Best</div>
+                <div class="best-score-val" id="menu-best-score">0</div>
+              </div>
+            </div>
+            <div class="coins-badge">
+              <span>🪙</span>
+              <span id="menu-coins">150</span>
+            </div>
+          </section>
+
+          <!-- Menu Action Buttons -->
+          <div class="menu-actions">
+            <!-- Continue button: dynamically displayed if active save exists -->
+            <button id="continue-game-btn" class="btn btn-continue btn--full" style="display:none;">
+              ▶ Continue Run (<span id="continue-score-val">0</span> pts)
+            </button>
+
+            <a href="game.html" class="btn btn--primary btn-play-new btn--full" id="new-game-btn">
+              ⚡ Start New Run
+            </a>
+
+            <div class="menu-sub-row">
+              <a href="store.html" class="btn btn--secondary">
+                🛒 Shop & Themes
+              </a>
+              <button id="how-to-play-btn" class="btn btn--secondary">
+                📖 How to Play
+              </button>
+            </div>
+
+            <button id="stats-btn" class="btn btn--secondary btn--full">
+              🏆 Stats & Records
+            </button>
+          </div>
+
+          <!-- Footer -->
+          <footer class="menu-footer">
+            <span>Ad-Free Mobile Gaming • Version 1.0</span>
+          </footer>
+        </div>
+      </div><!-- /.device-screen -->
+
+      <!-- Home Indicator -->
+      <div class="device-home-indicator">
+        <div class="device-home-pill"></div>
+      </div>
+    </div><!-- /.device-shell -->
+  </div><!-- /.device-wrapper -->
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- How to Play Modal -->
+  <div id="how-to-play-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <h2 style="font-family:var(--font-title);color:var(--amber-light);font-size:1.3rem;text-align:center;margin-bottom:0.75rem;">
+        How to Play
+      </h2>
+      <div style="font-size:0.78rem;color:#fef3c7;line-height:1.45;display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem;">
+        <div>
+          <strong style="color:var(--amber-gold);">1. Place Polyominoes:</strong> Drag shapes from the bottom tray onto the 8×8 grid, or tap a shape then tap any grid cell.
+        </div>
+        <div>
+          <strong style="color:var(--amber-gold);">2. Blast Lines:</strong> Completely fill any row or column to clear it. Rows and columns clear simultaneously!
+        </div>
+        <div>
+          <strong style="color:var(--amber-gold);">3. Build Combos:</strong> Clearing lines on consecutive placements builds a massive combo multiplier.
+        </div>
+        <div>
+          <strong style="color:var(--amber-gold);">4. Don't Get Trapped:</strong> If no remaining pieces in your tray can fit on the board, the run ends! Use Hammers and Rotations to rescue tight spots.
+        </div>
+      </div>
+      <button id="close-how-modal" class="btn btn--primary btn--full">
+        Got it!
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Modal -->
+  <div id="stats-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <h2 style="font-family:var(--font-title);color:var(--amber-light);font-size:1.3rem;text-align:center;margin-bottom:0.75rem;">
+        Your Career Stats
+      </h2>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.8rem;margin-bottom:1.25rem;">
+        <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--silver-border);">
+          <span style="color:#d97706;">Highest Score:</span>
+          <strong id="stat-high-score" style="color:#fff;">0</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--silver-border);">
+          <span style="color:#d97706;">Highest Combo:</span>
+          <strong id="stat-max-combo" style="color:var(--amber-gold);">0</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--silver-border);">
+          <span style="color:#d97706;">Total Lines Cleared:</span>
+          <strong id="stat-total-lines" style="color:#10b981;">0</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--silver-border);">
+          <span style="color:#d97706;">Games Played:</span>
+          <strong id="stat-games-played" style="color:#cbd5e1;">0</strong>
+        </div>
+      </div>
+      <button id="close-stats-modal" class="btn btn--secondary btn--full">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Render High Score & Coins
+      document.getElementById('menu-best-score').textContent = window.Progress.getHighScore();
+      document.getElementById('menu-coins').textContent = window.Progress.getCoins();
+
+      // 2. Check for Active Saved Run
+      const activeGame = window.Progress.getActiveGame();
+      const continueBtn = document.getElementById('continue-game-btn');
+      if (activeGame && !activeGame.isGameOver && activeGame.score !== undefined) {
+        document.getElementById('continue-score-val').textContent = activeGame.score;
+        continueBtn.style.display = 'inline-flex';
+        continueBtn.addEventListener('click', () => {
+          window.location.href = 'game.html?continue=1';
+        });
+      }
+
+      // 3. New Game button clicks
+      document.getElementById('new-game-btn').addEventListener('click', (e) => {
+        if (activeGame && !activeGame.isGameOver) {
+          // If starting fresh, clear old save
+          window.Progress.clearActiveGame();
+        }
+      });
+
+      // 4. Modals
+      const howModalBtn = document.getElementById('how-to-play-btn');
+      howModalBtn.addEventListener('click', () => window.Utils.openModal('how-to-play-modal'));
+      document.getElementById('close-how-modal').addEventListener('click', () => window.Utils.closeModal('how-to-play-modal'));
+
+      const statsBtn = document.getElementById('stats-btn');
+      statsBtn.addEventListener('click', () => {
+        const stats = window.Progress.getStats();
+        document.getElementById('stat-high-score').textContent = window.Progress.getHighScore();
+        document.getElementById('stat-max-combo').textContent = `x${stats.highestCombo}`;
+        document.getElementById('stat-total-lines').textContent = stats.totalLinesCleared;
+        document.getElementById('stat-games-played').textContent = stats.gamesPlayed;
+        window.Utils.openModal('stats-modal');
+      });
+      document.getElementById('close-stats-modal').addEventListener('click', () => window.Utils.closeModal('stats-modal'));
+    });
+  </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

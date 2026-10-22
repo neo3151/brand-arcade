@@ -17,7 +17,7 @@
   flex-direction: column;
   background: rgba(2, 44, 34, 0.95);
   border-bottom: 1px solid var(--felt-border);
-  padding: 0.4rem 0.75rem;
+  padding: calc(env(safe-area-inset-top, 0px) + 0.4rem) 0.75rem 0.4rem;
   z-index: 50;
   gap: 0.25rem;
 }

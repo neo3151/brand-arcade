@@ -23,6 +23,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.35rem 0.65rem;
+  margin-top: calc(env(safe-area-inset-top, 0px) + 0.25rem);
   background: rgba(10, 26, 18, 0.85);
   border: 1px solid rgba(212, 175, 55, 0.35);
   border-radius: var(--radius-md);

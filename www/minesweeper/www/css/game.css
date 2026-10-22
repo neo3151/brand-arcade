@@ -1,0 +1,364 @@
+/* ==========================================================================
+   INFERNO SWEEPER — Tactical HUD, Grid & Cell Styles
+   ========================================================================== */
+
+.game-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   Top Tactical Command HUD
+   -------------------------------------------------------------------------- */
+.hud-bar {
+  background: var(--bg-surface);
+  border-bottom: 3px solid var(--border-metal);
+  padding: calc(env(safe-area-inset-top, 0px) + var(--space-2)) var(--space-4) var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.hud-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.hud-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hud-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-hazard-yellow);
+}
+
+/* Center Face Avatar & Reset Button */
+.face-btn {
+  background: #1e2430;
+  border: 3px solid #475569;
+  border-top-color: #64748b;
+  border-left-color: #64748b;
+  border-bottom-color: #0f172a;
+  border-right-color: #0f172a;
+  border-radius: var(--radius-sm);
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-steel);
+  transition: transform 0.05s ease, background 0.15s ease;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+.face-btn:active {
+  border-top-color: #0f172a;
+  border-left-color: #0f172a;
+  border-bottom-color: #64748b;
+  border-right-color: #64748b;
+  background: #131720;
+  transform: translateY(1px);
+}
+
+.face-svg {
+  width: 44px;
+  height: 44px;
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Battlefield Grid Viewport & Scroll Area
+   -------------------------------------------------------------------------- */
+.grid-viewport {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: var(--space-4);
+  background: 
+    radial-gradient(ellipse at 50% 50%, rgba(220, 38, 38, 0.04) 0%, transparent 80%),
+    linear-gradient(#0c0d11, #0c0d11);
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Heavy Steel Frame surrounding the cells */
+.grid-frame {
+  background: #141720;
+  border: 4px solid #334155;
+  border-top-color: #475569;
+  border-left-color: #475569;
+  border-bottom-color: #0f172a;
+  border-right-color: #0f172a;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.95), inset 0 2px 5px rgba(0, 0, 0, 0.8);
+  padding: 6px;
+  display: inline-block;
+  user-select: none;
+  touch-action: pan-x pan-y;
+}
+
+.mine-grid {
+  display: grid;
+  gap: 1px;
+  background: #090b0e;
+  border: 2px solid #090b0e;
+}
+
+/* --------------------------------------------------------------------------
+   Minesweeper Cells
+   -------------------------------------------------------------------------- */
+.cell {
+  width: 34px;
+  height: 34px;
+  background: #2b3240;
+  border: 3px solid;
+  border-top-color: #55627a;
+  border-left-color: #55627a;
+  border-bottom-color: #121620;
+  border-right-color: #121620;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 900;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.08s ease;
+  line-height: 1;
+}
+
+/* Mobile responsive sizing */
+@media (max-width: 600px) {
+  .cell {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+    border-width: 2.5px;
+  }
+}
+
+/* Pressed / Active State */
+.cell:active:not(.cell--revealed) {
+  border-top-color: #121620;
+  border-left-color: #121620;
+  border-bottom-color: #55627a;
+  border-right-color: #55627a;
+  background: #1e2430;
+}
+
+/* Revealed Empty or Number Cell */
+.cell--revealed {
+  background: #151821;
+  border: 1px solid #1a202c;
+  cursor: default;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Number Colors (Authentic heavy tactical colors) */
+.cell--num-1 { color: #38bdf8; text-shadow: 0 0 4px rgba(56, 189, 248, 0.4); } /* Blue/Cyan */
+.cell--num-2 { color: #4ade80; text-shadow: 0 0 4px rgba(74, 222, 128, 0.4); } /* Toxic Green */
+.cell--num-3 { color: #f87171; text-shadow: 0 0 4px rgba(248, 113, 113, 0.5); } /* Crimson Red */
+.cell--num-4 { color: #818cf8; text-shadow: 0 0 4px rgba(129, 140, 248, 0.4); } /* Dark Blue/Purple */
+.cell--num-5 { color: #fb923c; text-shadow: 0 0 4px rgba(251, 146, 60, 0.4); }  /* Rust Amber */
+.cell--num-6 { color: #2dd4bf; text-shadow: 0 0 4px rgba(45, 212, 191, 0.4); }  /* Teal */
+.cell--num-7 { color: #f1f5f9; text-shadow: 0 0 4px rgba(241, 245, 249, 0.4); }  /* Light Gray */
+.cell--num-8 { color: #94a3b8; text-shadow: 0 0 4px rgba(148, 163, 184, 0.4); }  /* Dark Gray */
+
+/* Flagged Cell */
+.cell--flagged {
+  background: #252c3b;
+}
+
+.flag-icon {
+  font-size: 1.1rem;
+  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.8));
+  animation: flagPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes flagPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.12); }
+}
+
+/* Exploded Mine */
+.cell--exploded {
+  background: #991b1b !important;
+  border-color: #ef4444 !important;
+  animation: blastPulse 0.4s ease-out;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.9), inset 0 0 10px rgba(0, 0, 0, 0.9);
+}
+
+@keyframes blastPulse {
+  0%   { transform: scale(1.3); background: #fef08a; }
+  50%  { transform: scale(1.1); background: #ef4444; }
+  100% { transform: scale(1);   background: #991b1b; }
+}
+
+/* Unrevealed Mine on Game Over */
+.cell--mine {
+  background: #1c1318;
+  border-color: #3b171e;
+}
+
+/* Defused Mine via Bio-Shield */
+.cell--defused {
+  background: #0f2d3a !important;
+  border-color: #06b6d4 !important;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.7);
+}
+
+/* Clairvoyance & Sonar Scan Highlight */
+.cell--safe-hint {
+  outline: 3px solid #10b981;
+  outline-offset: -2px;
+  animation: safePulse 1.2s infinite ease-in-out;
+  z-index: 10;
+}
+
+@keyframes safePulse {
+  0%, 100% { outline-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.8); }
+  50%      { outline-color: #6ee7b7; box-shadow: 0 0 18px rgba(110, 231, 183, 1); }
+}
+
+.cell--scan-sector {
+  background: #164e63 !important;
+  border-color: #22d3ee !important;
+  box-shadow: inset 0 0 10px #06b6d4;
+  transition: all 0.2s ease;
+}
+
+/* --------------------------------------------------------------------------
+   Bottom Quick Action & Power-Up Bar
+   -------------------------------------------------------------------------- */
+.action-bar {
+  background: var(--bg-surface);
+  border-top: 3px solid var(--border-metal);
+  padding: var(--space-2) var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+/* Touch Dig vs Flag Mode Switcher */
+.mode-toggle {
+  display: flex;
+  background: #11141b;
+  border: 2px solid var(--border-metal);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.mode-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-dark);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  transition: all 0.15s ease;
+}
+
+.mode-btn.is-active {
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.5);
+}
+
+.mode-btn--flag.is-active {
+  background: linear-gradient(180deg, #dc2626, #991b1b);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
+}
+
+/* Power-Up Item Buttons */
+.power-items {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.power-btn {
+  background: var(--bg-panel);
+  border: 2px solid var(--border-metal);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-main);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-steel);
+  transition: all 0.12s ease;
+  position: relative;
+}
+
+.power-btn:hover:not(:disabled) {
+  border-color: var(--color-plasma-cyan);
+  transform: translateY(-1px);
+}
+
+.power-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.power-btn__icon {
+  font-size: 1.15rem;
+}
+
+.power-btn__badge {
+  background: #0284c7;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+.power-btn--empty .power-btn__badge {
+  background: #334155;
+  color: #94a3b8;
+}
+
+/* Screen Shake Effect */
+.screen-shake {
+  animation: screenShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes screenShake {
+  10%, 90% { transform: translate3d(-3px, 0, 0); }
+  20%, 80% { transform: translate3d(5px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+  40%, 60% { transform: translate3d(6px, 0, 0); }
+}

@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.6rem 1rem;
+  padding: calc(env(safe-area-inset-top, 0px) + 0.6rem) 1rem 0.6rem;
   background: var(--slate-950);
   border-bottom: 1px solid var(--slate-800);
   flex-shrink: 0;

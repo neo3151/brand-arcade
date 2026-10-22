@@ -17,6 +17,7 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-3) var(--space-5);
+  margin-top: calc(env(safe-area-inset-top, 0px) + 4px);
   background: var(--bg-surface);
   border: 2px solid var(--border-gold);
   border-radius: var(--radius-sm);

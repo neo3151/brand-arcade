@@ -1,0 +1,299 @@
+/* ==========================================================================
+   INFERNO SWEEPER — Menu & Mission Briefing Styles
+   ========================================================================== */
+
+.menu-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Header & Mission Dispatch */
+.menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  margin-top: calc(env(safe-area-inset-top, 0px) + 4px);
+  background: var(--bg-surface);
+  border: 2px solid var(--border-metal);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-steel);
+}
+
+.menu-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.menu-brand__icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6));
+}
+
+.menu-brand__title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.menu-brand__subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-hazard-yellow);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.armory-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid var(--color-plasma-cyan);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-plasma-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.armory-badge:hover {
+  background: rgba(6, 182, 212, 0.25);
+  box-shadow: var(--shadow-glow-cyan);
+  transform: translateY(-1px);
+}
+
+/* Hero Briefing Banner */
+.briefing-banner {
+  background: linear-gradient(135deg, #1c0505 0%, #16181f 60%);
+  border: 2px solid #7f1d1d;
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-steel);
+}
+
+.briefing-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #111,
+    #111 8px,
+    #dc2626 8px,
+    #dc2626 16px
+  );
+}
+
+.briefing-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ef4444;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-2);
+}
+
+.briefing-heading {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: #fff;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  margin-bottom: var(--space-2);
+}
+
+.briefing-text {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  max-width: 580px;
+  line-height: 1.5;
+}
+
+/* Mission Difficulty Selector */
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--space-4);
+}
+
+.mission-card {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-metal);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+  transition: all 0.15s ease;
+  box-shadow: var(--shadow-steel);
+  cursor: pointer;
+}
+
+.mission-card:hover {
+  border-color: var(--color-hazard-yellow);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
+}
+
+.mission-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mission-card__badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+}
+
+.badge--recruit { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #059669; }
+.badge--marine  { background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid #0891b2; }
+.badge--hell    { background: rgba(220, 38, 38, 0.15); color: #ef4444; border: 1px solid #dc2626; }
+.badge--custom  { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #d97706; }
+
+.mission-card__title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  letter-spacing: 0.03em;
+  color: #fff;
+}
+
+.mission-card__stats {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mission-card__stat-val {
+  color: var(--color-hazard-yellow);
+  font-weight: 700;
+}
+
+.mission-card__record {
+  font-size: 0.8rem;
+  color: var(--color-text-dark);
+  font-family: var(--font-mono);
+}
+
+.mission-card__record strong {
+  color: var(--color-plasma-cyan);
+}
+
+/* Custom Config Form */
+.custom-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.form-label {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.form-input {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-metal);
+  color: #fff;
+  padding: 0.35rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  width: 72px;
+  text-align: center;
+  border-radius: var(--radius-sm);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-hazard-yellow);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+/* Statistics Ribbon */
+.stats-ribbon {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-metal);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-3);
+  text-align: center;
+  box-shadow: var(--shadow-steel);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stat-val {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+.stat-val--cyan   { color: var(--color-plasma-cyan); }
+.stat-val--blood  { color: var(--color-blood-glow); }
+.stat-val--yellow { color: var(--color-hazard-yellow); }
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Quick Rules & Intel */
+.intel-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: 0.85rem;
+  color: var(--color-text-dark);
+  font-family: var(--font-mono);
+  padding: 0 var(--space-2);
+}

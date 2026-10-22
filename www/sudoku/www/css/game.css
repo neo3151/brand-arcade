@@ -1,0 +1,473 @@
+/* ==========================================================================
+   game.css — Game board page styles
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Page layout
+   -------------------------------------------------------------------------- */
+.game-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-subtle);
+  max-width: 520px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 0px) + var(--space-3)) var(--space-4) var(--space-3);
+  background: var(--color-bg);
+  border-bottom: 1.5px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  gap: var(--space-3);
+}
+
+.game-header__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.game-header__center {
+  flex: 1;
+  text-align: center;
+}
+
+.game-header__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+#back-btn {
+  background: var(--color-bg-muted);
+  border: 1.5px solid var(--color-border);
+  color: var(--color-text-muted);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+#back-btn:hover { background: var(--color-border); color: var(--color-text); }
+
+#difficulty-badge {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+#level-num {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* Timer */
+#timer {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  letter-spacing: 0.02em;
+}
+
+/* Mistakes display */
+#mistakes-display {
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Sudoku board container
+   -------------------------------------------------------------------------- */
+.board-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5) var(--space-4) var(--space-4);
+}
+
+#sudoku-board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 0;
+  width: min(calc(100vw - 32px), 450px);
+  aspect-ratio: 1;
+  border: 3px solid var(--gray-800);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  background: var(--gray-800);
+}
+
+/* --------------------------------------------------------------------------
+   Cells
+   -------------------------------------------------------------------------- */
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  cursor: pointer;
+  position: relative;
+  transition: background var(--transition-fast);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  /* Inner borders */
+  border-right: 1px solid var(--gray-300);
+  border-bottom: 1px solid var(--gray-300);
+}
+
+/* Box borders — thick lines every 3 cells */
+.cell--box-right  { border-right: 2.5px solid var(--gray-800); }
+.cell--box-bottom { border-bottom: 2.5px solid var(--gray-800); }
+
+/* Remove right/bottom borders on grid edges (the outer border handles it) */
+.cell:nth-child(9n)  { border-right: none; }
+.cell:nth-child(n+73) { border-bottom: none; }
+
+/* States */
+.cell--given .cell__number,
+.cell--given.cell--filled .cell__number {
+  color: var(--gray-800);
+  font-weight: 800;
+}
+
+.cell--filled .cell__number {
+  color: var(--blue-600);
+  font-weight: 700;
+}
+
+.cell--error .cell__number {
+  color: var(--color-error) !important;
+  animation: shake 0.4s ease;
+}
+
+.cell--selected {
+  background: var(--blue-100) !important;
+}
+
+.cell--highlight {
+  background: #f0f7ff;
+}
+
+.cell--same-num {
+  background: var(--blue-200) !important;
+}
+
+/* Hint highlights */
+.cell--hint-region {
+  background: #fef9c3 !important;
+}
+
+.cell--hint-target {
+  background: #bbf7d0 !important;
+  animation: pulse 0.8s ease 2;
+}
+
+/* Number inside cell */
+.cell__number {
+  font-size: clamp(14px, 4.5vw, 26px);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition: color var(--transition-fast);
+}
+
+/* --------------------------------------------------------------------------
+   Notes grid (pencil marks)
+   -------------------------------------------------------------------------- */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  padding: 1px;
+}
+
+.note-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(7px, 1.8vw, 10px);
+  font-weight: 600;
+  color: var(--blue-500);
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Controls row (Undo / Erase / Notes / Hint)
+   -------------------------------------------------------------------------- */
+.game-controls {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.ctrl-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-2);
+  min-width: 64px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-base);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ctrl-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.ctrl-btn:active { transform: translateY(0); }
+
+.ctrl-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.ctrl-btn__icon {
+  font-size: 1.375rem;
+  line-height: 1;
+}
+
+.btn-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* Notes active state */
+#notes-btn.btn--active {
+  background: var(--blue-600);
+  border-color: var(--blue-600);
+  box-shadow: var(--shadow-blue);
+}
+#notes-btn.btn--active .btn-label,
+#notes-btn.btn--active .ctrl-btn__icon {
+  color: white;
+  filter: none;
+}
+
+/* Hint button */
+#hint-btn {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: #f59e0b;
+}
+#hint-btn:hover {
+  background: linear-gradient(135deg, #fde68a, #fbbf24);
+  border-color: #d97706;
+}
+
+.hint-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--blue-600);
+  color: white;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-bg);
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   Number pad
+   -------------------------------------------------------------------------- */
+.num-pad {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4) var(--space-5);
+}
+
+.num-btn {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: clamp(1rem, 4.5vw, 1.5rem);
+  font-weight: 700;
+  color: var(--blue-700);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-base);
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.num-btn:hover {
+  background: var(--blue-600);
+  color: white;
+  border-color: var(--blue-600);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-blue);
+}
+
+.num-btn:active { transform: scale(0.96); }
+
+/* --------------------------------------------------------------------------
+   Hint panel (slides up from bottom)
+   -------------------------------------------------------------------------- */
+.hint-panel {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  width: min(100vw, 520px);
+  background: var(--color-bg);
+  border-top-left-radius: var(--radius-2xl);
+  border-top-right-radius: var(--radius-2xl);
+  padding: var(--space-5) var(--space-6) var(--space-8);
+  box-shadow: 0 -8px 30px rgb(0 0 0 / 0.12);
+  z-index: 100;
+  transition: transform var(--transition-slow) cubic-bezier(0.34, 1.26, 0.64, 1);
+  border-top: 1.5px solid var(--color-border);
+}
+
+.hint-panel--visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+.hint-panel__handle {
+  width: 40px;
+  height: 4px;
+  background: var(--gray-300);
+  border-radius: 2px;
+  margin: 0 auto var(--space-4);
+}
+
+.hint-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.hint-technique {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+#close-hint-btn {
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+}
+#close-hint-btn:hover { background: var(--color-bg-muted); color: var(--color-text); }
+
+.hint-explanation {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  line-height: 1.6;
+  margin-bottom: var(--space-5);
+}
+
+#reveal-btn {
+  width: 100%;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border: 1.5px solid #f59e0b;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-base);
+}
+#reveal-btn:hover {
+  background: linear-gradient(135deg, #fde68a, #fbbf24);
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   Victory modal
+   -------------------------------------------------------------------------- */
+.victory-emoji {
+  font-size: 3rem;
+  margin-bottom: var(--space-3);
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.victory-best {
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+
+/* --------------------------------------------------------------------------
+   Game Over modal
+   -------------------------------------------------------------------------- */
+.gameover-emoji {
+  font-size: 3rem;
+  margin-bottom: var(--space-3);
+}
+
+/* --------------------------------------------------------------------------
+   Difficulty badge colors
+   -------------------------------------------------------------------------- */
+[data-diff="beginner"] #difficulty-badge, .badge--beginner { background: #dcfce7; color: #15803d; }
+[data-diff="easy"]     #difficulty-badge, .badge--easy     { background: var(--blue-100); color: var(--blue-700); }
+[data-diff="medium"]   #difficulty-badge, .badge--medium   { background: #fef3c7; color: #92400e; }
+[data-diff="hard"]     #difficulty-badge, .badge--hard     { background: #fee2e2; color: #991b1b; }
+[data-diff="master"]   #difficulty-badge, .badge--master   { background: #f3e8ff; color: #7e22ce; }
+
+/* --------------------------------------------------------------------------
+   Responsive tweaks
+   -------------------------------------------------------------------------- */
+@media (max-width: 380px) {
+  .ctrl-btn { min-width: 52px; padding: var(--space-2) var(--space-1); }
+  .ctrl-btn__icon { font-size: 1.2rem; }
+  .game-controls { gap: var(--space-2); }
+  .num-pad { gap: var(--space-1); padding: var(--space-1) var(--space-3) var(--space-4); }
+}
+
+/* Safe area for mobile (iPhone notch/home bar) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .hint-panel { padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom)); }
+  .num-pad    { padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom)); }
+}

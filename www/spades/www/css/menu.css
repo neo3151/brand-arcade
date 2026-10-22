@@ -1,0 +1,232 @@
+/* ==========================================================================
+   menu.css — Royal Spades Main Menu & Mode Selector
+   ========================================================================== */
+
+.menu-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 0px) + 1.25rem) 1rem 1rem;
+  overflow-y: auto;
+}
+
+/* Header & Crest */
+.menu-header {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.spades-crest {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.crest-spade {
+  font-size: 3.5rem;
+  color: #0f172a;
+  text-shadow: 
+    0 0 20px var(--royal-gold-glow),
+    0 0 40px rgba(16, 185, 129, 0.4);
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
+}
+
+.crest-crown {
+  position: absolute;
+  top: -12px;
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  animation: floatCrown 3s ease-in-out infinite alternate;
+}
+
+@keyframes floatCrown {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+
+.menu-title {
+  font-family: var(--font-title);
+  font-size: 1.95rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #ffffff 30%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.2rem;
+}
+
+.menu-subtitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #a7f3d0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Mode Selection Cards */
+.mode-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--royal-gold);
+  margin-bottom: 0.2rem;
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.mode-card {
+  background: rgba(2, 44, 34, 0.85);
+  border: 2px solid var(--felt-border);
+  border-radius: 16px;
+  padding: 0.85rem 0.6rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--anim-bounce);
+  position: relative;
+  overflow: hidden;
+}
+
+.mode-card:hover {
+  border-color: rgba(245, 158, 11, 0.5);
+  transform: translateY(-2px);
+}
+
+.mode-card.selected {
+  border-color: var(--royal-gold);
+  background: rgba(6, 78, 59, 0.9);
+  box-shadow: 0 0 16px var(--royal-gold-glow);
+}
+
+.mode-card.selected::before {
+  content: '✓';
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--royal-gold);
+}
+
+.mode-card-icon {
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.mode-card-title {
+  font-family: var(--font-title);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.mode-card-desc {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+
+.twos-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 0.1rem 0.35rem;
+  border-radius: 6px;
+  margin-top: 0.3rem;
+  letter-spacing: 0.04em;
+}
+
+/* Target Score Selector */
+.target-section {
+  background: rgba(2, 44, 34, 0.6);
+  border: 1px solid var(--felt-border);
+  border-radius: 14px;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.target-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.target-pills {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.target-pill {
+  padding: 0.3rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid var(--silver-border);
+  background: rgba(6, 78, 59, 0.5);
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all var(--anim-fast);
+}
+
+.target-pill.active {
+  background: var(--royal-gold);
+  color: #1e1300;
+  border-color: var(--royal-gold);
+  font-weight: 800;
+}
+
+/* Actions */
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.aux-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.aux-btn {
+  background: rgba(2, 44, 34, 0.7);
+  border: 1px solid var(--felt-border);
+  border-radius: 12px;
+  padding: 0.5rem 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--anim-fast);
+}
+
+.aux-btn:hover {
+  background: var(--felt-surface);
+  border-color: var(--emerald-seal);
+}

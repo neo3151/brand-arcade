@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Royal Spades Table</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+  <link rel="stylesheet" href="css/game.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="device-wrapper">
+    <div class="device-shell">
+      <!-- Status Bar -->
+      <div class="device-status-bar">
+        <span id="device-clock">12:00</span>
+        <div class="device-camera-cutout"></div>
+        <div class="device-status-icons">
+          <button id="sound-toggle-btn" class="sound-toggle-btn" title="Toggle Sound">🔊</button>
+          <span>5G</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <!-- Main Game Screen -->
+      <div class="device-screen">
+        <div class="game-viewport">
+          <!-- Top HUD Scoreboard -->
+          <header class="game-top-bar">
+            <div class="scoreboard-row">
+              <div class="team-score-badge">
+                <span class="team-name us">Us</span>
+                <span id="score-us" class="team-pts">0</span>
+                <span id="bags-us" class="team-bags">🎒 0</span>
+              </div>
+
+              <div class="hud-center-pill">
+                <span id="hud-mode-pill">CLASSIC</span> • TO <span id="hud-target-pill">500</span>
+              </div>
+
+              <div class="team-score-badge">
+                <span id="bags-them" class="team-bags">🎒 0</span>
+                <span id="score-them" class="team-pts">0</span>
+                <span class="team-name them">Them</span>
+              </div>
+            </div>
+
+            <div class="trick-status-row">
+              <div>
+                <span>Tricks: </span>
+                <span id="tricks-us-counter" style="color:#34d399;font-weight:800;">0/0</span>
+                <span style="margin: 0 4px;opacity:0.4;">|</span>
+                <span id="tricks-them-counter" style="color:#f87171;font-weight:800;">0/0</span>
+              </div>
+
+              <div id="spades-status-badge" class="spades-status-tag locked">
+                <span>🔒 Spades Locked</span>
+              </div>
+
+              <div style="display:flex;gap:0.6rem;align-items:center;">
+                <button id="view-last-trick-btn" style="background:none;border:none;color:#a7f3d0;font-size:0.75rem;font-weight:700;cursor:pointer;">
+                  Last Trick 👁️
+                </button>
+                <a href="index.html" style="color:#94a3b8;text-decoration:none;font-size:0.75rem;font-weight:700;">
+                  Menu ✕
+                </a>
+              </div>
+            </div>
+          </header>
+
+          <!-- 4-Player Table -->
+          <main class="spades-table" id="spades-table">
+            <!-- North (Partner) -->
+            <div class="player-pod pod-north" id="pod-north">
+              <div class="pod-avatar">🎩</div>
+              <div class="pod-name">North (Partner)</div>
+              <div class="pod-bid-info" id="bid-info-north">Bid: - | Won: 0</div>
+            </div>
+
+            <!-- West (Opponent) -->
+            <div class="player-pod pod-west" id="pod-west">
+              <div class="pod-avatar">🦊</div>
+              <div class="pod-name">West</div>
+              <div class="pod-bid-info" id="bid-info-west">Bid: - | Won: 0</div>
+            </div>
+
+            <!-- East (Opponent) -->
+            <div class="player-pod pod-east" id="pod-east">
+              <div class="pod-avatar">🦅</div>
+              <div class="pod-name">East</div>
+              <div class="pod-bid-info" id="bid-info-east">Bid: - | Won: 0</div>
+            </div>
+
+            <!-- Center Trick Arena -->
+            <div class="trick-arena" id="trick-arena">
+              <div class="trick-center-disc"></div>
+              <div class="trick-slot slot-north" id="trick-slot-north">
+                <span class="slot-seat-label">North</span>
+              </div>
+              <div class="trick-slot slot-west" id="trick-slot-west">
+                <span class="slot-seat-label">West</span>
+              </div>
+              <div class="trick-slot slot-east" id="trick-slot-east">
+                <span class="slot-seat-label">East</span>
+              </div>
+              <div class="trick-slot slot-south" id="trick-slot-south">
+                <span class="slot-seat-label">You</span>
+              </div>
+            </div>
+
+            <!-- Single Dedicated Status Line Under Table -->
+            <div class="trick-status-bar" id="trick-status-bar">
+              <span id="trick-status-text">Your lead — choose a card to play</span>
+            </div>
+
+            <!-- South (Human Player Pod Info) -->
+            <div class="player-pod pod-south" id="pod-south">
+              <div class="pod-bid-info" id="bid-info-south">Your Bid: - | Won: 0</div>
+            </div>
+
+            <!-- South (Human Hand Cards) -->
+            <div class="human-hand-container">
+              <div class="hand-cards-fan" id="human-hand">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </main>
+        </div>
+      </div><!-- /.device-screen -->
+
+      <!-- Virtual Home Indicator -->
+      <div class="device-home-indicator">
+        <div class="device-home-pill"></div>
+      </div>
+    </div><!-- /.device-shell -->
+  </div><!-- /.device-wrapper -->
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Bidding Modal -->
+  <div id="bidding-modal" class="modal-backdrop bidding-backdrop">
+    <div class="modal-card bidding-card">
+      <div class="bidding-header">
+        <h2 class="bidding-title">♠️ Place Your Bid</h2>
+        <div class="bidding-partner-note" id="bidding-partner-info">Partner bid: Waiting...</div>
+      </div>
+
+      <div class="bidding-grid">
+        <button type="button" class="bid-btn" data-bid="1">1</button>
+        <button type="button" class="bid-btn" data-bid="2">2</button>
+        <button type="button" class="bid-btn" data-bid="3">3</button>
+        <button type="button" class="bid-btn" data-bid="4">4</button>
+        <button type="button" class="bid-btn" data-bid="5">5</button>
+        <button type="button" class="bid-btn" data-bid="6">6</button>
+        <button type="button" class="bid-btn" data-bid="7">7</button>
+        <button type="button" class="bid-btn" data-bid="8">8</button>
+        <button type="button" class="bid-btn" data-bid="9">9</button>
+        <button type="button" class="bid-btn" data-bid="10">10</button>
+        <button type="button" class="bid-btn" data-bid="11">11</button>
+        <button type="button" class="bid-btn" data-bid="12">12</button>
+        <button type="button" class="bid-btn" data-bid="13">13</button>
+        <button type="button" class="bid-btn bid-nil" data-bid="0">
+          NIL (0) • +100 / -100 Pts
+        </button>
+      </div>
+
+      <div id="bidding-ai-tip" style="font-size:0.72rem;color:#a7f3d0;text-align:center;">
+        Hand strength estimate: 3 tricks
+      </div>
+    </div>
+  </div>
+
+  <!-- Round Summary Modal -->
+  <div id="round-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div style="text-align:center;margin-bottom:0.75rem;">
+        <h2 style="font-family:var(--font-title);color:var(--royal-gold-light);font-size:1.3rem;">
+          Round Results
+        </h2>
+        <p id="round-number-tag" style="font-size:0.75rem;color:#94a3b8;">Hand Completed</p>
+      </div>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Team</th>
+            <th>Bid</th>
+            <th>Won</th>
+            <th>Round</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:#34d399;font-weight:800;">Us</td>
+            <td id="rnd-us-bid">0</td>
+            <td id="rnd-us-won">0</td>
+            <td id="rnd-us-pts">+0</td>
+            <td id="rnd-us-cum" style="font-weight:800;">0</td>
+          </tr>
+          <tr>
+            <td style="color:#f87171;font-weight:800;">Them</td>
+            <td id="rnd-them-bid">0</td>
+            <td id="rnd-them-won">0</td>
+            <td id="rnd-them-pts">+0</td>
+            <td id="rnd-them-cum" style="font-weight:800;">0</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div id="round-special-notes" style="font-size:0.72rem;color:#cbd5e1;line-height:1.4;margin-bottom:1rem;background:rgba(0,0,0,0.3);padding:0.5rem;border-radius:8px;">
+        <!-- Nil success, bag penalties, etc. -->
+      </div>
+
+      <button id="next-hand-btn" class="btn btn--primary btn--full">
+        Next Hand ▶
+      </button>
+    </div>
+  </div>
+
+  <!-- Match Game Over Modal -->
+  <div id="gameover-modal" class="modal-backdrop">
+    <div class="modal-card" style="text-align:center;">
+      <div id="gameover-icon" style="font-size:3rem;margin-bottom:0.5rem;">🏆</div>
+      <h2 id="gameover-title" style="font-family:var(--font-title);font-size:1.5rem;font-weight:900;color:var(--royal-gold-light);margin-bottom:0.25rem;">
+        Victory!
+      </h2>
+      <p id="gameover-subtitle" style="font-size:0.85rem;color:#cbd5e1;margin-bottom:1rem;">
+        Your partnership crossed 500 points!
+      </p>
+
+      <div style="background:rgba(0,0,0,0.4);border:1px solid var(--felt-border);border-radius:12px;padding:0.75rem;margin-bottom:1.25rem;display:flex;justify-content:space-around;">
+        <div>
+          <div style="font-size:0.65rem;color:#94a3b8;font-weight:700;">FINAL US</div>
+          <div id="final-us-score" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:800;color:#34d399;">520</div>
+        </div>
+        <div>
+          <div style="font-size:0.65rem;color:#94a3b8;font-weight:700;">FINAL THEM</div>
+          <div id="final-them-score" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:800;color:#f87171;">380</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <button id="play-again-btn" class="btn btn--primary btn--full">
+          Play Again
+        </button>
+        <a href="index.html" class="btn btn--secondary btn--full">
+          Main Menu
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Last Trick Modal -->
+  <div id="last-trick-modal" class="modal-backdrop">
+    <div class="modal-card" style="text-align:center;">
+      <h3 style="font-family:var(--font-title);color:var(--royal-gold-light);font-size:1.15rem;margin-bottom:0.75rem;">
+        Previous Trick
+      </h3>
+      <div id="last-trick-cards-display" style="display:flex;justify-content:center;gap:0.45rem;margin-bottom:1rem;min-height:90px;align-items:center;">
+        <!-- Populated by JS -->
+      </div>
+      <p id="last-trick-summary-text" style="font-size:0.75rem;color:#cbd5e1;margin-bottom:1rem;"></p>
+      <button id="close-last-trick-btn" class="btn btn--secondary btn--full">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/spades-engine.js"></script>
+  <script src="js/ai-player.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { mode, target, continue: isContinue } = window.Utils.getQueryParams();
+      const isTwosWild = mode === 'twos_wild';
+      const targetScore = target || 500;
+
+      // Update HUD Labels
+      document.getElementById('hud-mode-pill').textContent = isTwosWild ? "2'S WILD 👑" : "CLASSIC";
+      document.getElementById('hud-target-pill').textContent = targetScore;
+
+      let engine = null;
+      let isAiPlaying = false;
+
+      // Initialize or Resume Engine
+      if (isContinue) {
+        const saved = window.Progress.getActiveGame();
+        if (saved) {
+          engine = window.SpadesEngine.fromJSON(saved);
+        }
+      }
+
+      if (!engine) {
+        engine = new window.SpadesEngine({
+          isTwosWild,
+          targetScore
+        });
+        engine.startNewHand();
+      }
+
+      // UI Elements
+      const humanHandEl = document.getElementById('human-hand');
+      const scoreUsEl = document.getElementById('score-us');
+      const scoreThemEl = document.getElementById('score-them');
+      const bagsUsEl = document.getElementById('bags-us');
+      const bagsThemEl = document.getElementById('bags-them');
+      const tricksUsCounterEl = document.getElementById('tricks-us-counter');
+      const tricksThemCounterEl = document.getElementById('tricks-them-counter');
+      const spadesStatusBadge = document.getElementById('spades-status-badge');
+
+      const trickSlots = {
+        north: document.getElementById('trick-slot-north'),
+        west: document.getElementById('trick-slot-west'),
+        east: document.getElementById('trick-slot-east'),
+        south: document.getElementById('trick-slot-south')
+      };
+
+      const podEls = {
+        north: document.getElementById('pod-north'),
+        west: document.getElementById('pod-west'),
+        east: document.getElementById('pod-east'),
+        south: document.getElementById('pod-south')
+      };
+
+      const bidInfoEls = {
+        north: document.getElementById('bid-info-north'),
+        west: document.getElementById('bid-info-west'),
+        east: document.getElementById('bid-info-east'),
+        south: document.getElementById('bid-info-south')
+      };
+
+      function persist() {
+        if (engine.phase === 'game_over') {
+          window.Progress.clearActiveGame();
+        } else {
+          window.Progress.saveActiveGame(engine.toJSON());
+        }
+      }
+
+      window.addEventListener('pagehide', persist);
+      window.addEventListener('beforeunload', persist);
+
+      // Render Top HUD & Pods
+      function updateHUD() {
+        scoreUsEl.textContent = engine.scores.us;
+        scoreThemEl.textContent = engine.scores.them;
+        bagsUsEl.textContent = `🎒 ${engine.bags.us}`;
+        bagsThemEl.textContent = `🎒 ${engine.bags.them}`;
+
+        // Team Combined Bids & Tricks Won
+        const usBid = (engine.bids.south !== null ? engine.bids.south : 0) + (engine.bids.north !== null ? engine.bids.north : 0);
+        const usWon = engine.tricksTaken.south + engine.tricksTaken.north;
+        tricksUsCounterEl.textContent = `${usWon}/${usBid}`;
+
+        const themBid = (engine.bids.west !== null ? engine.bids.west : 0) + (engine.bids.east !== null ? engine.bids.east : 0);
+        const themWon = engine.tricksTaken.west + engine.tricksTaken.east;
+        tricksThemCounterEl.textContent = `${themWon}/${themBid}`;
+
+        // Spades Broken Status
+        if (engine.spadesBroken) {
+          spadesStatusBadge.className = 'spades-status-tag broken';
+          spadesStatusBadge.innerHTML = '<span>⚡ Spades Broken</span>';
+        } else {
+          spadesStatusBadge.className = 'spades-status-tag locked';
+          spadesStatusBadge.innerHTML = '<span>🔒 Spades Locked</span>';
+        }
+
+        // Active Player Turn Pod Highlight
+        for (const p of engine.players) {
+          if (engine.phase === 'playing' && engine.turnPlayer === p) {
+            podEls[p].classList.add('active-turn');
+          } else {
+            podEls[p].classList.remove('active-turn');
+          }
+
+          // Bid & Won Pod Labels
+          const bidText = engine.bids[p] === null ? '-' : (engine.bids[p] === 0 ? 'NIL' : engine.bids[p]);
+          if (p === 'south') {
+            bidInfoEls[p].textContent = `Your Bid: ${bidText} | Won: ${engine.tricksTaken[p]}`;
+          } else {
+            bidInfoEls[p].textContent = `Bid: ${bidText} | Won: ${engine.tricksTaken[p]}`;
+          }
+        }
+      }
+
+      // Render Trick Arena
+      function renderTrick(cardsToRender = null) {
+        const labels = {
+          north: 'North',
+          west: 'West',
+          east: 'East',
+          south: 'You'
+        };
+
+        for (const p of engine.players) {
+          trickSlots[p].innerHTML = `<span class="slot-seat-label">${labels[p]}</span>`;
+          trickSlots[p].classList.remove('winner-glow');
+          trickSlots[p].classList.remove('last-played-glow');
+        }
+
+        // Populate slots with cards played in current trick (or explicitly passed completed trick)
+        const trickCards = cardsToRender || engine.currentTrick;
+        for (const item of trickCards) {
+          const slot = trickSlots[item.player];
+          slot.appendChild(createCardElement(item.card, false));
+        }
+      }
+
+      // Render Human Hand
+      function renderHumanHand() {
+        humanHandEl.innerHTML = '';
+        const hand = engine.hands.south || [];
+        const legalCards = engine.phase === 'playing' && engine.turnPlayer === 'south' 
+          ? engine.getLegalCards('south') 
+          : [];
+
+        const total = hand.length;
+        if (total === 0) return;
+
+        // Fan calculation parameters
+        const cardWidth = 58;
+        const maxSpread = 320;
+        const step = Math.min(26, maxSpread / Math.max(1, total - 1));
+        const startX = -((total - 1) * step) / 2;
+
+        hand.forEach((card, idx) => {
+          const cardEl = createCardElement(card, true);
+
+          const isPlayable = legalCards.some(c => c.id === card.id);
+          if (engine.phase === 'playing') {
+            if (engine.turnPlayer === 'south') {
+              if (isPlayable) {
+                cardEl.classList.add('playable');
+              } else {
+                cardEl.classList.add('disabled-card');
+              }
+            } else {
+              cardEl.classList.add('disabled-card');
+            }
+          }
+
+          // Fan positioning
+          const xOffset = startX + idx * step;
+          const rot = (idx - (total - 1) / 2) * 2.2;
+          cardEl.style.left = `calc(50% + ${xOffset}px - ${cardWidth / 2}px)`;
+          cardEl.style.transform = `rotate(${rot}deg)`;
+          cardEl.style.zIndex = idx + 1;
+
+          // Card Click Handler
+          cardEl.addEventListener('click', () => {
+            if (engine.phase !== 'playing') return;
+            if (engine.turnPlayer !== 'south') {
+              window.Utils.showToast("Wait for opponents' turns!", 'info');
+              return;
+            }
+
+            if (!isPlayable) {
+              // Informative toast
+              if (engine.currentTrick.length > 0) {
+                const leadSuit = engine.currentTrick[0].card.getEffectiveSuit(engine.isTwosWild);
+                window.Utils.showToast(`Must follow lead suit: ${leadSuit.toUpperCase()}`, 'warning');
+              } else {
+                window.Utils.showToast('Cannot lead Spades until broken or holding only trumps!', 'warning');
+              }
+              // Card shake
+              cardEl.style.transform = `rotate(${rot}deg) translateX(-4px)`;
+              setTimeout(() => cardEl.style.transform = `rotate(${rot}deg) translateX(4px)`, 80);
+              setTimeout(() => cardEl.style.transform = `rotate(${rot}deg)`, 160);
+              return;
+            }
+
+            // Play the card!
+            handleHumanPlay(card.id);
+          });
+
+          humanHandEl.appendChild(cardEl);
+        });
+      }
+
+      // Create DOM element for Card
+      function createCardElement(card, isInteractive = false) {
+        const el = document.createElement('div');
+        const isWild = isTwosWild && card.value === 2;
+
+        el.className = `card suit-${card.suit} ${isWild ? 'wild-card' : ''}`;
+        el.dataset.cardId = card.id;
+
+        let wildTag = '';
+        if (isWild) {
+          wildTag = `<span class="wild-tag">👑 WILD</span>`;
+        }
+
+        el.innerHTML = `
+          ${wildTag}
+          <div class="card-corner-top">
+            <span class="card-rank">${card.rankStr}</span>
+            <span class="card-suit-small">${card.suitSymbol}</span>
+          </div>
+          <div class="card-center-suit">${card.suitSymbol}</div>
+          <div class="card-corner-bottom">
+            <span class="card-rank">${card.rankStr}</span>
+            <span class="card-suit-small">${card.suitSymbol}</span>
+          </div>
+        `;
+        return el;
+      }
+
+      // Status Line Helpers
+      function setStatusLine(text) {
+        const el = document.getElementById('trick-status-text');
+        if (el) el.textContent = text;
+      }
+
+      function updatePlayStatusLine(player, card) {
+        const cardStr = `${card.rankStr}${card.suitSymbol}`;
+        if (player === 'south') {
+          setStatusLine(`You played ${cardStr}`);
+        } else {
+          const name = player === 'north' ? 'North' :
+                       player === 'west' ? 'West' : 'East';
+          setStatusLine(`${name} played ${cardStr}`);
+        }
+      }
+
+      // Human plays card
+      async function handleHumanPlay(cardId) {
+        if (isAiPlaying || engine.phase !== 'playing' || engine.turnPlayer !== 'south') return;
+
+        const res = engine.playCard('south', cardId);
+        if (!res.success) return;
+
+        // Set status line immediately from this specific play: "You played 10♥"
+        updatePlayStatusLine('south', res.card);
+
+        if (isTwosWild && res.card.value === 2) {
+          if (window.SoundFX) window.SoundFX.playTwosWildSnap();
+        } else if (res.card.isTrump(isTwosWild)) {
+          if (window.SoundFX) window.SoundFX.playTrumpCut();
+        } else {
+          if (window.SoundFX) window.SoundFX.playCardSnap();
+        }
+
+        if (res.trickComplete) {
+          // Render all 4 cards on table including the 4th card that just finished the trick!
+          renderTrick(res.completedTrick || engine.lastTrick);
+          renderHumanHand();
+          updateHUD();
+          persist();
+
+          await handleTrickComplete(res);
+          // If trick complete and AI won, wait after trick clear before AI plays next lead
+          if (!res.handComplete && engine.phase === 'playing' && engine.turnPlayer !== 'south') {
+            await window.Utils.sleep(1000);
+            processAiTurns();
+          }
+        } else {
+          renderTrick();
+          renderHumanHand();
+          updateHUD();
+          persist();
+
+          // South played, trick not yet complete. Hold table so player can see card before AI plays.
+          await window.Utils.sleep(1000);
+          processAiTurns();
+        }
+      }
+
+      // AI Loop for remaining turns
+      async function processAiTurns() {
+        if (isAiPlaying || engine.phase !== 'playing') return;
+        isAiPlaying = true;
+
+        while (engine.phase === 'playing' && engine.turnPlayer !== 'south') {
+          const aiPlayer = engine.turnPlayer;
+
+          const chosenCard = window.AIPlayer.chooseCard(aiPlayer, engine);
+          if (!chosenCard) break;
+
+          const res = engine.playCard(aiPlayer, chosenCard.id);
+          if (res.success) {
+            // Set status line immediately from this specific AI play: "West played K♠"
+            updatePlayStatusLine(aiPlayer, res.card);
+
+            if (isTwosWild && res.card.value === 2) {
+              if (window.SoundFX) window.SoundFX.playTwosWildSnap();
+            } else if (res.card.isTrump(isTwosWild)) {
+              if (window.SoundFX) window.SoundFX.playTrumpCut();
+            } else {
+              if (window.SoundFX) window.SoundFX.playCardSnap();
+            }
+
+            if (res.trickComplete) {
+              // 4th card of trick: Render all 4 cards on the table!
+              renderTrick(res.completedTrick || engine.lastTrick);
+              updateHUD();
+              persist();
+
+              await handleTrickComplete(res);
+              if (res.handComplete) {
+                break;
+              }
+              // Next trick starts only after trick is cleared. Pause 1000ms before next AI lead.
+              if (engine.turnPlayer !== 'south') {
+                await window.Utils.sleep(1000);
+              }
+            } else {
+              renderTrick();
+              updateHUD();
+              persist();
+
+              // Trick not complete: hold the table after card is drawn, before the next AI play
+              await window.Utils.sleep(1000);
+            }
+          } else {
+            break;
+          }
+        }
+
+        isAiPlaying = false;
+        renderHumanHand();
+        updateHUD();
+
+        if (engine.phase === 'playing' && engine.turnPlayer === 'south') {
+          if (engine.currentTrick.length === 0) {
+            setStatusLine("Your lead — choose a card to play");
+          }
+        }
+      }
+
+      // Handle Trick Completion & Winner Glow
+      async function handleTrickComplete(res) {
+        // Highlight the 4th card that was just thrown so player sees it clearly
+        const lastPlayer = res.player;
+        const lastSlot = trickSlots[lastPlayer];
+        if (lastSlot) lastSlot.classList.add('last-played-glow');
+
+        // Highlight winner slot with gold glow
+        const winnerSlot = trickSlots[res.winner];
+        if (winnerSlot) winnerSlot.classList.add('winner-glow');
+
+        if (window.SoundFX) window.SoundFX.playTrickWin();
+
+        const winnerLabel = res.winner === 'south' ? 'You' :
+                            res.winner === 'north' ? 'North' :
+                            (res.winner === 'west' ? 'West' : 'East');
+
+        const winCardStr = `${res.winningCard.rankStr}${res.winningCard.suitSymbol}`;
+
+        // Set status line: "North took the trick with A♠" (using res.winner and res.winningCard only)
+        setStatusLine(`${winnerLabel} took the trick with ${winCardStr}`);
+
+        // Hold all 4 cards on the table for 2500ms
+        await window.Utils.sleep(2500);
+
+        if (lastSlot) lastSlot.classList.remove('last-played-glow');
+        if (winnerSlot) winnerSlot.classList.remove('winner-glow');
+
+        // Clear the table only AFTER the 2500ms sleep
+        renderTrick();
+        updateHUD();
+        persist();
+
+        if (res.handComplete) {
+          await window.Utils.sleep(800);
+          handleHandComplete(res.roundSummary, res.isGameOver);
+        } else {
+          renderHumanHand();
+        }
+      }
+
+      function showRoundModal(summary) {
+        if (!summary) return;
+        document.getElementById('round-number-tag').textContent = `Hand #${engine.handNumber} Completed`;
+        document.getElementById('rnd-us-bid').textContent = summary.us.bid;
+        document.getElementById('rnd-us-won').textContent = summary.us.won;
+        document.getElementById('rnd-us-pts').textContent = (summary.us.total >= 0 ? '+' : '') + summary.us.total;
+        document.getElementById('rnd-us-cum').textContent = summary.us.cumulativeScore;
+
+        document.getElementById('rnd-them-bid').textContent = summary.them.bid;
+        document.getElementById('rnd-them-won').textContent = summary.them.won;
+        document.getElementById('rnd-them-pts').textContent = (summary.them.total >= 0 ? '+' : '') + summary.them.total;
+        document.getElementById('rnd-them-cum').textContent = summary.them.cumulativeScore;
+
+        let notesHtml = '';
+        if (summary.us.bagPenalty < 0) notesHtml += '<div>⚠️ 10 Sandbag penalty: -100 pts for Us!</div>';
+        if (summary.them.bagPenalty < 0) notesHtml += '<div>⚠️ 10 Sandbag penalty: -100 pts for Them!</div>';
+        if (summary.us.nilScore > 0) notesHtml += '<div>🎉 Successful Nil bid: +100 pts for Us!</div>';
+        if (summary.us.nilScore < 0) notesHtml += '<div>💥 Busted Nil bid: -100 pts for Us!</div>';
+        if (!notesHtml) notesHtml = '<div>Clean round! Target score is ' + engine.targetScore + ' points.</div>';
+        document.getElementById('round-special-notes').innerHTML = notesHtml;
+
+        window.Utils.openModal('round-modal');
+      }
+
+      function showGameOverModal() {
+        const wonMatch = engine.scores.us >= engine.scores.them && engine.scores.us >= engine.targetScore;
+        if (wonMatch) {
+          document.getElementById('gameover-icon').textContent = '👑';
+          document.getElementById('gameover-title').textContent = 'Match Victory!';
+          document.getElementById('gameover-subtitle').textContent = `Your partnership reached ${engine.scores.us} points!`;
+        } else {
+          document.getElementById('gameover-icon').textContent = '💀';
+          document.getElementById('gameover-title').textContent = 'Match Defeat';
+          document.getElementById('gameover-subtitle').textContent = `The opponents won the match.`;
+        }
+
+        document.getElementById('final-us-score').textContent = engine.scores.us;
+        document.getElementById('final-them-score').textContent = engine.scores.them;
+        window.Utils.openModal('gameover-modal');
+      }
+
+      // Handle Round / Hand Completion
+      function handleHandComplete(summary, isGameOver) {
+        if (!summary) return;
+
+        // Sound effects
+        if (summary.us.nilScore > 0 || summary.them.nilScore > 0) {
+          if (window.SoundFX) window.SoundFX.playNilSuccess();
+        } else if (summary.us.nilScore < 0 || summary.them.nilScore < 0) {
+          if (window.SoundFX) window.SoundFX.playNilBusted();
+        }
+
+        if (isGameOver) {
+          const wonMatch = engine.scores.us >= engine.scores.them && engine.scores.us >= engine.targetScore;
+          window.Progress.recordGameResult(
+            wonMatch,
+            engine.isTwosWild,
+            engine.scores.us,
+            { bid: engine.bids.south === 0 ? 1 : 0, made: (engine.bids.south === 0 && engine.tricksTaken.south === 0) ? 1 : 0 },
+            engine.bags.us
+          );
+
+          if (wonMatch) {
+            if (window.SoundFX) window.SoundFX.playVictory();
+          } else {
+            if (window.SoundFX) window.SoundFX.playDefeat();
+          }
+
+          showGameOverModal();
+          return;
+        }
+
+        showRoundModal(summary);
+      }
+
+      // Next Hand Button
+      document.getElementById('next-hand-btn').addEventListener('click', () => {
+        window.Utils.closeModal('round-modal');
+        engine.startNewHand();
+        persist();
+        startRoundSequence();
+      });
+
+      // Play Again Button
+      document.getElementById('play-again-btn').addEventListener('click', () => {
+        window.Utils.closeModal('gameover-modal');
+        engine = new window.SpadesEngine({
+          isTwosWild,
+          targetScore
+        });
+        engine.startNewHand();
+        persist();
+        startRoundSequence();
+      });
+
+      // View Last Trick Modal Listener
+      const viewLastTrickBtn = document.getElementById('view-last-trick-btn');
+      if (viewLastTrickBtn) {
+        viewLastTrickBtn.addEventListener('click', () => {
+          const container = document.getElementById('last-trick-cards-display');
+          const summaryText = document.getElementById('last-trick-summary-text');
+          container.innerHTML = '';
+
+          if (engine.lastTrick && engine.lastTrick.length > 0) {
+            for (const item of engine.lastTrick) {
+              const cardEl = createCardElement(item.card, false);
+              const wrapper = document.createElement('div');
+              wrapper.style.display = 'flex';
+              wrapper.style.flexDirection = 'column';
+              wrapper.style.alignItems = 'center';
+              wrapper.style.gap = '4px';
+
+              const label = document.createElement('span');
+              label.style.fontSize = '0.65rem';
+              label.style.color = '#94a3b8';
+              label.style.fontWeight = '700';
+              label.textContent = item.player === 'south' ? 'You' : item.player === 'north' ? 'Partner' : item.player.toUpperCase();
+
+              wrapper.appendChild(label);
+              wrapper.appendChild(cardEl);
+              container.appendChild(wrapper);
+            }
+
+            const winInfo = engine.evaluateTrickWinner(engine.lastTrick);
+            const winLabel = winInfo.player === 'south' ? 'You' : winInfo.player === 'north' ? 'Partner (North)' : winInfo.player.toUpperCase();
+            summaryText.textContent = `${winLabel} took this trick with ${winInfo.card.rankStr}${winInfo.card.suitSymbol}.`;
+          } else {
+            container.innerHTML = '<span style="color:#94a3b8;font-size:0.8rem;padding:1.5rem 0;">No tricks have been completed yet this hand.</span>';
+            summaryText.textContent = '';
+          }
+
+          window.Utils.openModal('last-trick-modal');
+        });
+      }
+
+      const closeLastTrickBtn = document.getElementById('close-last-trick-btn');
+      if (closeLastTrickBtn) {
+        closeLastTrickBtn.addEventListener('click', () => {
+          window.Utils.closeModal('last-trick-modal');
+        });
+      }
+
+      // Bidding Sequence & Flow
+      function startRoundSequence() {
+        renderTrick();
+        renderHumanHand();
+        updateHUD();
+
+        if (engine.phase === 'bidding') {
+          setStatusLine("Bidding phase — place your bid");
+          processBiddingFlow();
+        } else if (engine.phase === 'playing') {
+          if (engine.turnPlayer !== 'south') {
+            const turnName = engine.turnPlayer === 'north' ? 'North' :
+                             engine.turnPlayer === 'west' ? 'West' : 'East';
+            setStatusLine(`${turnName}'s turn...`);
+            processAiTurns();
+          } else {
+            setStatusLine(engine.currentTrick.length === 0 ? "Your lead — choose a card to play" : "Your turn — choose a card to play");
+          }
+        } else if (engine.phase === 'round_over') {
+          if (engine.roundSummary) {
+            showRoundModal(engine.roundSummary);
+          } else {
+            engine.startNewHand();
+            persist();
+            startRoundSequence();
+          }
+        } else if (engine.phase === 'game_over') {
+          showGameOverModal();
+        }
+      }
+
+      async function processBiddingFlow() {
+        // Let any AI bidders before South place their bids
+        while (engine.phase === 'bidding' && engine.turnPlayer !== 'south') {
+          const ai = engine.turnPlayer;
+          await window.Utils.sleep(400);
+
+          const partner = (ai === 'north') ? 'south' : (ai === 'west' ? 'east' : 'west');
+          const pBid = engine.bids[partner];
+          const bid = window.AIPlayer.calculateBid(engine.hands[ai], isTwosWild, pBid);
+          engine.setBid(ai, bid);
+          updateHUD();
+          persist();
+        }
+
+        // If it's South's turn to bid, open Bidding Modal
+        if (engine.phase === 'bidding' && engine.turnPlayer === 'south') {
+          const partnerBid = engine.bids.north;
+          const pNote = partnerBid !== null 
+            ? `Partner (North) bid: ${partnerBid === 0 ? 'NIL' : partnerBid} tricks` 
+            : 'Partner (North) bids after you';
+          document.getElementById('bidding-partner-info').textContent = pNote;
+
+          const myEst = window.AIPlayer.calculateBid(engine.hands.south, isTwosWild, partnerBid);
+          document.getElementById('bidding-ai-tip').textContent = `Suggested Bid: ${myEst === 0 ? 'NIL (0)' : myEst} tricks`;
+
+          window.Utils.openModal('bidding-modal');
+        }
+      }
+
+      // Bind Bidding Modal Buttons
+      const bidBtns = document.querySelectorAll('.bid-btn');
+      bidBtns.forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const bidVal = parseInt(btn.dataset.bid, 10);
+          window.Utils.closeModal('bidding-modal');
+
+          engine.setBid('south', bidVal);
+          updateHUD();
+          persist();
+
+          // Let any AI bidders after South place their bids
+          while (engine.phase === 'bidding' && engine.turnPlayer !== 'south') {
+            const ai = engine.turnPlayer;
+            await window.Utils.sleep(400);
+
+            const partner = (ai === 'north') ? 'south' : (ai === 'west' ? 'east' : 'west');
+            const pBid = engine.bids[partner];
+            const bid = window.AIPlayer.calculateBid(engine.hands[ai], isTwosWild, pBid);
+            engine.setBid(ai, bid);
+            updateHUD();
+            persist();
+          }
+
+          // Bidding is complete: start trick play!
+          if (engine.phase === 'playing') {
+            renderHumanHand();
+            updateHUD();
+
+            if (engine.turnPlayer !== 'south') {
+              const leadName = engine.turnPlayer === 'north' ? 'North' :
+                               engine.turnPlayer === 'west' ? 'West' : 'East';
+              setStatusLine(`${leadName} leads first...`);
+              await window.Utils.sleep(1000);
+              processAiTurns();
+            } else {
+              setStatusLine("Your lead — choose a card to play");
+            }
+          }
+        });
+      });
+
+      // Initial Start
+      startRoundSequence();
+    });
+  </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

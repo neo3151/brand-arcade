@@ -35,7 +35,7 @@
       id: 'blockblast',
       title: 'Timber Block Blast',
       icon: '🧱',
-      path: 'blockblast/www/',
+      path: 'blockblast/www/index.html',
       targetDesc: 'Clear 6 double-lines & reach 3,500+ pts',
       targetScore: 3500,
       parTime: '2m 30s'
@@ -44,7 +44,7 @@
       id: 'minesweeper',
       title: 'Inferno Sweeper',
       icon: '💣',
-      path: 'minesweeper/www/',
+      path: 'minesweeper/www/index.html',
       targetDesc: 'Disarm 15 plasma mines on Phobos sector',
       targetScore: 2400,
       parTime: '3m 15s'
@@ -53,7 +53,7 @@
       id: 'codebreaker',
       title: 'Black Vault',
       icon: '🔐',
-      path: 'codebreaker/www/',
+      path: 'codebreaker/www/index.html',
       targetDesc: 'Crack the 4-digit cipher in ≤ 5 attempts',
       targetScore: 4000,
       parTime: '2m 45s'
@@ -62,7 +62,7 @@
       id: 'wordsearch',
       title: 'Word Search Classic',
       icon: '🔤',
-      path: 'wordsearch/www/',
+      path: 'wordsearch/www/index.html',
       targetDesc: 'Find all 12 literature terms without hints',
       targetScore: 1800,
       parTime: '3m 50s'
@@ -71,7 +71,7 @@
       id: 'solitaire',
       title: 'Curious Solitaire',
       icon: '🃏',
-      path: 'solitaire/www/',
+      path: 'solitaire/www/index.html',
       targetDesc: 'Win the Queen of Hearts Royal Deal #Daily',
       targetScore: 5200,
       parTime: '6m 10s'
@@ -80,7 +80,7 @@
       id: 'sudoku',
       title: 'Classic Sudoku',
       icon: '🔢',
-      path: 'sudoku/www/',
+      path: 'sudoku/www/index.html',
       targetDesc: 'Solve Japanese Master Grid with 0 mistakes',
       targetScore: 3200,
       parTime: '7m 30s'
@@ -89,7 +89,7 @@
       id: 'nonogram',
       title: 'Zen Nonogram',
       icon: '🖼️',
-      path: 'nonogram/www/',
+      path: 'nonogram/www/index.html',
       targetDesc: 'Reveal the 15×15 Pixel Tapestry without errors',
       targetScore: 2800,
       parTime: '6m 45s'
@@ -98,7 +98,7 @@
       id: 'spidersolitaire',
       title: 'Spider Solitaire',
       icon: '🕷️',
-      path: 'spidersolitaire/www/',
+      path: 'spidersolitaire/www/index.html',
       targetDesc: 'Assemble 4 descending royal flushes',
       targetScore: 4500,
       parTime: '9m 20s'
@@ -107,7 +107,7 @@
       id: 'spades',
       title: 'Royal Spades',
       icon: '♠️',
-      path: 'spades/www/',
+      path: 'spades/www/index.html',
       targetDesc: 'Make partner nil bid & win the trick match',
       targetScore: 3800,
       parTime: '12m 00s'
@@ -116,7 +116,7 @@
       id: 'mahjong',
       title: 'Celestial Jade',
       icon: '🀄',
-      path: 'mahjong/www/',
+      path: 'mahjong/www/index.html',
       targetDesc: 'Match all imperial dragon suites in order',
       targetScore: 3600,
       parTime: '8m 15s'

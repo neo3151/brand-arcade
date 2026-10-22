@@ -1,0 +1,106 @@
+/* ==========================================================================
+   store.css — Royal Spades Themes & Felts Store
+   ========================================================================== */
+
+.store-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1rem 1.25rem;
+  overflow-y: auto;
+}
+
+.store-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.store-title {
+  font-family: var(--font-title);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--royal-gold-light);
+}
+
+.coins-balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--royal-gold);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--royal-gold-light);
+}
+
+.store-section-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #a7f3d0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 1rem 0 0.5rem;
+}
+
+.themes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.theme-card {
+  background: rgba(2, 44, 34, 0.85);
+  border: 1px solid var(--felt-border);
+  border-radius: 14px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  transition: all var(--anim-bounce);
+}
+
+.theme-card.active-theme {
+  border-color: var(--royal-gold);
+  box-shadow: 0 0 12px var(--royal-gold-glow);
+}
+
+.theme-preview-box {
+  width: 100%;
+  height: 60px;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.theme-name {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.theme-desc {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+
+.theme-btn {
+  width: 100%;
+  padding: 0.35rem 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: 8px;
+  cursor: pointer;
+}

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Royal Spades: Table Felts & Decks</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+  <link rel="stylesheet" href="css/store.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="device-wrapper">
+    <div class="device-shell">
+      <!-- Status Bar -->
+      <div class="device-status-bar">
+        <span id="device-clock">12:00</span>
+        <div class="device-camera-cutout"></div>
+        <div class="device-status-icons">
+          <button id="sound-toggle-btn" class="sound-toggle-btn" title="Toggle Sound">🔊</button>
+          <span>5G</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <!-- Store Screen -->
+      <div class="device-screen">
+        <div class="store-container">
+          <!-- Store Header -->
+          <div class="store-header">
+            <h1 class="store-title">Table Felts</h1>
+            <div class="coins-balance">
+              <span>🪙</span>
+              <span id="coins-display">250</span>
+            </div>
+          </div>
+
+          <p style="font-size:0.75rem;color:#cbd5e1;line-height:1.4;margin-bottom:0.75rem;">
+            Earn coins by winning partnership matches. Unlock and equip custom high-roller velvet table felts!
+          </p>
+
+          <!-- Tables Grid -->
+          <div class="store-section-title">Available Table Felts</div>
+          <div class="themes-grid" id="tables-grid">
+            <!-- Populated by JS -->
+          </div>
+
+          <div style="margin-top:1.5rem;">
+            <a href="index.html" class="btn btn--secondary btn--full">
+              Back to Menu
+            </a>
+          </div>
+
+          <footer style="margin-top:1.25rem;text-align:center;">
+            <p class="store-legal" style="font-size:0.75rem;color:#94a3b8;line-height:1.5;">
+              Demo store — no real charges.
+            </p>
+          </footer>
+        </div>
+      </div><!-- /.device-screen -->
+
+      <!-- Virtual Home Indicator -->
+      <div class="device-home-indicator">
+        <div class="device-home-pill"></div>
+      </div>
+    </div><!-- /.device-shell -->
+  </div><!-- /.device-wrapper -->
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      function refreshUI() {
+        const inv = window.Progress.getInventory();
+        document.getElementById('coins-display').textContent = inv.coins;
+
+        const container = document.getElementById('tables-grid');
+        container.innerHTML = '';
+
+        const tables = window.Store.getTables();
+        tables.forEach(table => {
+          const card = document.createElement('div');
+          card.className = `theme-card ${table.active ? 'active-theme' : ''}`;
+
+          let btnText = 'Equipped';
+          let btnClass = 'btn--secondary';
+          if (!table.unlocked) {
+            btnText = `🪙 ${table.price}`;
+            btnClass = 'btn--primary';
+          } else if (!table.active) {
+            btnText = 'Equip';
+            btnClass = 'btn--secondary';
+          }
+
+          card.innerHTML = `
+            <div class="theme-preview-box" style="background:${table.previewBg};">
+              <span>${table.previewIcon}</span>
+            </div>
+            <div class="theme-name">${table.name}</div>
+            <div class="theme-desc">${table.desc}</div>
+            <button class="btn ${btnClass} theme-btn" data-id="${table.id}">
+              ${btnText}
+            </button>
+          `;
+
+          const btn = card.querySelector('.theme-btn');
+          btn.addEventListener('click', () => {
+            const res = window.Store.selectOrBuyTable(table.id);
+            if (res.success) {
+              if (window.SoundFX) window.SoundFX.playTrumpCut();
+              window.Utils.showToast(res.msg, 'success');
+              refreshUI();
+            } else {
+              window.Utils.showToast(res.msg, 'warning');
+            }
+          });
+
+          container.appendChild(card);
+        });
+      }
+
+      refreshUI();
+    });
+  </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

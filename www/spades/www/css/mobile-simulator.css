@@ -1,0 +1,107 @@
+/* ==========================================================================
+   mobile-simulator.css — Pixel 7 / Mobile Device Shell & Simulator Frame
+   ========================================================================== */
+
+.device-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at center, #0d281e 0%, #030a08 100%);
+  overflow: hidden;
+  padding: 10px;
+}
+
+.device-shell {
+  width: 100%;
+  max-width: 412px;
+  height: 100%;
+  max-height: 890px;
+  background: #000;
+  border-radius: 44px;
+  box-shadow: 
+    0 0 0 2px #1e293b,
+    0 0 0 5px #0f172a,
+    0 25px 50px -12px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(16, 185, 129, 0.15);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  border: 4px solid #111;
+}
+
+/* Status Bar */
+.device-status-bar {
+  height: 38px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  z-index: 100;
+  background: rgba(2, 44, 34, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.device-camera-cutout {
+  width: 12px;
+  height: 12px;
+  background: #000;
+  border-radius: 50%;
+  border: 1px solid #1e293b;
+}
+
+.device-status-icons {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+/* Sound Toggle Button */
+.sound-toggle-btn {
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  color: var(--royal-gold);
+  transition: transform 0.15s ease;
+}
+
+.sound-toggle-btn:hover {
+  transform: scale(1.15);
+}
+
+/* Screen Area */
+.device-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background: radial-gradient(circle at center, #064e3b 0%, #022c22 100%);
+}
+
+/* Home Indicator Pill */
+.device-home-indicator {
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-deep);
+  flex-shrink: 0;
+}
+
+.device-home-pill {
+  width: 120px;
+  height: 4px;
+  background: #475569;
+  border-radius: 9999px;
+}

@@ -36,6 +36,10 @@
 
   <!-- Nav -->
   <nav class="menu-nav">
+    <a href="../../index.html" class="arcade-hub-btn" aria-label="Return to Benchmark Arcade Cabinets">
+      <span style="font-size: 14px; line-height: 1;">🕹️</span>
+      <span>Arcade Hub</span>
+    </a>
     <a href="store.html" class="hint-balance-pill" aria-label="View hint store">
       <span>💡</span>
       <span class="hint-count-nav" id="nav-hint-count">0</span>
@@ -86,7 +90,15 @@
     <span class="menu-footer__copy">© 2026 Puzzle Labs. Free to play.</span>
   </footer>
 
-  <!-- ── Category Modal ─────────────────────────────────────────────────── -->
+    </div><!-- /.device-screen -->
+
+    <!-- Virtual Home Indicator -->
+    <div class="device-home-indicator">
+      <div class="device-home-pill"></div>
+    </div>
+  </div><!-- /.device-shell -->
+
+  <!-- ── Category Modal (Direct Body Child for Native iOS Gestures) ─────────────────── -->
   <div class="modal-overlay" id="category-modal" role="dialog" aria-modal="true" aria-labelledby="cat-modal-title">
     <div class="modal">
       <h2 class="modal__title" id="cat-modal-title">Choose a Category</h2>
@@ -159,14 +171,6 @@
       <button class="btn btn--ghost btn--sm" id="close-modal" style="margin-top:1rem;width:100%">Cancel</button>
     </div>
   </div>
-
-    </div><!-- /.device-screen -->
-
-    <!-- Virtual Home Indicator -->
-    <div class="device-home-indicator">
-      <div class="device-home-pill"></div>
-    </div>
-  </div><!-- /.device-shell -->
 
   <!-- Scripts -->
   <script src="js/progress.js"></script>
@@ -271,6 +275,8 @@
       }
 
       function showCategoryGrid() {
+        document.getElementById('cat-modal-title').style.display = 'block';
+        modal.querySelector('.modal__subtitle').style.display = 'block';
         catGrid.style.display = 'grid';
         diffPicker.classList.remove('visible');
         levelPicker.classList.remove('visible');
@@ -278,6 +284,8 @@
       }
 
       function showDiffPicker() {
+        document.getElementById('cat-modal-title').style.display = 'none';
+        modal.querySelector('.modal__subtitle').style.display = 'none';
         catGrid.style.display = 'none';
         diffPicker.classList.add('visible');
         levelPicker.classList.remove('visible');
@@ -314,6 +322,9 @@
       }
 
       function showLevelPicker() {
+        document.getElementById('cat-modal-title').style.display = 'none';
+        modal.querySelector('.modal__subtitle').style.display = 'none';
+        catGrid.style.display = 'none';
         diffPicker.classList.remove('visible');
         levelPicker.classList.add('visible');
         levelTitle.textContent =
@@ -366,5 +377,6 @@
       backToDiff.addEventListener('keydown', e => e.key === 'Enter' && showDiffPicker());
     });
   </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
 </body>
 </html>

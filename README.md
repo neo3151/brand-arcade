@@ -7,6 +7,8 @@ A modern, centralized web and mobile games hub containing 10 casual, mindful gam
 ## 🏛️ Centralized Arcade Hub Features
 * **Universal Daily Challenge (P1):** Zero-server deterministic daily runs derived from date strings using Mulberry32 PRNG.
 * **Wordle-Style Emoji Share Grid:** 1-click clipboard copy of formatted emoji scorecards (`🟩🟩🟩🟨⬜`) for organic, viral social sharing.
+* **"Behind the Build" Live Dev Inspector HUD (P2):** Slide-out real-time telemetry drawer (`assets/arcade-inspector.js`, hotkey `~`) showing live 60 FPS sparklines, frame budgets, JS heap memory, DOM metrics, interactive ASCII architecture blueprints, and 0-overhead vanilla engineering specs.
+* **Unified Arcade Passport & Trophy Room (P3):** Zero-login IndexedDB gamification layer (`assets/arcade-passport.js`) tracking 8 cross-game achievements (*"Sub-2m Speedrun"*, *"Arcade Triathlon"*, *"Cabinet Grandmaster"*), player levels/XP, and 4 unlockable CRT phosphor themes (*Cyberpunk Neon*, *Game Boy DMG-01*, *Amber Phosphor*, *Midnight Synthwave*).
 * **Zero-Ad Guarantee:** No banners, no interstitial video ads, and no tracking cookies.
 * **Retro Arcade 3D Stage & Wall Matrix:** Physical arcade cabinet spotlight with 3D perspective, CRT phosphor scanlines, and tactile controls.
 * **Player Retention & Streaks:** Tracks daily challenge streaks, total play sessions, and bookmarked ROM cartridges in local storage.

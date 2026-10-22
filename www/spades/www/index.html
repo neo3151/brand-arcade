@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Royal Spades: Classic & 2's Wild</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+  <link rel="stylesheet" href="css/menu.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="device-wrapper">
+    <div class="device-shell">
+      <!-- Status Bar -->
+      <div class="device-status-bar">
+        <span id="device-clock">12:00</span>
+        <div class="device-camera-cutout"></div>
+        <div class="device-status-icons">
+          <button id="sound-toggle-btn" class="sound-toggle-btn" title="Toggle Sound">🔊</button>
+          <span>5G</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <!-- Main Screen -->
+      <div class="device-screen">
+        <div class="menu-container">
+          <!-- Crest Header -->
+          <div class="menu-header">
+            <div class="spades-crest">
+              <span class="crest-crown">👑</span>
+              <span class="crest-spade">♠</span>
+            </div>
+            <h1 class="menu-title">ROYAL SPADES</h1>
+            <p class="menu-subtitle">Partnership & 2's Wild Edition</p>
+          </div>
+
+          <!-- Mode Selection -->
+          <div class="mode-section">
+            <span class="section-label">Select Game Variant</span>
+            <div class="mode-grid">
+              <!-- Classic Mode -->
+              <div class="mode-card selected" id="mode-classic" data-mode="classic">
+                <div class="mode-card-icon">♠️</div>
+                <div class="mode-card-title">Classic Spades</div>
+                <div class="mode-card-desc">Official partnership rules. Spades are permanent trumps.</div>
+              </div>
+
+              <!-- 2's Wild Mode -->
+              <div class="mode-card" id="mode-twos-wild" data-mode="twos_wild">
+                <div class="mode-card-icon">👑</div>
+                <div class="mode-card-title">2's Wild</div>
+                <div class="mode-card-desc">All four 2s are supreme trumps!</div>
+                <span class="twos-badge">2♥ > 2♣ > 2♦ > 2♠</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Target Score -->
+          <div class="target-section">
+            <span class="target-label">Target Score</span>
+            <div class="target-pills">
+              <button type="button" class="target-pill" data-target="250">250 Pts</button>
+              <button type="button" class="target-pill active" data-target="500">500 Pts</button>
+            </div>
+          </div>
+
+          <!-- Main Actions -->
+          <div class="menu-actions">
+            <button id="continue-game-btn" class="btn btn--secondary btn--full" style="display:none;">
+              Continue Active Game ▶
+            </button>
+            <button id="start-game-btn" class="btn btn--primary btn--full">
+              Deal New Match
+            </button>
+
+            <div class="aux-btns">
+              <button id="rules-btn" class="aux-btn">
+                <span>📜</span>
+                <span>Rules</span>
+              </button>
+              <button id="stats-btn" class="aux-btn">
+                <span>📊</span>
+                <span>Stats</span>
+              </button>
+              <a href="store.html" class="aux-btn">
+                <span>🎨</span>
+                <span>Felts</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.device-screen -->
+
+      <!-- Virtual Home Indicator -->
+      <div class="device-home-indicator">
+        <div class="device-home-pill"></div>
+      </div>
+    </div><!-- /.device-shell -->
+  </div><!-- /.device-wrapper -->
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Rules Modal -->
+  <div id="rules-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <h3 style="font-family:var(--font-title);color:var(--royal-gold-light);font-size:1.15rem;margin-bottom:0.75rem;text-align:center;">
+        Rules of Royal Spades
+      </h3>
+      <div style="font-size:0.75rem;color:#cbd5e1;line-height:1.5;display:flex;flex-direction:column;gap:0.6rem;">
+        <p><strong>Partnerships:</strong> You and North (Us) play together against East and West (Them).</p>
+        <p><strong>Bidding:</strong> Each player bids the tricks they expect to take (0 to 13). Team bid is the combined total. Bidding <strong>Nil (0)</strong> awards <strong>+100 pts</strong> if made, or <strong>-100 pts</strong> if you take any trick!</p>
+        <p><strong>Must Follow Suit:</strong> You must play a card of the led suit if you have one. If void, you may play any card (including Spades / Trumps).</p>
+        <p><strong>Spades Broken:</strong> Spades cannot be led until someone cuts with a spade on an off-suit trick ("spades broken"), or you have only spades in hand.</p>
+        <p><strong>Sandbags:</strong> Every trick taken over your team bid gives 1 bag. Accumulating 10 bags incurs a <strong>-100 point penalty</strong>!</p>
+        <div style="background:rgba(245,158,11,0.1);border:1px solid var(--royal-gold);padding:0.5rem;border-radius:8px;">
+          <strong style="color:var(--royal-gold-light);">👑 2's Wild Hierarchy:</strong>
+          <p style="margin-top:0.25rem;">When 2's Wild is enabled, all four 2s act as top trump cards in this exact order:</p>
+          <p style="font-weight:800;color:#fff;margin-top:0.2rem;">
+            2♥ (Supreme) &gt; 2♣ &gt; 2♦ &gt; 2♠ &gt; A♠ &gt; K♠...
+          </p>
+        </div>
+      </div>
+      <button id="close-rules-btn" class="btn btn--secondary btn--full" style="margin-top:1.25rem;">
+        Got It
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Modal -->
+  <div id="stats-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <h3 style="font-family:var(--font-title);color:var(--royal-gold-light);font-size:1.15rem;margin-bottom:0.75rem;text-align:center;">
+        Career Statistics
+      </h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
+        <div style="background:rgba(2,44,34,0.7);padding:0.5rem;border-radius:10px;text-align:center;border:1px solid var(--felt-border);">
+          <div id="stat-matches" style="font-family:var(--font-mono);font-size:1.2rem;font-weight:800;color:#fff;">0</div>
+          <div style="font-size:0.65rem;color:#94a3b8;font-weight:700;">MATCHES PLAYED</div>
+        </div>
+        <div style="background:rgba(2,44,34,0.7);padding:0.5rem;border-radius:10px;text-align:center;border:1px solid var(--felt-border);">
+          <div id="stat-wins" style="font-family:var(--font-mono);font-size:1.2rem;font-weight:800;color:var(--royal-gold);">0</div>
+          <div style="font-size:0.65rem;color:#94a3b8;font-weight:700;">MATCHES WON</div>
+        </div>
+        <div style="background:rgba(2,44,34,0.7);padding:0.5rem;border-radius:10px;text-align:center;border:1px solid var(--felt-border);">
+          <div id="stat-nils" style="font-family:var(--font-mono);font-size:1.2rem;font-weight:800;color:#34d399;">0 / 0</div>
+          <div style="font-size:0.65rem;color:#94a3b8;font-weight:700;">NILS MADE / BID</div>
+        </div>
+        <div style="background:rgba(2,44,34,0.7);padding:0.5rem;border-radius:10px;text-align:center;border:1px solid var(--felt-border);">
+          <div id="stat-bags" style="font-family:var(--font-mono);font-size:1.2rem;font-weight:800;color:#f87171;">0</div>
+          <div style="font-size:0.65rem;color:#94a3b8;font-weight:700;">BAGS ACCRUED</div>
+        </div>
+      </div>
+      <button id="close-stats-btn" class="btn btn--secondary btn--full">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let selectedMode = 'classic';
+      let selectedTarget = 500;
+
+      // Check active game continue
+      const activeGame = window.Progress.getActiveGame();
+      const continueBtn = document.getElementById('continue-game-btn');
+      if (activeGame && activeGame.phase !== 'game_over') {
+        continueBtn.style.display = 'block';
+        continueBtn.addEventListener('click', () => {
+          window.location.href = `game.html?mode=${activeGame.isTwosWild ? 'twos_wild' : 'classic'}&target=${activeGame.targetScore}&continue=1`;
+        });
+      }
+
+      // Mode toggling
+      const modeCards = document.querySelectorAll('.mode-card');
+      modeCards.forEach(card => {
+        card.addEventListener('click', () => {
+          modeCards.forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedMode = card.dataset.mode;
+        });
+      });
+
+      // Target score toggling
+      const targetPills = document.querySelectorAll('.target-pill');
+      targetPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          targetPills.forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          selectedTarget = parseInt(pill.dataset.target, 10);
+        });
+      });
+
+      // Start Game
+      document.getElementById('start-game-btn').addEventListener('click', () => {
+        window.location.href = `game.html?mode=${selectedMode}&target=${selectedTarget}`;
+      });
+
+      // Modals
+      document.getElementById('rules-btn').addEventListener('click', () => window.Utils.openModal('rules-modal'));
+      document.getElementById('close-rules-btn').addEventListener('click', () => window.Utils.closeModal('rules-modal'));
+
+      document.getElementById('stats-btn').addEventListener('click', () => {
+        const stats = window.Progress.getStats();
+        document.getElementById('stat-matches').textContent = stats.gamesPlayed;
+        document.getElementById('stat-wins').textContent = stats.gamesWon;
+        document.getElementById('stat-nils').textContent = `${stats.nilsMade} / ${stats.nilBids}`;
+        document.getElementById('stat-bags').textContent = stats.bagsAccrued;
+        window.Utils.openModal('stats-modal');
+      });
+      document.getElementById('close-stats-btn').addEventListener('click', () => window.Utils.closeModal('stats-modal'));
+    });
+  </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>

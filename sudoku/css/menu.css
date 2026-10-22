@@ -42,7 +42,7 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: var(--space-4) var(--space-6);
+  padding: calc(env(safe-area-inset-top, 0px) + var(--space-4)) var(--space-6) var(--space-4);
   position: relative;
   z-index: 1;
 }
@@ -195,16 +195,37 @@
    Difficulty modal (overlay)
    -------------------------------------------------------------------------- */
 #difficulty-modal .modal {
-  max-width: 420px;
-  max-height: 85dvh;
-  overflow-y: auto;
+  max-width: 440px;
+  width: min(92vw, 440px);
+  max-height: 84vh;
+  max-height: 84dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--space-5);
+  box-sizing: border-box;
+}
+
+#difficulty-modal .modal__title {
+  flex-shrink: 0;
+  margin-bottom: var(--space-1);
+}
+
+#difficulty-modal .modal__subtitle {
+  flex-shrink: 0;
+  margin-bottom: var(--space-3);
 }
 
 .difficulty-grid {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  margin-top: var(--space-4);
+  margin-top: var(--space-2);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y !important;
 }
 
 .diff-btn {
@@ -212,13 +233,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
   background: var(--color-bg-subtle);
   border: 1.5px solid var(--color-border);
   transition: all var(--transition-base);
   cursor: pointer;
   font-family: inherit;
+  touch-action: pan-y !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .diff-btn:hover {
@@ -231,9 +257,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  pointer-events: none;
 }
 
-.diff-btn__icon { font-size: 1.5rem; }
+.diff-btn__icon { font-size: 1.4rem; }
 
 .diff-btn__name {
   font-size: var(--font-size-base);
@@ -247,7 +274,7 @@
   margin-top: 1px;
 }
 
-.diff-btn__badge { font-size: var(--font-size-xs); }
+.diff-btn__badge { font-size: var(--font-size-xs); pointer-events: none; }
 
 .diff-btn--beginner { border-left: 4px solid #34d399; }
 .diff-btn--easy     { border-left: 4px solid #60a5fa; }
@@ -259,8 +286,11 @@
 .level-picker {
   display: none;
   flex-direction: column;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 .level-picker.visible {
   display: flex;
@@ -277,6 +307,10 @@
   font-size: var(--font-size-xs);
   font-weight: 600;
   color: var(--color-text-muted);
+  user-select: none;
+  -webkit-user-select: none;
+  flex-shrink: 0;
+  touch-action: manipulation;
 }
 
 .level-page-btn {
@@ -289,6 +323,7 @@
   color: var(--color-text);
   cursor: pointer;
   transition: all var(--transition-fast);
+  touch-action: manipulation;
 }
 
 .level-page-btn:hover:not(:disabled) {
@@ -308,13 +343,29 @@
   text-align: left;
 }
 
+.level-picker__back {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  touch-action: manipulation;
+}
+.level-picker__back:hover {
+  color: var(--color-primary);
+}
+
 .level-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: var(--space-2);
-  max-height: 240px;
-  overflow-y: auto;
-  padding-right: var(--space-1);
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y !important;
+  padding: 6px 4px 16px 4px;
 }
 
 .level-cell {
@@ -331,6 +382,11 @@
   transition: all var(--transition-fast);
   min-width: 44px;
   min-height: 44px;
+  touch-action: pan-y !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .level-cell:hover { border-color: var(--color-primary); background: var(--color-primary-light); }
 .level-cell--completed {
@@ -345,16 +401,10 @@
 }
 .level-cell--locked:hover { border-color: var(--color-border); background: var(--color-bg-muted); }
 
-.level-picker__back {
-  align-self: flex-start;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
+#close-diff-modal {
+  flex-shrink: 0;
+  margin-top: var(--space-3) !important;
 }
-.level-picker__back:hover { color: var(--color-primary); }
 
 /* --------------------------------------------------------------------------
    Footer

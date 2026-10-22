@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Timber Block Blast - Shop</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/mobile-simulator.css">
+  <link rel="stylesheet" href="css/store.css">
+</head>
+<body>
+  <div class="device-wrapper">
+    <div class="device-shell">
+      <!-- Status Bar -->
+      <div class="device-status-bar">
+        <span id="device-clock">12:00</span>
+        <div class="device-camera-cutout"></div>
+        <div class="device-status-icons">
+          <button id="sound-toggle-btn" class="sound-toggle-btn" aria-label="Toggle Sound">🔊</button>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <!-- Main Store Viewport -->
+      <div class="device-screen">
+        <div class="store-viewport">
+          <header class="store-top-bar">
+            <h1 class="store-title">🛒 Block Shop</h1>
+            <div style="display:flex;align-items:center;gap:0.6rem;">
+              <div style="background:rgba(0,0,0,0.4);border:1px solid var(--amber-gold);padding:0.35rem 0.7rem;border-radius:12px;font-family:var(--font-mono);font-size:0.85rem;color:var(--amber-light);font-weight:800;">
+                🪙 <span id="store-coins">150</span>
+              </div>
+              <a href="index.html" class="btn btn--secondary" style="padding:0.4rem 0.75rem;font-size:0.8rem;">
+                ✕
+              </a>
+            </div>
+          </header>
+
+          <!-- Free Coins Refill -->
+          <div style="background:rgba(245, 158, 11, 0.12);border:1px dashed var(--amber-gold);border-radius:14px;padding:0.65rem 0.85rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <div>
+              <div style="font-size:0.8rem;font-weight:800;color:var(--amber-light);">Free Daily Stash</div>
+              <div style="font-size:0.68rem;color:#d97706;">Claim +200 bonus coins anytime</div>
+            </div>
+            <button id="free-coins-btn" class="btn btn--primary" style="padding:0.35rem 0.65rem;font-size:0.75rem;">
+              +200 🪙
+            </button>
+          </div>
+
+          <!-- Board & Block Themes -->
+          <div class="store-section-title">Visual Themes</div>
+          <div class="themes-grid" id="themes-grid">
+            <!-- Populated dynamically -->
+          </div>
+
+          <!-- Power-up Bundles -->
+          <div class="store-section-title">Power-up Bundles</div>
+          <div class="packs-grid">
+            <div class="pack-card">
+              <div class="pack-info">
+                <span class="pack-icon">🔨</span>
+                <div>
+                  <div class="pack-title">3x Hammer Bombs</div>
+                  <div class="pack-desc">Detonates any 3x3 block on board</div>
+                </div>
+              </div>
+              <button class="btn btn--primary pack-btn" data-buy="hammer" data-cost="75" data-amount="3">
+                75 🪙
+              </button>
+            </div>
+
+            <div class="pack-card">
+              <div class="pack-info">
+                <span class="pack-icon">🔄</span>
+                <div>
+                  <div class="pack-title">3x Rotations</div>
+                  <div class="pack-desc">Rotates chosen tray piece 90°</div>
+                </div>
+              </div>
+              <button class="btn btn--primary pack-btn" data-buy="rotate" data-cost="50" data-amount="3">
+                50 🪙
+              </button>
+            </div>
+
+            <div class="pack-card">
+              <div class="pack-info">
+                <span class="pack-icon">🎲</span>
+                <div>
+                  <div class="pack-title">3x Tray Rerolls</div>
+                  <div class="pack-desc">Swaps all remaining pieces</div>
+                </div>
+              </div>
+              <button class="btn btn--primary pack-btn" data-buy="reroll" data-cost="50" data-amount="3">
+                50 🪙
+              </button>
+            </div>
+          </div>
+
+          <!-- Legal Disclaimer -->
+          <footer style="margin-top:auto;text-align:center;">
+            <p class="store-legal">Demo store — no real charges.</p>
+          </footer>
+        </div>
+      </div><!-- /.device-screen -->
+
+      <!-- Home Indicator -->
+      <div class="device-home-indicator">
+        <div class="device-home-pill"></div>
+      </div>
+    </div><!-- /.device-shell -->
+  </div><!-- /.device-wrapper -->
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/mobile-shell.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const themes = [
+        { id: 'timber', name: 'Timber Oak', cost: 0, preview: ['#d97706', '#b45309', '#f59e0b', '#78350f'] },
+        { id: 'neon', name: 'Neon Cyber', cost: 150, preview: ['#06b6d4', '#ec4899', '#8b5cf6', '#10b981'] },
+        { id: 'jewel', name: 'Royal Jewels', cost: 200, preview: ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'] },
+        { id: 'slate', name: 'Pastel Slate', cost: 150, preview: ['#64748b', '#94a3b8', '#cbd5e1', '#475569'] },
+        { id: 'aurora', name: 'Aurora Borealis', cost: 0, preview: ['#22d3ee', '#a78bfa', '#34d399', '#6366f1'] }
+      ];
+
+      function updateCoinsDisplay() {
+        document.getElementById('store-coins').textContent = window.Progress.getCoins();
+      }
+
+      function renderThemes() {
+        const grid = document.getElementById('themes-grid');
+        grid.innerHTML = '';
+
+        const unlocked = window.Progress.getUnlockedThemes();
+        const selected = window.Progress.getSelectedTheme();
+
+        themes.forEach(th => {
+          const isUnlocked = unlocked.includes(th.id);
+          const isSelected = selected === th.id;
+
+          const card = document.createElement('div');
+          card.className = `theme-card ${isSelected ? 'active' : ''}`;
+
+          const previewEl = document.createElement('div');
+          previewEl.className = 'theme-preview';
+          previewEl.style.background = '#1a0e07';
+          th.preview.forEach(color => {
+            const block = document.createElement('div');
+            block.style.background = color;
+            block.style.borderRadius = '3px';
+            previewEl.appendChild(block);
+          });
+
+          const nameEl = document.createElement('div');
+          nameEl.className = 'theme-name';
+          nameEl.textContent = th.name;
+
+          const actionBtn = document.createElement('button');
+          if (isSelected) {
+            actionBtn.className = 'btn btn--secondary';
+            actionBtn.style.padding = '0.35rem 0.65rem';
+            actionBtn.style.fontSize = '0.75rem';
+            actionBtn.textContent = '✓ Active';
+            actionBtn.disabled = true;
+          } else if (isUnlocked) {
+            actionBtn.className = 'btn btn--primary';
+            actionBtn.style.padding = '0.35rem 0.65rem';
+            actionBtn.style.fontSize = '0.75rem';
+            actionBtn.textContent = 'Equip';
+            actionBtn.addEventListener('click', () => {
+              window.Progress.setSelectedTheme(th.id);
+              renderThemes();
+              window.Utils.showToast(`Equipped ${th.name} theme!`, 'success');
+            });
+          } else {
+            actionBtn.className = 'btn btn--primary';
+            actionBtn.style.padding = '0.35rem 0.65rem';
+            actionBtn.style.fontSize = '0.75rem';
+            actionBtn.textContent = `${th.cost} 🪙`;
+            actionBtn.addEventListener('click', () => {
+              if (window.Progress.spendCoins(th.cost)) {
+                window.Progress.unlockTheme(th.id);
+                window.Progress.setSelectedTheme(th.id);
+                updateCoinsDisplay();
+                renderThemes();
+                window.Utils.showToast(`Unlocked & equipped ${th.name}!`, 'success');
+              } else {
+                window.Utils.showToast('Not enough coins!', 'warning');
+              }
+            });
+          }
+
+          card.appendChild(previewEl);
+          card.appendChild(nameEl);
+          card.appendChild(actionBtn);
+          grid.appendChild(card);
+        });
+      }
+
+      // Free Coins button
+      document.getElementById('free-coins-btn').addEventListener('click', () => {
+        window.Progress.addCoins(200);
+        updateCoinsDisplay();
+        window.Utils.showToast('Claimed +200 coins!', 'success');
+      });
+
+      // Buy Powerup Bundles
+      document.querySelectorAll('.pack-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const type = btn.dataset.buy;
+          const cost = parseInt(btn.dataset.cost, 10);
+          const amount = parseInt(btn.dataset.amount, 10);
+
+          if (window.Progress.spendCoins(cost)) {
+            window.Progress.addPowerup(type, amount);
+            updateCoinsDisplay();
+            window.Utils.showToast(`Purchased +${amount} ${type}s!`, 'success');
+          } else {
+            window.Utils.showToast('Not enough coins!', 'warning');
+          }
+        });
+      });
+
+      updateCoinsDisplay();
+      renderThemes();
+    });
+  </script>
+  <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+</body>
+</html>
