@@ -126,12 +126,22 @@ const VECTREX = 'com.gamingempire.benchmarkarcade.arcade.crt.vectrex';
 
 async function main() {
   const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
-  assert.strictEqual(pkg.dependencies['@revenuecat/purchases-capacitor'], '9.2.2');
+  assert.strictEqual(pkg.dependencies['@capacitor/core'], '8.5.3');
+  assert.strictEqual(pkg.dependencies['@capacitor/ios'], '8.5.3');
+  assert.strictEqual(pkg.dependencies['@capacitor/android'], '8.5.3');
+  assert.strictEqual(pkg.dependencies['@revenuecat/purchases-capacitor'], '13.7.6');
   const pluginPkg = JSON.parse(fs.readFileSync(
     path.join(root, 'node_modules/@revenuecat/purchases-capacitor/package.json'),
     'utf8'
   ));
-  assert.strictEqual(pluginPkg.peerDependencies['@capacitor/core'], '^6.0.0');
+  assert.strictEqual(pluginPkg.peerDependencies['@capacitor/core'], '>=8.0.0');
+  const podspec = fs.readFileSync(
+    path.join(root, 'node_modules/@revenuecat/purchases-capacitor/RevenuecatPurchasesCapacitor.podspec'),
+    'utf8'
+  );
+  assert.ok(podspec.includes("PurchasesHybridCommon', '19.15.0'"));
+  const podfile = fs.readFileSync(path.join(root, 'ios/App/Podfile'), 'utf8');
+  assert.ok(podfile.includes('RevenuecatPurchasesCapacitor'));
 
   fs.readdirSync(root).forEach(name => {
     const file = path.join(root, name, 'package.json');
