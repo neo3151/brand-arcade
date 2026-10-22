@@ -37,7 +37,11 @@ coreFiles.forEach(file => {
   }
 });
 
-// 2. Copy Shared Assets Folder (CSS, Icons, Scripts, Telemetry HUD, Passport)
+// 2. Copy Shared Assets Folder (CSS, Icons, Scripts, Telemetry HUD, Passport, hub store)
+const storeEntry = path.join(rootDir, 'assets', 'arcade-store.js');
+if (!fs.existsSync(storeEntry)) {
+  throw new Error('assets/arcade-store.js is required for the hub store');
+}
 copyRecursive(path.join(rootDir, 'assets'), path.join(destDir, 'assets'));
 
 // 3. Copy 10 Arcade Game Web Runtime Bundles

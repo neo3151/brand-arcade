@@ -16,6 +16,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Chakra+Petch:ital,wght@0,500;0,600;0,700;0,800;1,700&family=Outfit:wght@600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
   <script src="assets/arcade-daily.js"></script>
   <script src="assets/arcade-inspector.js"></script>
+  <script src="assets/arcade-store-config.js"></script>
+  <script src="assets/arcade-store.js"></script>
+  <script type="module" src="assets/arcade-store-boot.js"></script>
   <script src="assets/arcade-passport.js"></script>
 
   <style>
@@ -118,14 +121,21 @@
     /* ARCADE MARQUEE TOP HEADER */
     .arcade-header {
       width: 100%;
-      padding: max(16px, env(safe-area-inset-top)) 0 14px 0;
+      padding: max(16px, env(safe-area-inset-top)) 12px 14px 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      border-bottom: 2px solid var(--arcade-border);
+      background: var(--arcade-bezel);
+      border: 3px solid var(--arcade-border);
+      border-radius: 14px;
       position: relative;
       margin-bottom: 20px;
+      box-shadow: 0 0 0 6px var(--arcade-bezel);
+    }
+
+    html[data-arcade-patron="1"] .arcade-header {
+      box-shadow: 0 0 0 6px var(--arcade-bezel), 0 0 22px rgba(230, 179, 37, 0.45);
     }
 
     .marquee-chase-lights {
@@ -1291,6 +1301,9 @@
             <span>PLAYED:</span>
             <strong id="arcade-sessions-val" style="color: var(--neon-cyan);">0 SESSIONS</strong>
           </div>
+          <div class="status-item" id="arcade-patron-chip" hidden style="color: #e6b325; letter-spacing: 0.08em;">
+            🏅 PATRON
+          </div>
         </div>
 
         <div class="status-group">
@@ -1602,7 +1615,8 @@
       </p>
       <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--neon-green); padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.6; letter-spacing: 0.02em; color: #a7f3d0;">
         • 0 Third-Party Advertisements (Forever)<br>
-        • 0 Forced Subscriptions or In-App Purchases<br>
+        • 0 Paywalls on games, levels, hints, or trophies<br>
+        • Optional one-time cabinet cosmetics in the native hub app. This website stays free.<br>
         • 100% Offline Capability (Airplane & Subway Friendly)
       </div>
       <p>
@@ -1637,6 +1651,15 @@
         <button type="button" id="btn-install-pwa" class="btn-push-sub" style="width: 100%; justify-content: center;">
           📲 INSTALL ARCADE APP
         </button>
+      </div>
+
+      <div style="border-top: 1px solid var(--arcade-border); padding-top: 12px;">
+        <div style="font-family: var(--font-arcade); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; color: #ffffff; margin-bottom: 4px;">CABINET EXTRAS:</div>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">Patron and premium phosphors are one-time extras in the Benchmark Arcade app. XP and trophies stay earned.</p>
+        <button type="button" id="btn-restore-purchases" class="btn-push-sub" style="width: 100%; justify-content: center;">
+          ↺ RESTORE PURCHASES
+        </button>
+        <p id="restore-purchases-note" style="font-size: 0.75rem; color: #94a3b8; margin: 8px 0 0 0;"></p>
       </div>
 
       <div style="border-top: 1px solid var(--arcade-border); padding-top: 12px;">
@@ -2619,7 +2642,25 @@
         }
       });
 
-      // Reset stats
+      // Restore store purchases. This does not read or write Passport progress.
+      const restorePurchasesBtn = document.getElementById('btn-restore-purchases');
+      if (restorePurchasesBtn) {
+        restorePurchasesBtn.addEventListener('click', () => {
+          const note = document.getElementById('restore-purchases-note');
+          const write = (text) => { if (note) note.textContent = text; };
+          if (!window.ArcadeStore || typeof window.ArcadeStore.restore !== 'function') {
+            write('Purchases are unavailable in this browser.');
+            return;
+          }
+          window.ArcadeStore.restore().then((result) => {
+            if (result && result.ok) write('Purchases restored.');
+            else if (result && result.reason === 'unavailable') write('Restore is available in the Benchmark Arcade app. This website stays free.');
+            else write('Restore could not be completed.');
+          }).catch(() => write('Restore could not be completed.'));
+        });
+      }
+
+      // Reset stats. Leaves arcade_entitlements alone.
       document.getElementById('btn-reset-arcade').addEventListener('click', () => {
         if (confirm('RESET ALL RETRO STATS & PLAY COUNTERS?')) {
           localStorage.removeItem('arcade_play_count');
