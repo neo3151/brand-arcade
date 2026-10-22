@@ -43,6 +43,12 @@ const CATEGORY_META = {
   jobs:       { label: 'Jobs & Careers',   icon: '💼' },
   technology: { label: 'Technology',       icon: '💻' },
   colors:     { label: 'Colors & Shapes',  icon: '🎨' },
+  brand:      { label: 'Arcade Words',     icon: '🕹️' },
+  mythology:  { label: 'Mythology',        icon: '⚡' },
+  cooking:    { label: 'Cooking',          icon: '🍳' },
+  parks:      { label: 'US National Parks', icon: '🏞️' },
+  ocean:      { label: 'Ocean Life',       icon: '🌊' },
+  kids:       { label: "Kids' Words",      icon: '🎈' },
 };
 
 // ── Init ─────────────────────────────────────────────────────────────────────
@@ -51,6 +57,21 @@ function initGame() {
   State.category   = params.category   || 'animals';
   State.difficulty = params.difficulty || 'beginner';
   State.level      = parseInt(params.level, 10) || 1;
+
+  const paidWords = ['mythology', 'cooking', 'parks', 'ocean', 'kids'];
+  const wordAllowed = window.ArcadeContent
+    ? window.ArcadeContent.allowsWord(State.category, State.level, State.difficulty)
+    : paidWords.indexOf(State.category) === -1;
+  if (!wordAllowed) {
+    if (window.ArcadeContent) window.ArcadeContent.showLock('explorer');
+    else {
+      const note = document.createElement('p');
+      note.id = 'content-lock-fallback';
+      note.textContent = 'This pack is part of Benchmark Arcade.';
+      document.body.appendChild(note);
+    }
+    return;
+  }
 
   const isContinue = params.continue === '1' || params.continue === 'true';
   const active = isContinue ? window.Progress.getActiveGame() : null;

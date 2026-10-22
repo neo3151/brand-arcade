@@ -14,7 +14,9 @@
     '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
-    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>' +
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-content.css">' +
+    '<script src="' + prefix + 'assets/arcade-content.js"><\/script>'
   );
 })();
 </script>
@@ -207,6 +209,7 @@
     </div>
 
     <!-- Dossier Clearance Records Ribbon -->
+<div id="content-pack-shelf" data-content-shelf data-game="codebreaker"></div>
     <section class="stats-ribbon">
       <div class="stat-item">
         <div class="stat-val stat-val--amber" id="stat-attempted">0</div>
@@ -412,5 +415,6 @@
     });
   </script>
   <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+  <script src="js/heist.js"></script>
 </body>
 </html>

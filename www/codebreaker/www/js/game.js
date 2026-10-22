@@ -113,10 +113,79 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------------------------
   // Initialization & Config
   // ---------------------------------------------------------------------------
+  function beginSession() {
+    State.timer = new Utils.GameTimer((sec) => {
+      State.elapsed = sec;
+      if (UI.timerDisplay) {
+        UI.timerDisplay.textContent = formatTime(sec);
+      }
+    }, State.elapsed);
+    State.timer.start();
+    renderVaultSlots();
+    renderPalette();
+    renderBoard();
+    applyRevealedSlotsToCurrentRow();
+    updateEquipmentBadges();
+    saveState();
+  }
+
+  function lockHeist() {
+    State.lockedPack = true;
+    State.isGameOver = true;
+    if (window.ArcadeContent) window.ArcadeContent.showLock('heist');
+    else {
+      const note = document.createElement('p');
+      note.id = 'content-lock-fallback';
+      note.textContent = 'This pack is part of Benchmark Arcade.';
+      document.body.appendChild(note);
+    }
+  }
+
   function initGame() {
     const params = new URLSearchParams(window.location.search);
     const diffParam = params.get('diff') || 'operative';
     const continueMission = params.get('continue') === '1';
+
+    if (diffParam === 'heist') {
+      const missionNo = parseInt(params.get('mission') || '1', 10);
+      const mission = window.HeistCampaign && window.HeistCampaign.get(missionNo);
+      const allowed = mission && window.ArcadeContent && window.ArcadeContent.allowsMission(missionNo);
+      if (!allowed) {
+        lockHeist();
+        return;
+      }
+      State.difficulty = 'heist';
+      State.missionId = mission.id;
+      State.codeLength = mission.code.length;
+      State.poolSize = mission.poolSize;
+      State.allowDuplicates = false;
+      State.maxAttempts = mission.maxAttempts;
+      State.poolSymbols = CipherEngine.PIN_SYMBOLS.slice(0, State.poolSize);
+      const savedHeist = Progress.getActiveGame();
+      if (continueMission && savedHeist && savedHeist.difficulty === 'heist' && savedHeist.missionId === mission.id && !savedHeist.isGameOver) {
+        State.secretCode = savedHeist.secretCode;
+        State.history = savedHeist.history || [];
+        State.currentRowIndex = savedHeist.currentRowIndex || 0;
+        State.revealedSlots = savedHeist.revealedSlots || {};
+        State.filteredSymbols = savedHeist.filteredSymbols || [];
+        State.elapsed = savedHeist.elapsed || 0;
+        State.currentGuess = savedHeist.currentGuess || new Array(State.codeLength).fill(null);
+      } else {
+        State.secretCode = mission.code.slice();
+        State.history = [];
+        State.currentRowIndex = 0;
+        State.revealedSlots = {};
+        State.filteredSymbols = [];
+        State.elapsed = 0;
+        State.currentGuess = new Array(State.codeLength).fill(null);
+        Progress.clearActiveGame();
+      }
+      if (UI.clearanceLabel) UI.clearanceLabel.textContent = mission.title;
+      const story = document.getElementById('hud-story');
+      if (story) story.textContent = mission.story;
+      beginSession();
+      return;
+    }
 
     State.difficulty = diffParam;
     const preset = CipherEngine.CLEARANCE_PRESETS[diffParam] || CipherEngine.CLEARANCE_PRESETS.operative;
@@ -180,32 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Start Timer
-    State.timer = new Utils.GameTimer((sec) => {
-      State.elapsed = sec;
-      if (UI.timerDisplay) {
-        UI.timerDisplay.textContent = formatTime(sec);
-      }
-    }, State.elapsed);
-    State.timer.start();
-
-    // Render Vault Compartment
-    renderVaultSlots();
-
-    // Render Color Palette
-    renderPalette();
-
-    // Render Guess Board
-    renderBoard();
-
-    // Synchronize pre-revealed slots into active row
-    applyRevealedSlotsToCurrentRow();
-
-    // Update equipment badges
-    updateEquipmentBadges();
-
-    // Persist Initial State
-    saveState();
+    beginSession();
   }
 
   // ---------------------------------------------------------------------------
@@ -841,9 +885,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // State Persistence & Safe Navigation
   // ---------------------------------------------------------------------------
   function saveState() {
-    if (State.isGameOver) return;
+    if (State.isGameOver || State.lockedPack) return;
     Progress.saveActiveGame({
       difficulty: State.difficulty,
+      missionId: State.missionId || null,
       codeLength: State.codeLength,
       poolSize: State.poolSize,
       allowDuplicates: State.allowDuplicates,
@@ -883,6 +928,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (State.difficulty === 'custom') {
       const dup = State.allowDuplicates ? '1' : '0';
       return `game.html?diff=custom&len=${State.codeLength}&pool=${State.poolSize}&dup=${dup}&att=${State.maxAttempts}`;
+    }
+    if (State.difficulty === 'heist') {
+      const next = (State.missionId || 1) + 1;
+      const open = window.HeistCampaign && window.HeistCampaign.get(next) && window.ArcadeContent && window.ArcadeContent.allowsMission(next);
+      return open ? `game.html?diff=heist&mission=${next}` : 'index.html';
     }
     return `game.html?diff=${State.difficulty}`;
   }

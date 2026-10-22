@@ -14,7 +14,9 @@
     '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
-    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>' +
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-content.css">' +
+    '<script src="' + prefix + 'assets/arcade-content.js"><\/script>'
   );
 })();
 </script>
@@ -79,6 +81,7 @@
         <button id="btn-select-deal" class="btn btn--outline" type="button">
           <span>📜</span> Choose Deal (1 – 1,000)
         </button>
+<div id="content-pack-shelf" data-content-shelf data-game="solitaire"></div>
 
         <a href="store.html" class="btn btn--crimson">
           <span>🗝️</span> Daily Supply <span id="menu-powerups-badge" class="badge badge--pill">0</span>
@@ -330,5 +333,6 @@
 
   <script src="js/mobile-shell.js"></script>
   <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+  <script src="js/curated-deals.js"></script>
 </body>
 </html>

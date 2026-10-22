@@ -2,6 +2,7 @@
  * arcade-store.js — Hub-only RevenueCat store.
  * Phase 1: Arcade Patron and premium CRT phosphors.
  * Phase 2: per-game cosmetic skins and packs. Gameplay stays free.
+ * Phase 3: extra content packs. Existing free boards stay unlocked.
  *
  * Standalone game apps do not load this file. On the web and the installed
  * PWA, init() sees a non-native platform and leaves every price unavailable.
@@ -141,6 +142,55 @@
       entitlementId: 'wordsearch_pack_atlas',
       kind: 'cosmetic',
       name: 'Word Search Atlas'
+    },
+    {
+      id: 'explorer',
+      productId: 'com.gamingempire.benchmarkarcade.wordsearch.pack.explorer',
+      entitlementId: 'wordsearch_pack_explorer',
+      kind: 'content',
+      name: 'World Explorer'
+    },
+    {
+      id: 'layouts',
+      productId: 'com.gamingempire.benchmarkarcade.mahjong.pack.layouts',
+      entitlementId: 'mahjong_pack_layouts',
+      kind: 'content',
+      name: 'Jade Layouts'
+    },
+    {
+      id: 'holiday',
+      productId: 'com.gamingempire.benchmarkarcade.nonogram.pack.holiday',
+      entitlementId: 'nonogram_pack_holiday',
+      kind: 'content',
+      name: 'Holiday Pictures'
+    },
+    {
+      id: 'animals',
+      productId: 'com.gamingempire.benchmarkarcade.nonogram.pack.animals',
+      entitlementId: 'nonogram_pack_animals',
+      kind: 'content',
+      name: 'Animal Pictures'
+    },
+    {
+      id: 'curated',
+      productId: 'com.gamingempire.benchmarkarcade.solitaire.pack.curated',
+      entitlementId: 'solitaire_pack_curated',
+      kind: 'content',
+      name: 'Curated Deals'
+    },
+    {
+      id: 'heist',
+      productId: 'com.gamingempire.benchmarkarcade.codebreaker.pack.heist',
+      entitlementId: 'codebreaker_pack_heist',
+      kind: 'content',
+      name: 'Heist Campaign'
+    },
+    {
+      id: 'puzzler',
+      productId: 'com.gamingempire.benchmarkarcade.mindful.pack.puzzler',
+      entitlementId: 'mindful_pack_puzzler',
+      kind: 'content',
+      name: 'Mindful Puzzler'
     }
   ];
 

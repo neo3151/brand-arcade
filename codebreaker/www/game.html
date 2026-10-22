@@ -14,7 +14,9 @@
     '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
-    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>' +
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-content.css">' +
+    '<script src="' + prefix + 'assets/arcade-content.js"><\/script>'
   );
 })();
 </script>
@@ -57,7 +59,7 @@
         <a href="index.html" class="btn btn--secondary" id="btn-back-base" style="padding: 0.35rem 0.65rem; font-size: 0.85rem;" title="Return to Dossier Base">← BASE</a>
         <div>
           <div class="hud-title" id="clearance-label">Field Operative</div>
-          <div class="hud-sub">DECODING TELEPRINTER // LINE ACTIVE</div>
+          <div class="hud-sub" id="hud-story">DECODING TELEPRINTER // LINE ACTIVE</div>
         </div>
       </div>
 
@@ -194,5 +196,6 @@
   <script src="js/game.js"></script>
   <script src="js/mobile-shell.js"></script>
   <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+  <script src="js/heist.js"></script>
 </body>
 </html>
