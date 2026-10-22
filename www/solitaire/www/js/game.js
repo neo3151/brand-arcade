@@ -485,7 +485,7 @@
 
     if (!isFreeHint) {
       if (window.SolitaireProgress.getHints() <= 0) {
-        window.SolitaireStore.showStoreToast("No Looking Glass Hints remaining! Visit the Curiosity Shop.");
+        window.SolitaireStore.showStoreToast("No Looking Glass Hints remaining! The morning refill restores these.");
         return;
       }
       if (!window.SolitaireProgress.useHint()) return;
@@ -528,7 +528,7 @@
   function executePeek() {
     if (isAutoCompleting) return;
     if (window.SolitaireProgress.getPeeks() <= 0) {
-      window.SolitaireStore.showStoreToast("No Cheshire Peeks remaining! Visit the Curiosity Shop.");
+      window.SolitaireStore.showStoreToast("No Cheshire Peeks remaining! The morning refill restores these.");
       return;
     }
 
@@ -578,7 +578,7 @@
   function executeReshuffle() {
     if (isAutoCompleting) return;
     if (window.SolitaireProgress.getShuffles() <= 0) {
-      window.SolitaireStore.showStoreToast("No Wonderland Reshuffles remaining! Visit the Curiosity Shop.");
+      window.SolitaireStore.showStoreToast("No Wonderland Reshuffles remaining! The morning refill restores these.");
       return;
     }
 

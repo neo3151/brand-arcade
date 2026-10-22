@@ -185,6 +185,7 @@
   <!-- Scripts -->
   <script src="js/utils.js"></script>
   <script src="js/audio.js"></script>
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/mobile-shell.js"></script>
   <script src="js/level-generator.js"></script>
@@ -582,7 +583,7 @@
       hintBtn.addEventListener('click', () => {
         const inv = window.Progress.getInventory();
         if (inv.hints <= 0) {
-          window.Utils.showToast('Out of hints! Visit store to refill.', 'warning');
+          window.Utils.showToast('Out of hints! The morning refill restores these.', 'warning');
           return;
         }
 
@@ -627,7 +628,7 @@
       document.getElementById('pwr-radar-btn').addEventListener('click', () => {
         const inv = window.Progress.getInventory();
         if (inv.radars <= 0) {
-          window.Utils.showToast('Out of Line Radars! Visit store to refill.', 'warning');
+          window.Utils.showToast('Out of Line Radars! The morning refill restores these.', 'warning');
           return;
         }
 
@@ -662,7 +663,7 @@
       document.getElementById('pwr-bomb-btn').addEventListener('click', () => {
         const inv = window.Progress.getInventory();
         if (inv.bombs <= 0) {
-          window.Utils.showToast('Out of Pixel Bombs! Visit store to refill.', 'warning');
+          window.Utils.showToast('Out of Pixel Bombs! The morning refill restores these.', 'warning');
           return;
         }
 

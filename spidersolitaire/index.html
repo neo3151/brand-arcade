@@ -39,10 +39,9 @@
           <div class="brand-badge">
             <span>🕸️</span> COBWEB MANOR
           </div>
-          <a href="store.html" class="store-link-btn" aria-label="Open Power-ups Store">
+          <a href="store.html" class="store-link-btn" aria-label="Open daily supply">
             <span>🪙</span>
             <span id="nav-coins">150</span>
-            <span>+</span>
           </a>
         </div>
 
@@ -85,7 +84,7 @@
               </div>
               <div class="mode-desc">Pure Spades • Fluid sequencing & cascading</div>
             </div>
-            <div class="mode-badge" id="badge-1suit">Deal 1</div>
+            <div class="mode-badge" id="badge-1suit">Open</div>
           </div>
 
           <div class="mode-card" data-diff="2suit">
@@ -95,7 +94,7 @@
               </div>
               <div class="mode-desc">Spades & Hearts • Mixed builds, pure moves</div>
             </div>
-            <div class="mode-badge" id="badge-2suit">Deal 1</div>
+            <div class="mode-badge" id="badge-2suit">Open</div>
           </div>
 
           <div class="mode-card" data-diff="4suit">
@@ -105,12 +104,12 @@
               </div>
               <div class="mode-desc">All 4 Suits • The ultimate strategic test</div>
             </div>
-            <div class="mode-badge" id="badge-4suit">Deal 1</div>
+            <div class="mode-badge" id="badge-4suit">Open</div>
           </div>
         </div>
 
         <a href="store.html" class="btn btn--secondary btn--full">
-          ✨ Relic Store
+          ✨ Daily Supply
         </a>
       </div>
 
@@ -146,6 +145,7 @@
   <!-- Scripts -->
   <script src="js/utils.js"></script>
   <script src="js/audio.js"></script>
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/mobile-shell.js"></script>
   <script>
@@ -161,7 +161,7 @@
       // Update mode deal badges
       ['1suit', '2suit', '4suit'].forEach(diff => {
         const el = document.getElementById(`badge-${diff}`);
-        if (el) el.textContent = `Deal ${window.Progress.getUnlockedLevel(diff)}`;
+        if (el) el.textContent = 'Open';
       });
 
       // Continue game check
@@ -193,8 +193,7 @@
       document.querySelectorAll('.mode-card').forEach(card => {
         card.addEventListener('click', () => {
           currentDiff = card.dataset.diff;
-          const unlocked = window.Progress.getUnlockedLevel(currentDiff);
-          currentPage = Math.max(1, Math.ceil(unlocked / DEALS_PER_PAGE));
+          currentPage = 1;
           dealModalTitle.textContent = `${window.Utils.getDifficultyLabel(currentDiff)} — Deals`;
           renderDeals();
           window.Utils.openModal('deal-modal');

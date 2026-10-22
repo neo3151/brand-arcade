@@ -8,14 +8,16 @@
 const STORAGE_KEY = 'sudoku_progress_v1';
 
 const DIFFICULTIES = ['beginner', 'easy', 'medium', 'hard', 'master'];
+const ALL_LEVELS_OPEN = 1000;
+const SUPPLY_KEYS = ['hints'];
 
 function defaultProgress() {
   const difficulty = {};
   DIFFICULTIES.forEach(d => {
-    difficulty[d] = { unlocked: 1, completed: [], bestTimes: {} };
+    difficulty[d] = { unlocked: ALL_LEVELS_OPEN, completed: [], bestTimes: {} };
   });
   return {
-    hints: 3,          // Start with 3 free hints
+    hints: 15,         // Morning floor; Fair Play tops this up each local day
     difficulty,
     streak: { lastPlayed: null, count: 0 },
     stats: {
@@ -26,23 +28,43 @@ function defaultProgress() {
   };
 }
 
+function openAllDifficulties(parsed) {
+  const def = defaultProgress();
+  parsed.difficulty = parsed.difficulty || def.difficulty;
+  let changed = false;
+  DIFFICULTIES.forEach(d => {
+    parsed.difficulty[d] = parsed.difficulty[d] || def.difficulty[d];
+    if (parsed.difficulty[d].unlocked !== ALL_LEVELS_OPEN) {
+      parsed.difficulty[d].unlocked = ALL_LEVELS_OPEN;
+      changed = true;
+    }
+  });
+  return changed;
+}
+
+function applySupply(parsed, hadSave) {
+  const opened = openAllDifficulties(parsed);
+  let saveNeeded = !hadSave || opened;
+  if (typeof window !== 'undefined' && window.FairPlay) {
+    const result = window.FairPlay.refillKeys('sudoku', parsed, SUPPLY_KEYS);
+    if (Object.keys(result.topped).length) saveNeeded = true;
+  }
+  if (saveNeeded) save(parsed);
+  return parsed;
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultProgress();
+    if (!raw) return applySupply(defaultProgress(), false);
     const parsed = JSON.parse(raw);
-    // Merge with defaults to handle schema additions
     const def = defaultProgress();
-    parsed.difficulty = parsed.difficulty || def.difficulty;
-    DIFFICULTIES.forEach(d => {
-      parsed.difficulty[d] = parsed.difficulty[d] || def.difficulty[d];
-    });
     parsed.stats = parsed.stats || def.stats;
     parsed.streak = parsed.streak || def.streak;
     if (typeof parsed.hints !== 'number') parsed.hints = def.hints;
-    return parsed;
+    return applySupply(parsed, true);
   } catch (e) {
-    return defaultProgress();
+    return applySupply(defaultProgress(), false);
   }
 }
 
@@ -75,7 +97,7 @@ function useHint() {
 }
 
 function getUnlockedLevel(difficulty) {
-  return load().difficulty[difficulty]?.unlocked || 1;
+  return load().difficulty[difficulty]?.unlocked || ALL_LEVELS_OPEN;
 }
 
 function isLevelCompleted(difficulty, level) {
@@ -93,9 +115,11 @@ function completeLevel(difficulty, level, timeSeconds) {
     p.stats.totalPuzzlesSolved++;
   }
 
-  // Unlock next level
-  if (level >= d.unlocked) {
-    d.unlocked = level + 1;
+  // Every difficulty is open from the start. Completing a puzzle does not gate the next one.
+  d.unlocked = ALL_LEVELS_OPEN;
+
+  if (typeof window !== 'undefined' && window.FairPlay) {
+    window.FairPlay.milestoneKeys('sudoku', p.stats.totalPuzzlesSolved, p, SUPPLY_KEYS);
   }
 
   // Best time

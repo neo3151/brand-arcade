@@ -40,7 +40,7 @@
       <span style="font-size: 14px; line-height: 1;">🕹️</span>
       <span>Arcade Hub</span>
     </a>
-    <a href="store.html" class="hint-balance-pill" aria-label="View hint store">
+    <a href="store.html" class="hint-balance-pill" aria-label="View daily supply">
       <span>💡</span>
       <span class="hint-count-nav" id="nav-hint-count">0</span>
       <span>Hints</span>
@@ -80,7 +80,7 @@
       <button class="btn btn--secondary btn--full" id="play-btn" aria-haspopup="dialog">
         Play
       </button>
-      <a href="store.html" class="btn btn--buy-hints btn--full">💡 Get Hints</a>
+      <a href="store.html" class="btn btn--buy-hints btn--full">💡 Daily Supply</a>
     </div>
   </main>
 
@@ -173,6 +173,7 @@
   </div>
 
   <!-- Scripts -->
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/mobile-shell.js"></script>
@@ -330,8 +331,7 @@
         levelTitle.textContent =
           `${CATEGORY_META[selCat]?.icon} ${window.Utils.formatDifficulty(selDiff)} — Level`;
 
-        const unlocked = getUnlockedLevel(selCat, selDiff);
-        currentPage = Math.max(1, Math.min(20, Math.ceil(unlocked / LEVELS_PER_PAGE)));
+        currentPage = 1;
         renderLevelPage(selCat, selDiff);
       }
 

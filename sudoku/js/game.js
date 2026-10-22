@@ -561,7 +561,7 @@ function handleHintTap() {
 
   // Only charge when highlighting a real fill move (targetCell + value)
   if (getHints() <= 0) {
-    showToast('No hints left! <a href="store.html">Buy more →</a>', 3000, 'warning');
+    showToast('No hints left. The morning refill restores them. <a href="store.html">Daily Supply →</a>', 3000, 'warning');
     return;
   }
 

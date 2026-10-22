@@ -167,6 +167,7 @@
   <script src="js/utils.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/cards.js"></script>
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/deck-generator.js"></script>
   <script src="js/spider-engine.js"></script>
@@ -754,7 +755,7 @@
       hintBtn.addEventListener('click', () => {
         const inv = window.Progress.getInventory();
         if (inv.hints <= 0) {
-          window.Utils.showToast('Out of hints! Visit store to refill.', 'warning');
+          window.Utils.showToast('Out of hints! The morning refill restores these.', 'warning');
           return;
         }
 
@@ -807,7 +808,7 @@
       document.getElementById('pwr-lantern-btn').addEventListener('click', () => {
         const inv = window.Progress.getInventory();
         if (inv.lanterns <= 0) {
-          window.Utils.showToast('Out of Lanterns! Visit store to refill.', 'warning');
+          window.Utils.showToast('Out of Lanterns! The morning refill restores these.', 'warning');
           return;
         }
 
@@ -829,7 +830,7 @@
         clearSelection();
         const inv = window.Progress.getInventory();
         if (inv.magnets <= 0) {
-          window.Utils.showToast('Out of Spider Magnets! Visit store to refill.', 'warning');
+          window.Utils.showToast('Out of Spider Magnets! The morning refill restores these.', 'warning');
           return;
         }
 

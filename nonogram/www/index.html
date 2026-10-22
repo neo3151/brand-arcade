@@ -39,10 +39,9 @@
           <div class="brand-badge">
             <span>🎋</span> ZEN NONOGRAM
           </div>
-          <a href="store.html" class="store-link-btn" aria-label="Open Power-ups Store">
+          <a href="store.html" class="store-link-btn" aria-label="Open daily supply">
             <span>🪙</span>
             <span id="nav-coins">150</span>
-            <span>+</span>
           </a>
         </div>
 
@@ -91,7 +90,7 @@
             ▶ Play Puzzles
           </button>
           <a href="store.html" class="btn btn--secondary btn--full">
-            ✨ Power-up Store
+            ✨ Daily Supply
           </a>
         </div>
       </div>
@@ -119,7 +118,7 @@
             <div class="diff-name">Beginner</div>
             <div class="diff-grid-size">5x5 Grid • 1,000 Levels</div>
           </div>
-          <div class="diff-progress" id="prog-beginner">Lvl 1</div>
+          <div class="diff-progress" id="prog-beginner">Open</div>
         </div>
 
         <div class="diff-card" data-diff="easy">
@@ -127,7 +126,7 @@
             <div class="diff-name">Easy</div>
             <div class="diff-grid-size">10x10 Grid • 1,000 Levels</div>
           </div>
-          <div class="diff-progress" id="prog-easy">Lvl 1</div>
+          <div class="diff-progress" id="prog-easy">Open</div>
         </div>
 
         <div class="diff-card" data-diff="medium">
@@ -135,7 +134,7 @@
             <div class="diff-name">Medium</div>
             <div class="diff-grid-size">15x15 Grid • 1,000 Levels</div>
           </div>
-          <div class="diff-progress" id="prog-medium">Lvl 1</div>
+          <div class="diff-progress" id="prog-medium">Open</div>
         </div>
 
         <div class="diff-card" data-diff="hard">
@@ -143,7 +142,7 @@
             <div class="diff-name">Hard</div>
             <div class="diff-grid-size">20x20 Grid • 1,000 Levels</div>
           </div>
-          <div class="diff-progress" id="prog-hard">Lvl 1</div>
+          <div class="diff-progress" id="prog-hard">Open</div>
         </div>
 
         <div class="diff-card" data-diff="master">
@@ -151,7 +150,7 @@
             <div class="diff-name">Master</div>
             <div class="diff-grid-size">20x20 Expert • 1,000 Levels</div>
           </div>
-          <div class="diff-progress" id="prog-master">Lvl 1</div>
+          <div class="diff-progress" id="prog-master">Open</div>
         </div>
       </div>
 
@@ -178,6 +177,7 @@
   <!-- Scripts -->
   <script src="js/utils.js"></script>
   <script src="js/audio.js"></script>
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/mobile-shell.js"></script>
   <script>
@@ -193,7 +193,7 @@
       // Update difficulty progress labels
       ['beginner', 'easy', 'medium', 'hard', 'master'].forEach(d => {
         const el = document.getElementById(`prog-${d}`);
-        if (el) el.textContent = `Lvl ${window.Progress.getUnlockedLevel(d)}`;
+        if (el) el.textContent = 'Open';
       });
 
       // Continue game check
@@ -247,8 +247,7 @@
       document.querySelectorAll('.diff-card').forEach(card => {
         card.addEventListener('click', () => {
           currentDiff = card.dataset.diff;
-          const unlocked = window.Progress.getUnlockedLevel(currentDiff);
-          currentPage = Math.max(1, Math.ceil(unlocked / LEVELS_PER_PAGE));
+          currentPage = 1;
           showLevels();
         });
       });

@@ -670,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (Progress.getItemCount('decryptors') <= 0) {
-      Utils.showToast("No Signal Decryptors available! Visit the Dead Drop Armory.", 2500, 'warning');
+      Utils.showToast("No Signal Decryptors available! The morning refill restores these.", 2500, 'warning');
       return;
     }
 
@@ -696,7 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (State.isGameOver) return;
 
     if (Progress.getItemCount('filters') <= 0) {
-      Utils.showToast("No Frequency Filters available! Visit the Dead Drop Armory.", 2500, 'warning');
+      Utils.showToast("No Frequency Filters available! The morning refill restores these.", 2500, 'warning');
       return;
     }
 
@@ -737,7 +737,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (State.isGameOver) return;
 
     if (Progress.getItemCount('rewinds') <= 0) {
-      Utils.showToast("No Magnetic Tape Rewinds in cache! Requisition at Dead Drop Armory.", 2500, 'warning');
+      Utils.showToast("No Magnetic Tape Rewinds in cache! The morning refill restores these.", 2500, 'warning');
       return;
     }
 
@@ -767,7 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (Progress.getItemCount('probes') <= 0) {
-      Utils.showToast("No Logic Probes available! Requisition at Dead Drop Armory.", 2500, 'warning');
+      Utils.showToast("No Logic Probes available! The morning refill restores these.", 2500, 'warning');
       return;
     }
 

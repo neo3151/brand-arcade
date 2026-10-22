@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="description" content="Zen Nonogram Power-up & Hint Store — Purchase smart hints, line radars, and pixel bombs. 100% ad-free." />
-  <title>Power-up Store — Zen Nonogram</title>
+  <meta name="description" content="Zen Nonogram Daily Supply — hints, radars, and bombs refill every morning. Play-earned coins stay on your profile. 100% ad-free." />
+  <title>Daily Supply — Zen Nonogram</title>
   <link rel="stylesheet" href="css/main.css" />
   <link rel="stylesheet" href="css/store.css" />
   <link rel="stylesheet" href="css/mobile-simulator.css" />
@@ -39,7 +39,7 @@
           <button id="store-back-btn" class="btn btn--ghost btn--sm">
             ← Back
           </button>
-          <div class="store-title">Power-up Store</div>
+          <div class="store-title">Daily Supply</div>
           <div class="store-balance-badge">
             <span>🪙</span>
             <span id="store-coins-val">150</span>
@@ -50,9 +50,9 @@
         <main class="store-content">
           <!-- Hero Banner -->
           <div class="store-hero-banner">
-            <h1 class="store-hero-title">Master the Tapestry</h1>
-            <p class="store-hero-desc">
-              All games are 100% ad-free. Refill hints and tactical tools using coins earned from playing, or unlock master bundles!
+            <h1 class="store-hero-title">Morning Supply</h1>
+            <p class="store-hero-desc" id="fair-play-status">
+              Hints, radars, and bombs refill every local morning. Coins are earned by solving puzzles.
             </p>
           </div>
 
@@ -78,17 +78,9 @@
             </div>
           </div>
 
-          <!-- Power-up Bundles List -->
-          <div>
-            <div class="store-section-title">Available Bundles</div>
-            <div class="packs-grid" id="packs-container">
-              <!-- Populated by JS -->
-            </div>
-          </div>
-
           <footer style="margin-top:1.5rem;text-align:center;">
             <p class="store-legal" style="font-size:0.75rem;color:var(--slate-500);line-height:1.5;">
-              Demo store — no real charges. Coin prices are fine.
+              This game is 100% free and ad-free. All 1,000 levels in every difficulty are open. Coins you earn by playing stay on this device.
             </p>
           </footer>
         </main>
@@ -104,6 +96,7 @@
   <!-- Scripts -->
   <script src="js/utils.js"></script>
   <script src="js/audio.js"></script>
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/mobile-shell.js"></script>
   <script src="js/store.js"></script>
@@ -117,92 +110,15 @@
         document.getElementById('inv-bombs-val').textContent = inv.bombs;
       }
       refreshUI();
+      const status = document.getElementById('fair-play-status');
+      if (status && window.Store.summary) status.textContent = window.Store.summary();
 
-      // Back navigation
       document.getElementById('store-back-btn').addEventListener('click', () => {
         if (window.history.length > 1) {
           window.history.back();
         } else {
           window.location.href = 'index.html';
         }
-      });
-
-      // Render Store Packs
-      const container = document.getElementById('packs-container');
-      const packs = window.Store.getPacks();
-
-      packs.forEach(pack => {
-        const card = document.createElement('div');
-        card.className = `pack-card ${pack.popular ? 'popular' : ''}`;
-
-        if (pack.popular) {
-          const ribbon = document.createElement('div');
-          ribbon.className = 'popular-ribbon';
-          ribbon.textContent = 'BEST VALUE';
-          card.appendChild(ribbon);
-        }
-
-        const info = document.createElement('div');
-        info.className = 'pack-info';
-
-        const icon = document.createElement('div');
-        icon.className = 'pack-icon';
-        icon.textContent = pack.icon;
-
-        const details = document.createElement('div');
-        details.className = 'pack-details';
-
-        const name = document.createElement('div');
-        name.className = 'pack-name';
-        name.textContent = pack.name;
-
-        const contents = document.createElement('div');
-        contents.className = 'pack-contents';
-        contents.textContent = pack.contents;
-
-        details.appendChild(name);
-        details.appendChild(contents);
-        info.appendChild(icon);
-        info.appendChild(details);
-        card.appendChild(info);
-
-        const actions = document.createElement('div');
-        actions.style.display = 'flex';
-        actions.style.flexDirection = 'column';
-        actions.style.gap = '0.35rem';
-        actions.style.alignItems = 'flex-end';
-
-        // Coin purchase button (if available)
-        if (pack.costCoins) {
-          const coinBtn = document.createElement('button');
-          coinBtn.className = 'btn btn--gold pack-buy-btn';
-          coinBtn.textContent = `${pack.costCoins} 🪙`;
-          coinBtn.addEventListener('click', () => {
-            const res = window.Store.purchaseWithCoins(pack.id);
-            if (res.success) {
-              window.Utils.showToast(res.message, 'success');
-              refreshUI();
-            } else {
-              window.Utils.showToast(res.message, 'warning');
-            }
-          });
-          actions.appendChild(coinBtn);
-        }
-
-        // IAP Purchase button
-        const iapBtn = document.createElement('button');
-        iapBtn.className = 'btn btn--secondary btn--sm';
-        iapBtn.style.fontSize = '0.75rem';
-        iapBtn.textContent = pack.priceUSD;
-        iapBtn.addEventListener('click', () => {
-          const res = window.Store.purchaseWithIAP(pack.id);
-          window.Utils.showToast(res.message, 'success');
-          refreshUI();
-        });
-        actions.appendChild(iapBtn);
-
-        card.appendChild(actions);
-        container.appendChild(card);
       });
     });
   </script>

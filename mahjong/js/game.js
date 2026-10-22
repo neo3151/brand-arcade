@@ -402,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (State.isGameOver || State.activeTiles.length === 0) return;
 
     if (Progress.getItemCount('hints') <= 0) {
-      Utils.showToast("No Compass Hints available! Requisition at Pavilion Emporium.", 2500, 'warning');
+      Utils.showToast("No Compass Hints available! The morning refill restores these.", 2500, 'warning');
       return;
     }
 
@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (State.isGameOver || State.activeTiles.length === 0) return;
 
     if (Progress.getItemCount('shuffles') <= 0) {
-      Utils.showToast("No Dragon Shuffles available! Visit Pavilion Emporium.", 2500, 'warning');
+      Utils.showToast("No Dragon Shuffles available! The morning refill restores these.", 2500, 'warning');
       return;
     }
 
@@ -475,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (Progress.getItemCount('undos') <= 0) {
-      Utils.showToast("No Time Rewinds available! Visit Pavilion Emporium.", 2500, 'warning');
+      Utils.showToast("No Time Rewinds available! The morning refill restores these.", 2500, 'warning');
       return;
     }
 
@@ -501,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (State.isGameOver || State.activeTiles.length === 0) return;
 
     if (Progress.getItemCount('lotuses') <= 0) {
-      Utils.showToast("No Celestial Lotuses in cache! Visit Pavilion Emporium.", 2500, 'warning');
+      Utils.showToast("No Celestial Lotuses in cache! The morning refill restores these.", 2500, 'warning');
       return;
     }
 

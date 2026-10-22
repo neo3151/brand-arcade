@@ -7,6 +7,8 @@
   'use strict';
 
   const STORAGE_KEY = 'spider_solitaire_save_v1';
+  const ALL_LEVELS_OPEN = 1000;
+  const SUPPLY_KEYS = ['hints', 'lanterns', 'magnets'];
 
   const defaultState = {
     stats: {
@@ -16,14 +18,14 @@
     },
     inventory: {
       coins: 150,
-      hints: 5,
-      lanterns: 3,
-      magnets: 2
+      hints: 15,
+      lanterns: 15,
+      magnets: 15
     },
     unlocked: {
-      '1suit': 1,
-      '2suit': 1,
-      '4suit': 1
+      '1suit': ALL_LEVELS_OPEN,
+      '2suit': ALL_LEVELS_OPEN,
+      '4suit': ALL_LEVELS_OPEN
     },
     completed: {
       '1suit': {},
@@ -36,9 +38,9 @@
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return JSON.parse(JSON.stringify(defaultState));
+      if (!raw) return finishState(JSON.parse(JSON.stringify(defaultState)), false);
       const parsed = JSON.parse(raw);
-      return {
+      return finishState({
         stats: { ...defaultState.stats, ...(parsed.stats || {}) },
         inventory: { ...defaultState.inventory, ...(parsed.inventory || {}) },
         unlocked: { ...defaultState.unlocked, ...(parsed.unlocked || {}) },
@@ -48,11 +50,28 @@
           '4suit': (parsed.completed && parsed.completed['4suit']) || {}
         },
         activeGame: parsed.activeGame || null
-      };
+      }, true);
     } catch (e) {
       console.warn('Failed to parse spider solitaire state', e);
-      return JSON.parse(JSON.stringify(defaultState));
+      return finishState(JSON.parse(JSON.stringify(defaultState)), false);
     }
+  }
+
+  function finishState(state, hadSave) {
+    let opened = false;
+    Object.keys(defaultState.unlocked).forEach(function (key) {
+      if (state.unlocked[key] !== ALL_LEVELS_OPEN) {
+        state.unlocked[key] = ALL_LEVELS_OPEN;
+        opened = true;
+      }
+    });
+    let saveNeeded = !hadSave || opened;
+    if (window.FairPlay) {
+      const result = window.FairPlay.refillKeys('spidersolitaire', state.inventory, SUPPLY_KEYS);
+      if (Object.keys(result.topped).length) saveNeeded = true;
+    }
+    if (saveNeeded) saveState(state);
+    return state;
   }
 
   function saveState(state) {
@@ -86,7 +105,7 @@
 
     getUnlockedLevel(difficulty) {
       const state = loadState();
-      return state.unlocked[difficulty] || 1;
+      return state.unlocked[difficulty] || ALL_LEVELS_OPEN;
     },
 
     isLevelCompleted(difficulty, level) {
@@ -107,9 +126,9 @@
         // Award 30 coins for clear
         state.inventory.coins = (state.inventory.coins || 0) + 30;
 
-        // Unlock next deal
-        if (level >= (state.unlocked[difficulty] || 1)) {
-          state.unlocked[difficulty] = Math.min(1000, level + 1);
+        state.unlocked[difficulty] = ALL_LEVELS_OPEN;
+        if (window.FairPlay) {
+          window.FairPlay.milestoneKeys('spidersolitaire', state.stats.totalSolved, state.inventory, SUPPLY_KEYS);
         }
       }
 

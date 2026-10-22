@@ -10,22 +10,34 @@ window.Progress = (() => {
   const STATS_KEY = 'bv_stats';
   const INVENTORY_KEY = 'bv_armory';
   const ACTIVE_GAME_KEY = 'bv_active_game';
+  const SUPPLY_KEYS = ['decryptors', 'filters', 'rewinds', 'probes'];
+  const DEFAULT_INVENTORY = {
+    decryptors: 15,
+    filters: 15,
+    rewinds: 15,
+    probes: 15
+  };
 
   // ---------------------------------------------------------------------------
   // Equipment Inventory
   // ---------------------------------------------------------------------------
   function getInventory() {
+    let inv = { ...DEFAULT_INVENTORY };
+    let hadSave = false;
     try {
       const raw = localStorage.getItem(INVENTORY_KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        hadSave = true;
+        inv = { ...DEFAULT_INVENTORY, ...JSON.parse(raw) };
+      }
     } catch (e) {}
-    // Initial grant for new operatives
-    return {
-      decryptors: 3,
-      filters: 3,
-      rewinds: 2,
-      probes: 3
-    };
+    let saveNeeded = !hadSave;
+    if (window.FairPlay) {
+      const result = window.FairPlay.refillKeys('codebreaker', inv, SUPPLY_KEYS);
+      if (Object.keys(result.topped).length) saveNeeded = true;
+    }
+    if (saveNeeded) saveInventory(inv);
+    return inv;
   }
 
   function saveInventory(inv) {
@@ -95,6 +107,11 @@ window.Progress = (() => {
       stats.currentStreak++;
       if (stats.currentStreak > stats.bestStreak) {
         stats.bestStreak = stats.currentStreak;
+      }
+      const inv = getInventory();
+      if (window.FairPlay) {
+        const result = window.FairPlay.milestoneKeys('codebreaker', stats.missionsCleared, inv, SUPPLY_KEYS);
+        if (result.granted) saveInventory(inv);
       }
       if (['operative', 'officer', 'chief'].includes(difficulty)) {
         const prevBestTime = stats.bestTimes[difficulty];

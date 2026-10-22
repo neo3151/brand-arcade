@@ -150,6 +150,7 @@
   <!-- Scripts -->
   <script src="js/utils.js"></script>
   <script src="js/audio.js"></script>
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/block-engine.js"></script>
   <script src="js/mobile-shell.js"></script>
@@ -806,7 +807,7 @@
           return;
         }
         if (window.Progress.getPowerups().rotate <= 0) {
-          window.Utils.showToast('No Rotates left! Visit the Shop.', 'warning');
+          window.Utils.showToast('No Rotates left! The morning refill restores these.', 'warning');
           return;
         }
         if (!engine.rotatePiece(selectedSlotIndex)) {
@@ -825,7 +826,7 @@
 
       document.getElementById('powerup-hammer-btn').addEventListener('click', () => {
         if (window.Progress.getPowerups().hammer <= 0) {
-          window.Utils.showToast('No Hammers left! Visit the Shop.', 'warning');
+          window.Utils.showToast('No Hammers left! The morning refill restores these.', 'warning');
           return;
         }
         activeHammerMode = !activeHammerMode;
@@ -853,7 +854,7 @@
             window.Utils.showToast('New pieces dealt!', 'success');
           }
         } else {
-          window.Utils.showToast('No Rerolls left! Visit the Shop.', 'warning');
+          window.Utils.showToast('No Rerolls left! The morning refill restores these.', 'warning');
         }
       });
 

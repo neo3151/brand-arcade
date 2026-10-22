@@ -7,6 +7,8 @@
   'use strict';
 
   const STORAGE_KEY = 'zen_nonogram_save_v1';
+  const ALL_LEVELS_OPEN = 1000;
+  const SUPPLY_KEYS = ['hints', 'radars', 'bombs'];
 
   const defaultState = {
     stats: {
@@ -16,16 +18,16 @@
     },
     inventory: {
       coins: 150,
-      hints: 5,
-      radars: 3,
-      bombs: 2
+      hints: 15,
+      radars: 15,
+      bombs: 15
     },
     unlocked: {
-      beginner: 1,
-      easy: 1,
-      medium: 1,
-      hard: 1,
-      master: 1
+      beginner: ALL_LEVELS_OPEN,
+      easy: ALL_LEVELS_OPEN,
+      medium: ALL_LEVELS_OPEN,
+      hard: ALL_LEVELS_OPEN,
+      master: ALL_LEVELS_OPEN
     },
     completed: {
       beginner: {},
@@ -40,9 +42,9 @@
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return JSON.parse(JSON.stringify(defaultState));
+      if (!raw) return finishState(JSON.parse(JSON.stringify(defaultState)), false);
       const parsed = JSON.parse(raw);
-      return {
+      return finishState({
         stats: { ...defaultState.stats, ...(parsed.stats || {}) },
         inventory: { ...defaultState.inventory, ...(parsed.inventory || {}) },
         unlocked: { ...defaultState.unlocked, ...(parsed.unlocked || {}) },
@@ -54,11 +56,28 @@
           master: (parsed.completed && parsed.completed.master) || {}
         },
         activeGame: parsed.activeGame || null
-      };
+      }, true);
     } catch (e) {
       console.warn('Failed to parse state from localStorage', e);
-      return JSON.parse(JSON.stringify(defaultState));
+      return finishState(JSON.parse(JSON.stringify(defaultState)), false);
     }
+  }
+
+  function finishState(state, hadSave) {
+    let opened = false;
+    Object.keys(defaultState.unlocked).forEach(function (key) {
+      if (state.unlocked[key] !== ALL_LEVELS_OPEN) {
+        state.unlocked[key] = ALL_LEVELS_OPEN;
+        opened = true;
+      }
+    });
+    let saveNeeded = !hadSave || opened;
+    if (window.FairPlay) {
+      const result = window.FairPlay.refillKeys('nonogram', state.inventory, SUPPLY_KEYS);
+      if (Object.keys(result.topped).length) saveNeeded = true;
+    }
+    if (saveNeeded) saveState(state);
+    return state;
   }
 
   function saveState(state) {
@@ -92,7 +111,7 @@
 
     getUnlockedLevel(difficulty) {
       const state = loadState();
-      return state.unlocked[difficulty] || 1;
+      return state.unlocked[difficulty] || ALL_LEVELS_OPEN;
     },
 
     isLevelCompleted(difficulty, level) {
@@ -118,9 +137,9 @@
         // Award 25 coins for clear
         state.inventory.coins = (state.inventory.coins || 0) + 25;
 
-        // Unlock next level
-        if (level >= (state.unlocked[difficulty] || 1)) {
-          state.unlocked[difficulty] = Math.min(1000, level + 1);
+        state.unlocked[difficulty] = ALL_LEVELS_OPEN;
+        if (window.FairPlay) {
+          window.FairPlay.milestoneKeys('nonogram', state.stats.totalSolved, state.inventory, SUPPLY_KEYS);
         }
       }
 

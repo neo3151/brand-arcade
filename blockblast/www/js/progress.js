@@ -18,10 +18,11 @@
   };
 
   const DEFAULT_POWERUPS = {
-    hammer: 2,
-    rotate: 2,
-    reroll: 2
+    hammer: 15,
+    rotate: 15,
+    reroll: 15
   };
+  const SUPPLY_KEYS = ['hammer', 'rotate', 'reroll'];
 
   const DEFAULT_STATS = {
     gamesPlayed: 0,
@@ -115,12 +116,24 @@
 
     // Powerups Inventory
     getPowerups() {
+      let inv = { ...DEFAULT_POWERUPS };
+      let hadSave = false;
       try {
         const raw = localStorage.getItem(STORAGE_KEYS.POWERUPS);
-        return raw ? { ...DEFAULT_POWERUPS, ...JSON.parse(raw) } : { ...DEFAULT_POWERUPS };
-      } catch (_) {
-        return { ...DEFAULT_POWERUPS };
+        if (raw) {
+          hadSave = true;
+          inv = { ...DEFAULT_POWERUPS, ...JSON.parse(raw) };
+        }
+      } catch (_) {}
+      let saveNeeded = !hadSave;
+      if (window.FairPlay) {
+        const result = window.FairPlay.refillKeys('blockblast', inv, SUPPLY_KEYS);
+        if (Object.keys(result.topped).length) saveNeeded = true;
       }
+      if (saveNeeded) {
+        localStorage.setItem(STORAGE_KEYS.POWERUPS, JSON.stringify(inv));
+      }
+      return inv;
     },
 
     usePowerup(type) {
@@ -153,6 +166,13 @@
     recordGameEnd(finalScore, linesCleared, maxCombo) {
       const stats = this.getStats();
       stats.gamesPlayed++;
+      const powerups = this.getPowerups();
+      if (window.FairPlay) {
+        const result = window.FairPlay.milestoneKeys('blockblast', stats.gamesPlayed, powerups, SUPPLY_KEYS);
+        if (result.granted) {
+          localStorage.setItem(STORAGE_KEYS.POWERUPS, JSON.stringify(powerups));
+        }
+      }
       stats.totalLinesCleared += linesCleared;
       stats.highestCombo = Math.max(stats.highestCombo, maxCombo);
       stats.allTimeScore += finalScore;
