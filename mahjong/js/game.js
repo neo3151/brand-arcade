@@ -106,8 +106,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const layoutParam = params.get('layout') || 'turtle';
     const continueGame = params.get('continue') === '1';
 
+    const paidLayouts = ['pagoda', 'bridge', 'lotus', 'gate', 'compass', 'wave', 'lantern', 'garden', 'crown', 'river'];
+    if (paidLayouts.indexOf(layoutParam) !== -1) {
+      const allowed = window.ArcadeContent && window.ArcadeContent.allowsLayout(layoutParam);
+      if (!allowed) {
+        State.lockedPack = true;
+        if (window.ArcadeContent) window.ArcadeContent.showLock('layouts');
+        else {
+          const note = document.createElement('p');
+          note.id = 'content-lock-fallback';
+          note.textContent = 'This pack is part of Benchmark Arcade.';
+          document.body.appendChild(note);
+        }
+        return;
+      }
+    }
+
     State.layoutId = layoutParam;
-    State.layoutDef = MahjongLayouts.DEFINITIONS[layoutParam] || MahjongLayouts.DEFINITIONS.turtle;
+    State.layoutDef = MahjongLayouts.DEFINITIONS[layoutParam];
+    if (!State.layoutDef) {
+      if (paidLayouts.indexOf(layoutParam) !== -1) return;
+      State.layoutId = 'turtle';
+      State.layoutDef = MahjongLayouts.DEFINITIONS.turtle;
+    }
 
     if (UI.layoutLabel) {
       UI.layoutLabel.textContent = State.layoutDef.title;

@@ -14,7 +14,9 @@
     '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
-    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>' +
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-content.css">' +
+    '<script src="' + prefix + 'assets/arcade-content.js"><\/script>'
   );
 })();
 </script>
@@ -110,6 +112,7 @@
             ✨ Daily Supply
           </a>
         </div>
+<div id="content-pack-shelf" data-content-shelf data-game="nonogram"></div>
       </div>
 
     </div><!-- /.device-screen -->
@@ -216,7 +219,16 @@
       // Continue game check
       const activeGame = window.Progress.getActiveGame();
       const continueBtn = document.getElementById('continue-btn');
-      if (activeGame && activeGame.difficulty && activeGame.level) {
+      if (activeGame && activeGame.pack && activeGame.level) {
+        const packName = window.PicturePacks && window.PicturePacks[activeGame.pack]
+          ? window.PicturePacks[activeGame.pack].name
+          : activeGame.pack;
+        continueBtn.style.display = 'block';
+        continueBtn.textContent = `▶ Continue (${packName} ${activeGame.level})`;
+        continueBtn.addEventListener('click', () => {
+          window.location.href = `game.html?pack=${activeGame.pack}&level=${activeGame.level}&continue=1`;
+        });
+      } else if (activeGame && activeGame.difficulty && activeGame.level) {
         continueBtn.style.display = 'block';
         continueBtn.textContent = `▶ Continue (${activeGame.difficulty.toUpperCase()} Lvl ${activeGame.level})`;
         continueBtn.addEventListener('click', () => {
@@ -325,5 +337,6 @@
     });
   </script>
   <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+  <script src="js/picture-packs.js"></script>
 </body>
 </html>

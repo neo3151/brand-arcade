@@ -14,7 +14,9 @@
     '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
-    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>' +
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-content.css">' +
+    '<script src="' + prefix + 'assets/arcade-content.js"><\/script>'
   );
 })();
 </script>
@@ -210,14 +212,42 @@
   <script src="js/hint-engine.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const { difficulty, level, continue: isContinue } = window.Utils.getQueryParams();
+      const raw = new URLSearchParams(window.location.search);
+      let packId = raw.get('pack') || '';
+      let difficulty;
+      let level;
+      let isContinue;
+      let levelData;
 
-      // UI elements
-      document.getElementById('header-diff-tag').textContent = difficulty.toUpperCase();
-      document.getElementById('header-level-num').textContent = `Lvl ${level}`;
-
-      // Load Level Data
-      const levelData = window.LevelGenerator.getLevel(difficulty, level);
+      if (packId === 'holiday' || packId === 'animals') {
+        level = parseInt(raw.get('level') || '1', 10);
+        isContinue = raw.get('continue') === '1';
+        const puzzle = window.PicturePacks && window.PicturePacks.get(packId, level);
+        const allowed = puzzle && window.ArcadeContent && window.ArcadeContent.allowsPicture(packId, level);
+        if (!allowed) {
+          if (window.ArcadeContent) window.ArcadeContent.showLock(packId);
+          else {
+            const note = document.createElement('p');
+            note.id = 'content-lock-fallback';
+            note.textContent = 'This pack is part of Benchmark Arcade.';
+            document.body.appendChild(note);
+          }
+          return;
+        }
+        levelData = puzzle;
+        difficulty = packId;
+        document.getElementById('header-diff-tag').textContent = window.PicturePacks[packId].name;
+        document.getElementById('header-level-num').textContent = puzzle.name;
+      } else {
+        packId = '';
+        const query = window.Utils.getQueryParams();
+        difficulty = query.difficulty;
+        level = query.level;
+        isContinue = query.continue;
+        document.getElementById('header-diff-tag').textContent = difficulty.toUpperCase();
+        document.getElementById('header-level-num').textContent = `Lvl ${level}`;
+        levelData = window.LevelGenerator.getLevel(difficulty, level);
+      }
       const engine = new window.NonogramEngine(levelData);
 
       // Active tool: 'fill' (1) or 'cross' (2)
@@ -247,6 +277,7 @@
         window.Progress.saveActiveGame({
           difficulty,
           level,
+          pack: packId || undefined,
           grid: engine.grid.map(row => [...row]),
           lives: engine.lives,
           elapsed: elapsedSeconds,
@@ -257,7 +288,7 @@
       // Check if continuing an active game
       if (isContinue) {
         const activeGame = window.Progress.getActiveGame();
-        if (activeGame && activeGame.difficulty === difficulty && activeGame.level === level) {
+        if (activeGame && activeGame.level === level && (packId ? activeGame.pack === packId : !activeGame.pack && activeGame.difficulty === difficulty)) {
           if (Array.isArray(activeGame.grid)) {
             engine.grid = activeGame.grid.map(row => [...row]);
           }
@@ -746,6 +777,13 @@
 
       // Next level button
       document.getElementById('next-level-btn').addEventListener('click', () => {
+        if (packId) {
+          const nextLvl = level + 1;
+          const open = window.PicturePacks && window.PicturePacks.get(packId, nextLvl) &&
+            window.ArcadeContent && window.ArcadeContent.allowsPicture(packId, nextLvl);
+          window.location.href = open ? `game.html?pack=${packId}&level=${nextLvl}` : 'index.html';
+          return;
+        }
         const nextLvl = Math.min(1000, level + 1);
         window.location.href = `game.html?difficulty=${difficulty}&level=${nextLvl}`;
       });
@@ -778,7 +816,9 @@
 
       document.getElementById('restart-btn').addEventListener('click', () => {
         window.Progress.clearActiveGame();
-        window.location.href = `game.html?difficulty=${difficulty}&level=${level}`;
+        window.location.href = packId
+          ? `game.html?pack=${packId}&level=${level}`
+          : `game.html?difficulty=${difficulty}&level=${level}`;
       });
 
       document.getElementById('gameover-menu-btn').addEventListener('click', () => {
@@ -793,5 +833,6 @@
     });
   </script>
   <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+  <script src="js/picture-packs.js"></script>
 </body>
 </html>

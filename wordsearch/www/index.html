@@ -14,7 +14,9 @@
     '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
-    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>' +
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-content.css">' +
+    '<script src="' + prefix + 'assets/arcade-content.js"><\/script>'
   );
 })();
 </script>
@@ -99,6 +101,7 @@
       </button>
       <a href="store.html" class="btn btn--buy-hints btn--full">💡 Daily Supply</a>
     </div>
+<div id="content-pack-shelf" data-content-shelf data-game="wordsearch"></div>
   </main>
 
   <!-- Footer -->
@@ -195,7 +198,7 @@
   <script src="js/utils.js"></script>
   <script src="js/mobile-shell.js"></script>
   <script>
-    const CATEGORY_META = {
+    const FREE_CATEGORY_META = {
       animals:    { label: 'Animals',         icon: '🐾' },
       sports:     { label: 'Sports',          icon: '⚽' },
       food:       { label: 'Food & Cooking',  icon: '🍕' },
@@ -211,7 +214,16 @@
       jobs:       { label: 'Jobs & Careers',  icon: '💼' },
       technology: { label: 'Technology',      icon: '💻' },
       colors:     { label: 'Colors & Shapes', icon: '🎨' },
+      brand:      { label: 'Arcade Words',    icon: '🕹️' },
     };
+    const PAID_CATEGORY_META = {
+      mythology: { label: 'Mythology',         icon: '⚡' },
+      cooking:   { label: 'Cooking',           icon: '🍳' },
+      parks:     { label: 'US National Parks', icon: '🏞️' },
+      ocean:     { label: 'Ocean Life',        icon: '🌊' },
+      kids:      { label: "Kids' Words",       icon: '🎈' },
+    };
+    const CATEGORY_META = Object.assign({}, FREE_CATEGORY_META, PAID_CATEGORY_META);
 
     document.addEventListener('DOMContentLoaded', () => {
       const { getStats, getUnlockedLevel, isLevelCompleted, getActiveGame } = window.Progress;
@@ -263,15 +275,19 @@
       const LEVELS_PER_PAGE = 50;
       const MAX_LEVELS = 1000;
 
-      // Build category buttons
-      Object.entries(CATEGORY_META).forEach(([slug, { label, icon }]) => {
+      // Build category buttons. Paid lists join the grid only after the pack is owned.
+      function addCategoryButton(slug, label, icon) {
         const btn = document.createElement('button');
         btn.className = 'cat-btn';
         btn.dataset.category = slug;
         btn.innerHTML = `<span class="cat-btn__icon">${icon}</span><span class="cat-btn__name">${label}</span>`;
         btn.addEventListener('click', () => { selCat = slug; showDiffPicker(); });
         catGrid.appendChild(btn);
-      });
+      }
+      Object.entries(FREE_CATEGORY_META).forEach(([slug, meta]) => addCategoryButton(slug, meta.label, meta.icon));
+      if (window.ArcadeContent && window.ArcadeContent.ownsPack('explorer')) {
+        Object.entries(PAID_CATEGORY_META).forEach(([slug, meta]) => addCategoryButton(slug, meta.label, meta.icon));
+      }
 
       playBtn.addEventListener('click', () => {
         modal.classList.add('modal--visible');

@@ -45,6 +45,22 @@
     drawMode = parseInt(urlParams.get('mode') || '1', 10);
     isContinuing = urlParams.get('continue') === '1';
 
+    const curated = window.CuratedDeals && window.CuratedDeals.contains(dealNumber);
+    if (curated) {
+      drawMode = 1;
+      const allowed = window.ArcadeContent && window.ArcadeContent.allowsDeal(dealNumber);
+      if (!allowed) {
+        if (window.ArcadeContent) window.ArcadeContent.showLock('curated');
+        else {
+          const note = document.createElement('p');
+          note.id = 'content-lock-fallback';
+          note.textContent = 'This pack is part of Benchmark Arcade.';
+          document.body.appendChild(note);
+        }
+        return;
+      }
+    }
+
     if (isContinuing) {
       resumeSavedGame();
     } else {
@@ -817,6 +833,14 @@
     if (btnNextDeal) {
       btnNextDeal.addEventListener('click', () => {
         if (victoryAnimId) cancelAnimationFrame(victoryAnimId);
+        if (window.CuratedDeals && window.CuratedDeals.contains(dealNumber)) {
+          const nextDeal = window.CuratedDeals.next(dealNumber);
+          const nextAllowed = nextDeal && window.ArcadeContent && window.ArcadeContent.allowsDeal(nextDeal);
+          window.location.href = nextAllowed
+            ? `game.html?deal=${nextDeal}&mode=1`
+            : 'index.html';
+          return;
+        }
         window.location.href = `game.html?deal=${dealNumber + 1}&mode=${drawMode}`;
       });
     }

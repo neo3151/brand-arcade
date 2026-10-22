@@ -14,7 +14,9 @@
     '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
     '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
-    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>' +
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-content.css">' +
+    '<script src="' + prefix + 'assets/arcade-content.js"><\/script>'
   );
 })();
 </script>
@@ -96,6 +98,7 @@
           </div>
 
           <div id="paid-cosmetic-shelf"></div>
+<div id="content-pack-shelf" data-content-shelf data-game="nonogram"></div>
 <footer style="margin-top:1.5rem;text-align:center;">
             <p class="store-legal" style="font-size:0.75rem;color:var(--slate-500);line-height:1.5;">
               This game is 100% free and ad-free. All 1,000 levels in every difficulty are open. Coins you earn by playing stay on this device.
@@ -141,5 +144,6 @@
     });
   </script>
   <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+  <script src="js/picture-packs.js"></script>
 </body>
 </html>

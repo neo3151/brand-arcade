@@ -58,7 +58,7 @@ These are the public SDK keys from RevenueCat → Project → API keys. They are
 
 Entitlements are cached in `localStorage['arcade_entitlements']`. Passport progress stays in IndexedDB `BrandArcadePassportDB` and `localStorage['arcade_passport_state']`. Resetting or exporting the Passport does not read or delete the entitlement cache. The hub “reset coin credits” button does not clear it either.
 
-`sync-hub.js` copies `assets/` (including `arcade-store.js`, `arcade-cosmetics.js`, `arcade-cosmetics.css`, the config, the boot script, and `assets/vendor/arcade-purchases.js`) into `www/`, then copies each game’s `www/` into `www/<game>/www/`. After changing the plugin version, rebuild the bridge bundle:
+`sync-hub.js` copies `assets/` (including `arcade-store.js`, `arcade-cosmetics.js`, `arcade-cosmetics.css`, `arcade-content.js`, `arcade-content.css`, the config, the boot script, and `assets/vendor/arcade-purchases.js`) into `www/`, then copies each game’s `www/` into `www/<game>/www/`. After changing the plugin version, rebuild the bridge bundle:
 
 ```bash
 npm run bundle:store
@@ -78,6 +78,26 @@ npm run cap:sync
 `cap sync` copies `www/` and runs `pod install` on macOS. If sync is not convenient, from `ios/App` run `pod install --repo-update`, then in Xcode use Product → Clean Build Folder and build again. `Podfile.lock` should show `RevenueCat` 5.98.0 and `PurchasesHybridCommon` 19.15.0.
 
 The Fair Play branch (`cursor/fair-play-economy-19bc`) does not reference RevenueCat in `package.json` or `ios/App/Podfile`.
+
+## Content packs
+
+These are additional **non-consumables** on the same hub app. They add puzzles beside the free ones. Deals 1–1,000, the original word lists, Turtle / Dragon / Fortress, the 5,000 nonogram levels, and the three clearances stay free and unlocked. Nothing in this table adds hints, scores, or easier rules. Enter the **store price** in App Store Connect and Play Console. The hub shows that localized `priceString` plus Buy. The website shows **Unavailable**.
+
+Each picker shows the pack with a lock, the localized price (or Unavailable), and one or two sample items that can be played before buying. A direct link to a locked item stops on a lock screen instead of opening a free board under another name. `Arcade Words` in Word Search is a free gift and is not part of World Explorer.
+
+Mindful Puzzler (`mindful_pack_puzzler`) unlocks Holiday Pictures, Animal Pictures, Jade Layouts, and World Explorer. It does not unlock Curated Deals or the Heist. Owning one of those four packs does not unlock the others.
+
+| Product | Product ID | Entitlement | Store price | What the player gets |
+| --- | --- | --- | --- | --- |
+| World Explorer | `com.gamingempire.benchmarkarcade.wordsearch.pack.explorer` | `wordsearch_pack_explorer` | $1.99 | Mythology, Cooking, US National Parks, Ocean Life, Kids' Words |
+| Jade Layouts | `com.gamingempire.benchmarkarcade.mahjong.pack.layouts` | `mahjong_pack_layouts` | $1.99 | 10 solvable 144-tile layouts |
+| Holiday Pictures | `com.gamingempire.benchmarkarcade.nonogram.pack.holiday` | `nonogram_pack_holiday` | $2.99 | 25 uniquely solvable holiday pictures |
+| Animal Pictures | `com.gamingempire.benchmarkarcade.nonogram.pack.animals` | `nonogram_pack_animals` | $2.99 | 25 uniquely solvable animal pictures |
+| Curated Deals | `com.gamingempire.benchmarkarcade.solitaire.pack.curated` | `solitaire_pack_curated` | $1.99 | 100 verified draw-1 deals outside 1–1,000 |
+| Heist Campaign | `com.gamingempire.benchmarkarcade.codebreaker.pack.heist` | `codebreaker_pack_heist` | $1.99 | 15 hand-written missions with story text |
+| Mindful Puzzler | `com.gamingempire.benchmarkarcade.mindful.pack.puzzler` | `mindful_pack_puzzler` | $4.99 | Both picture packs, Jade Layouts, and World Explorer |
+
+Samples that stay playable while locked: Word Search beginner level 1 of Mythology and Cooking, Mahjong Pagoda and Moon Bridge, nonogram picture 1 and 2 of each pack, the first two curated deals, and Heist missions 1 and 2.
 
 ## App Store Connect
 
@@ -100,10 +120,10 @@ The Fair Play branch (`cursor/fair-play-economy-19bc`) does not reference Revenu
 
 1. Create or open a project and add two apps: iOS (bundle ID `com.gamingempire.benchmarkarcade`) and Android (same application ID).
 2. Copy each app’s **public** SDK key into `assets/arcade-store-config.js`.
-3. Create the entitlements in both tables: `arcade_patron`, `arcade_crt_vectrex`, `arcade_crt_c64`, `arcade_crt_tron`, and every cosmetic entitlement (`blockblast_skin_marble`, `blockblast_skin_walnut`, `blockblast_skin_stainedglass`, `solitaire_pack_atelier`, `spidersolitaire_pack_atelier`, `cardroom_pack`, `spades_pack_salon`, `mahjong_pack_tiles`, `minesweeper_pack_sectors`, `codebreaker_pack_terminals`, `sudoku_pack_ink`, `nonogram_pack_mosaic`, `wordsearch_pack_atlas`).
-4. Import or attach the store products and attach each product to its matching entitlement. One product, one entitlement. Card Room attaches only to `cardroom_pack`. The hub treats that entitlement as the Solitaire atelier, the Spider atelier, and the Spades salon. You do not need to attach those three entitlements to the Card Room product.
+3. Create the entitlements in both tables: `arcade_patron`, `arcade_crt_vectrex`, `arcade_crt_c64`, `arcade_crt_tron`, every cosmetic entitlement (`blockblast_skin_marble`, `blockblast_skin_walnut`, `blockblast_skin_stainedglass`, `solitaire_pack_atelier`, `spidersolitaire_pack_atelier`, `cardroom_pack`, `spades_pack_salon`, `mahjong_pack_tiles`, `minesweeper_pack_sectors`, `codebreaker_pack_terminals`, `sudoku_pack_ink`, `nonogram_pack_mosaic`, `wordsearch_pack_atlas`), and every content entitlement (`wordsearch_pack_explorer`, `mahjong_pack_layouts`, `nonogram_pack_holiday`, `nonogram_pack_animals`, `solitaire_pack_curated`, `codebreaker_pack_heist`, `mindful_pack_puzzler`).
+4. Import or attach the store products and attach each product to its matching entitlement. One product, one entitlement. Card Room attaches only to `cardroom_pack`. The hub treats that entitlement as the Solitaire atelier, the Spider atelier, and the Spades salon. Mindful Puzzler attaches only to `mindful_pack_puzzler`. The hub treats that entitlement as Holiday Pictures, Animal Pictures, Jade Layouts, and World Explorer. You do not need to attach those included entitlements to the bundle products.
 5. Create an offering with identifier `arcade` and mark it **current**.
-6. Add one package per product and point it at that store product. Custom identifiers that match the catalog ids are fine: `patron`, `crt_vectrex`, `crt_c64`, `crt_tron`, `marble`, `walnut`, `stainedglass`, `solitaire-atelier`, `spider-atelier`, `cardroom`, `spades-salon`, `mahjong-tiles`, `minesweeper-sectors`, `codebreaker-terminals`, `sudoku-ink`, `nonogram-mosaic`, `wordsearch-atlas`.
+6. Add one package per product and point it at that store product. Custom identifiers that match the catalog ids are fine: `patron`, `crt_vectrex`, `crt_c64`, `crt_tron`, `marble`, `walnut`, `stainedglass`, `solitaire-atelier`, `spider-atelier`, `cardroom`, `spades-salon`, `mahjong-tiles`, `minesweeper-sectors`, `codebreaker-terminals`, `sudoku-ink`, `nonogram-mosaic`, `wordsearch-atlas`, `explorer`, `layouts`, `holiday`, `animals`, `curated`, `heist`, `puzzler`.
 7. The hub reads `offerings.current.availablePackages[].product.priceString` and purchases with `Purchases.purchasePackage({ aPackage })`. Restore uses `Purchases.restorePurchases()`.
 
 Anonymous App User IDs are fine. The hub passes `appUserID: null` and does not link purchases to a Passport account.
@@ -119,3 +139,4 @@ Anonymous App User IDs are fine. The hub passes `appUserID: null` and does not l
 - Reset the Passport (0/8) and export it to the clipboard. `arcade_entitlements` is still present, and the clipboard JSON is only the Passport state.
 - Confirm no product grants XP, a trophy, or a gameplay consumable.
 - Open a hub game store. Locked cabinet skins show the localized price and Buy, or Unavailable on the web. Preview with `game.html?theme=` and confirm the look is not saved. Coin themes still spend coins. Card Room unlocks the solitaire, spider, and spades salon looks. A standalone game opened at `/index.html` does not load the store.
+- Open a hub picker for Word Search, Mahjong, Nonogram, Solitaire, or Codebreaker. The content pack shows a lock and Unavailable on the web, plus one or two samples. Buying Mindful Puzzler in the sandbox unlocks both picture packs, the layouts, and World Explorer, and leaves Curated Deals and the Heist locked. A locked direct link does not start a free board.
