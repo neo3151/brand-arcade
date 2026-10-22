@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="description" content="Buy hint packs for Sudoku. Get expert move suggestions with plain-English explanations. No subscription required." />
-  <title>Hint Store — Sudoku</title>
+  <meta name="description" content="Daily Supply for Sudoku. Hints refill every morning. Every difficulty and level is open. No purchases." />
+  <title>Daily Supply — Sudoku</title>
   <link rel="stylesheet" href="css/main.css" />
   <link rel="stylesheet" href="css/store.css" />
   <link rel="stylesheet" href="css/mobile-simulator.css" />
@@ -42,7 +42,7 @@
       ← Back
     </button>
     <div class="store-header__title">
-      <span>💡</span> Hint Store
+      <span>💡</span> Daily Supply
     </div>
     <div class="store-balance" aria-label="Current hint balance">
       <span aria-hidden="true">💡</span>
@@ -56,9 +56,9 @@
        ====================================================== -->
   <section class="store-hero">
     <span class="store-hero__emoji" aria-hidden="true">🧠</span>
-    <h1 class="store-hero__title">Get Expert Hints</h1>
+    <h1 class="store-hero__title">Morning Hint Supply</h1>
     <p class="store-hero__subtitle">
-      Each hint reveals the best available move and teaches you <em>why</em> it works — no guessing required.
+      Hints refill every morning. Each one reveals the best available move and teaches you <em>why</em> it works.
     </p>
   </section>
 
@@ -88,7 +88,7 @@
   <!-- ======================================================
        Hint Pack Cards (rendered by store.js)
        ====================================================== -->
-  <div id="pack-grid" role="list" aria-label="Hint packs available for purchase">
+  <div id="pack-grid" role="list" aria-label="Daily hint supply">
     <!-- Populated by store.js -->
   </div>
 
@@ -96,9 +96,8 @@
        Footer
        ====================================================== -->
   <footer class="store-footer">
-    <button id="restore-btn" aria-label="Restore previous purchases">Restore Purchases</button>
     <p class="store-legal">
-      Hints are stored locally on this device. Demo store simulation mode — no real charges are made.
+      This game is 100% free and ad-free. Hints are stored on this device and topped up every local morning.
     </p>
   </footer>
 
@@ -113,6 +112,7 @@
   <!-- ======================================================
        Scripts
        ====================================================== -->
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/store.js"></script>

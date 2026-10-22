@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>BLACK VAULT — Dead Drop Armory</title>
+  <title>BLACK VAULT — Daily Supply</title>
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/store.css">
   <link rel="stylesheet" href="css/mobile-simulator.css">
@@ -39,8 +39,8 @@
       <div style="display: flex; align-items: center; gap: var(--space-3);">
         <a href="index.html" class="btn btn--secondary" style="padding: 0.35rem 0.65rem; font-size: 0.85rem;" title="Return to Dossier Base">← BASE</a>
         <div>
-          <h1 style="font-family: var(--font-typewriter); font-size: 1.25rem; font-weight: 800; color: #fff; letter-spacing: 0.05em;">DEAD DROP ARMORY</h1>
-          <div style="font-family: var(--font-typewriter); font-size: 0.75rem; color: var(--color-amber-crt);">TACTICAL FIELD SUPPLY DEPOT</div>
+          <h1 style="font-family: var(--font-typewriter); font-size: 1.25rem; font-weight: 800; color: #fff; letter-spacing: 0.05em;">DAILY SUPPLY</h1>
+          <div style="font-family: var(--font-typewriter); font-size: 0.75rem; color: var(--color-amber-crt);">MORNING REFILL</div>
         </div>
       </div>
 
@@ -67,10 +67,9 @@
 
     <!-- Armory Hero -->
     <section class="armory-hero">
-      <h2 class="armory-hero__title">CLASSIFIED REQUISITIONS</h2>
-      <p class="armory-hero__desc">
-        Zero advertisements. Pure tactical codebreaking. Equip your field agent with electronic countermeasures 
-        and teleprinter telemetry tools to break stubborn bunker ciphers. All equipment synchronizes directly to your field kit.
+      <h2 class="armory-hero__title">MORNING REFILL</h2>
+      <p class="armory-hero__desc" id="fair-play-status">
+        Decryptors, filters, rewinds, and probes refill every local morning. Operative, Officer, and Chief clearances are open from the start.
       </p>
     </section>
 
@@ -90,8 +89,7 @@
           High-frequency carrier desynchronizer. Instantly discovers and permanently locks the exact color and slot of 1 concealed vault compartment.
         </p>
         <div class="supply-meta">
-          <span class="supply-price">$0.99</span>
-          <button type="button" class="btn btn--primary" data-pack="decryptor">REQUISITION</button>
+          <span class="supply-qty">Restocked each morning</span>
         </div>
       </div>
 
@@ -108,8 +106,7 @@
           Telemetry spectrum analyzer. Identifies carrier noise and completely eliminates 2 unused pin frequencies from your palette.
         </p>
         <div class="supply-meta">
-          <span class="supply-price">$0.99</span>
-          <button type="button" class="btn btn--primary" data-pack="filter">REQUISITION</button>
+          <span class="supply-qty">Restocked each morning</span>
         </div>
       </div>
 
@@ -126,8 +123,7 @@
           Spools back the analog wiretap tape, granting +2 bonus guess attempts to prevent transmission compromise when running low on lines.
         </p>
         <div class="supply-meta">
-          <span class="supply-price">$0.99</span>
-          <button type="button" class="btn btn--primary" data-pack="rewind">REQUISITION</button>
+          <span class="supply-qty">Restocked each morning</span>
         </div>
       </div>
 
@@ -144,30 +140,7 @@
           Automated cryptographic cross-examiner. Scans your pending row against every prior clue to catch logical contradictions before transmitting.
         </p>
         <div class="supply-meta">
-          <span class="supply-price">$0.99</span>
-          <button type="button" class="btn btn--primary" data-pack="probe">REQUISITION</button>
-        </div>
-      </div>
-
-      <!-- Master Spy Dead Drop Crate (Featured) -->
-      <div class="supply-card supply-card--featured" style="grid-column: 1 / -1;">
-        <div class="supply-badge">MOST POPULAR // FIELD CRATE</div>
-        <div class="supply-header">
-          <span class="supply-icon">🧰</span>
-          <div>
-            <h3 class="supply-title">Master Spy Dead Drop Crate</h3>
-            <span class="supply-qty" style="color: #f59e0b;">+5 Decryptors, +5 Filters, +4 Tape Rewinds, +5 Logic Probes</span>
-          </div>
-        </div>
-        <p class="supply-desc">
-          The ultimate field countermeasure crate. Fully restocks your classified inventory with a balanced suite of high-tier tactical gear for all clearance levels.
-        </p>
-        <div class="supply-meta">
-          <div>
-            <span style="text-decoration: line-through; color: var(--color-text-dark); margin-right: 8px; font-size: 0.95rem;">$4.96</span>
-            <span class="supply-price" style="color: var(--color-amber-crt);">$2.99</span>
-          </div>
-          <button type="button" class="btn btn--primary" data-pack="master" style="background: linear-gradient(180deg, #d97706 0%, #b45309 100%);">REQUISITION CRATE</button>
+          <span class="supply-qty">Restocked each morning</span>
         </div>
       </div>
 
@@ -175,7 +148,7 @@
 
     <!-- Legal & Information -->
     <footer class="store-legal">
-      Demo store — no real charges. Items stored on this device. // 100% AD-FREE CLIENT
+      This game is 100% free and ad-free. Supplies are stored on this device.
     </footer>
 
   </div>
@@ -190,6 +163,7 @@
   </div><!-- /.device-shell -->
 
   <script src="js/utils.js"></script>
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/store.js"></script>
   <script src="js/mobile-shell.js"></script>

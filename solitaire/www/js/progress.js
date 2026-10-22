@@ -6,11 +6,13 @@
 const SOLITAIRE_PROGRESS_KEY = 'curious_solitaire_progress_v1';
 const SOLITAIRE_ACTIVE_GAME_KEY = 'curious_solitaire_active_game_v1';
 
+const SOLITAIRE_SUPPLY_KEYS = ['hints', 'peeks', 'shuffles'];
+
 function defaultSolitaireProgress() {
   return {
-    hints: 3,        // Looking Glass hints
-    peeks: 2,        // Cheshire Peeks
-    shuffles: 2,     // Wonderland Reshuffles
+    hints: 15,       // Looking Glass hints — morning floor
+    peeks: 15,       // Cheshire Peeks
+    shuffles: 15,    // Wonderland Reshuffles
     draw1: {
       completed: [],
       bestTimes: {},
@@ -32,10 +34,20 @@ function defaultSolitaireProgress() {
   };
 }
 
+function applySolitaireSupply(p, hadSave) {
+  let saveNeeded = !hadSave;
+  if (typeof window !== 'undefined' && window.FairPlay) {
+    const result = window.FairPlay.refillKeys('solitaire', p, SOLITAIRE_SUPPLY_KEYS);
+    if (Object.keys(result.topped).length) saveNeeded = true;
+  }
+  if (saveNeeded) saveProgress(p);
+  return p;
+}
+
 function loadProgress() {
   try {
     const raw = localStorage.getItem(SOLITAIRE_PROGRESS_KEY);
-    if (!raw) return defaultSolitaireProgress();
+    if (!raw) return applySolitaireSupply(defaultSolitaireProgress(), false);
     const p = JSON.parse(raw);
     const def = defaultSolitaireProgress();
 
@@ -55,9 +67,9 @@ function loadProgress() {
     if (typeof p.peeks !== 'number') p.peeks = def.peeks;
     if (typeof p.shuffles !== 'number') p.shuffles = def.shuffles;
 
-    return p;
+    return applySolitaireSupply(p, true);
   } catch (e) {
-    return defaultSolitaireProgress();
+    return applySolitaireSupply(defaultSolitaireProgress(), false);
   }
 }
 
@@ -138,6 +150,10 @@ function recordGameWon(drawMode, dealNumber, timeSeconds, moves) {
   }
 
   p.stats.gamesWon = (p.stats.gamesWon || 0) + 1;
+
+  if (typeof window !== 'undefined' && window.FairPlay) {
+    window.FairPlay.milestoneKeys('solitaire', p.stats.gamesWon, p, SOLITAIRE_SUPPLY_KEYS);
+  }
 
   // Streak logic
   const today = getLocalDateString();

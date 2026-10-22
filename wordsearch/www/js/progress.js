@@ -5,6 +5,8 @@
 
 const STORAGE_KEY = 'wordsearch_progress_v1';
 const DIFFICULTIES = ['beginner','easy','medium','hard','master'];
+const ALL_LEVELS_OPEN = 1000;
+const SUPPLY_KEYS = ['hints'];
 const CATEGORIES = [
   'animals','sports','food','science','geography','movies','music',
   'history','space','nature','holidays','health','jobs','technology','colors'
@@ -15,35 +17,56 @@ function defaultProgress() {
   CATEGORIES.forEach(cat => {
     levels[cat] = {};
     DIFFICULTIES.forEach(diff => {
-      levels[cat][diff] = { unlocked: 1, completed: [], bestTimes: {} };
+      levels[cat][diff] = { unlocked: ALL_LEVELS_OPEN, completed: [], bestTimes: {} };
     });
   });
   return {
-    hints: 3,
+    hints: 15,
     levels,
     streak: { lastPlayed: null, count: 0 },
     stats: { totalSolved: 0, totalHintsUsed: 0 },
   };
 }
 
+function openAllLevels(p) {
+  const def = defaultProgress();
+  p.levels = p.levels || def.levels;
+  let changed = false;
+  CATEGORIES.forEach(cat => {
+    p.levels[cat] = p.levels[cat] || def.levels[cat];
+    DIFFICULTIES.forEach(diff => {
+      p.levels[cat][diff] = p.levels[cat][diff] || def.levels[cat][diff];
+      if (p.levels[cat][diff].unlocked !== ALL_LEVELS_OPEN) {
+        p.levels[cat][diff].unlocked = ALL_LEVELS_OPEN;
+        changed = true;
+      }
+    });
+  });
+  return changed;
+}
+
+function applySupply(p, hadSave) {
+  const opened = openAllLevels(p);
+  let saveNeeded = !hadSave || opened;
+  if (typeof window !== 'undefined' && window.FairPlay) {
+    const result = window.FairPlay.refillKeys('wordsearch', p, SUPPLY_KEYS);
+    if (Object.keys(result.topped).length) saveNeeded = true;
+  }
+  if (saveNeeded) save(p);
+  return p;
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultProgress();
+    if (!raw) return applySupply(defaultProgress(), false);
     const p = JSON.parse(raw);
     const def = defaultProgress();
-    p.levels = p.levels || def.levels;
-    CATEGORIES.forEach(cat => {
-      p.levels[cat] = p.levels[cat] || def.levels[cat];
-      DIFFICULTIES.forEach(diff => {
-        p.levels[cat][diff] = p.levels[cat][diff] || def.levels[cat][diff];
-      });
-    });
     p.stats  = p.stats  || def.stats;
     p.streak = p.streak || def.streak;
     if (typeof p.hints !== 'number') p.hints = def.hints;
-    return p;
-  } catch { return defaultProgress(); }
+    return applySupply(p, true);
+  } catch { return applySupply(defaultProgress(), false); }
 }
 
 function save(p) {
@@ -66,7 +89,7 @@ function useHint() {
 }
 
 function getUnlockedLevel(category, difficulty) {
-  return load().levels[category]?.[difficulty]?.unlocked || 1;
+  return load().levels[category]?.[difficulty]?.unlocked || ALL_LEVELS_OPEN;
 }
 
 function isLevelCompleted(category, difficulty, level) {
@@ -85,7 +108,10 @@ function completeLevel(category, difficulty, level, timeSeconds) {
   const d = p.levels[category]?.[difficulty];
   if (!d) return;
   if (!d.completed.includes(level)) { d.completed.push(level); p.stats.totalSolved++; }
-  if (level >= d.unlocked) d.unlocked = level + 1;
+  d.unlocked = ALL_LEVELS_OPEN;
+  if (typeof window !== 'undefined' && window.FairPlay) {
+    window.FairPlay.milestoneKeys('wordsearch', p.stats.totalSolved, p, SUPPLY_KEYS);
+  }
   if (!d.bestTimes[level] || timeSeconds < d.bestTimes[level]) d.bestTimes[level] = timeSeconds;
 
   const today = getLocalDateString();

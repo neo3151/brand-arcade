@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="description" content="UAC Tactical Armory for Inferno Sweeper. Acquire Bio-Shields, Sonar Scans, AI Clairvoyance, and Orbital Strikes. 100% Ad-Free." />
-  <title>Tactical Armory — INFERNO SWEEPER</title>
+  <meta name="description" content="Daily Supply for Inferno Sweeper. Shields, scans, orbs, and strikes refill every morning. 100% ad-free." />
+  <title>Daily Supply — INFERNO SWEEPER</title>
   <link rel="stylesheet" href="css/main.css" />
   <link rel="stylesheet" href="css/store.css" />
   <link rel="stylesheet" href="css/mobile-simulator.css" />
@@ -42,7 +42,7 @@
       ← Return
     </button>
     <div style="font-family:var(--font-display);font-size:1.3rem;letter-spacing:0.05em;color:#fff;">
-      🛡️ UAC Tactical Armory
+      🛡️ Daily Supply
     </div>
     <div class="armory-inventory-strip" aria-label="Current Tactical Munitions">
       <div class="armory-inv-item"><span>🛡️</span> <span class="armory-inv-val" id="inv-shields">0</span></div>
@@ -56,16 +56,16 @@
        Hero Banner
        ====================================================== -->
   <section class="armory-hero">
-    <h1 class="armory-hero__title">Tactical Munitions & Upgrades</h1>
+    <h1 class="armory-hero__title">Morning Refill</h1>
     <p class="armory-hero__desc">
-      Face Hell's Gate fully fortified. Deploy Bio-Shields to absorb fatal detonations, ping terrain with Hell-Scan radar, or request orbital air support. Zero advertisements, zero subscriptions.
+      Shields, scans, orbs, and strikes are topped up every local morning. Recruit, Marine, and Nightmare are open from the start.
     </p>
   </section>
 
   <!-- ======================================================
        Store Items Grid
        ====================================================== -->
-  <main class="armory-grid" id="armory-grid" role="list" aria-label="Tactical supplies available for requisition">
+  <main class="armory-grid" id="armory-grid" role="list" aria-label="Daily tactical supply">
     <!-- Populated by store.js -->
   </main>
 
@@ -73,11 +73,8 @@
        Footer
        ====================================================== -->
   <footer class="store-legal">
-    <button class="btn btn--sm" id="restore-btn" style="margin-bottom:var(--space-3);">
-      Restore Terminal Records
-    </button>
     <p>
-      Terminal simulation mode: no actual financial transactions occur. All munitions are stored directly on this device.
+      This game is 100% free and ad-free. Supplies are stored on this device and topped up every local morning.
     </p>
   </footer>
   </div><!-- /.device-screen -->
@@ -89,6 +86,7 @@
 </div><!-- /.device-shell -->
 
   <!-- Scripts -->
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/store.js"></script>

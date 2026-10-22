@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="description" content="Buy hint packs for Word Search. Reveal hidden words on the grid with zero advertisements. No subscription required." />
-  <title>Hint Store — Word Search</title>
+  <meta name="description" content="Daily Supply for Word Search. Hints refill every morning. Every category and level is open. No purchases." />
+  <title>Daily Supply — Word Search</title>
   <link rel="stylesheet" href="css/main.css" />
   <link rel="stylesheet" href="css/store.css" />
   <link rel="stylesheet" href="css/mobile-simulator.css" />
@@ -42,7 +42,7 @@
       ← Back
     </button>
     <div class="store-header__title">
-      <span>💡</span> Word Search Store
+      <span>💡</span> Daily Supply
     </div>
     <div class="store-balance" aria-label="Current hint balance">
       <span aria-hidden="true">💡</span>
@@ -56,9 +56,9 @@
        ====================================================== -->
   <section class="store-hero">
     <span class="store-hero__emoji" aria-hidden="true">🔍</span>
-    <h1 class="store-hero__title">Find Any Hidden Word</h1>
+    <h1 class="store-hero__title">Morning Hint Supply</h1>
     <p class="store-hero__subtitle">
-      Stuck on a tricky puzzle? Hints illuminate hidden words directly on your grid so you can spot and trace them.
+      Hints refill every morning and illuminate a hidden word on your grid so you can spot and trace it.
     </p>
   </section>
 
@@ -80,7 +80,7 @@
       </li>
       <li>
         <span class="step-num" aria-hidden="true">3</span>
-        <span>Solve faster, maintain your streak, and unlock new levels.</span>
+        <span>Solve faster and keep your streak. Every level is already open.</span>
       </li>
     </ul>
   </div>
@@ -88,7 +88,7 @@
   <!-- ======================================================
        Hint Pack Cards (rendered by store.js)
        ====================================================== -->
-  <div id="pack-grid" role="list" aria-label="Hint packs available for purchase">
+  <div id="pack-grid" role="list" aria-label="Daily hint supply">
     <!-- Populated by store.js -->
   </div>
 
@@ -96,9 +96,8 @@
        Footer
        ====================================================== -->
   <footer class="store-footer">
-    <button id="restore-btn" aria-label="Restore previous purchases">Restore Purchases</button>
     <p class="store-legal">
-      Hints are stored locally on this device. Demo store simulation mode — no real charges are made.
+      This game is 100% free and ad-free. Hints are stored on this device and topped up every local morning.
     </p>
   </footer>
 
@@ -113,6 +112,7 @@
   <!-- ======================================================
        Scripts
        ====================================================== -->
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/store.js"></script>

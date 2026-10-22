@@ -38,7 +38,7 @@
        Top nav: hint balance
        ====================================================== -->
   <nav class="menu-nav">
-    <a href="store.html" class="hint-balance-pill" id="hint-balance-nav" aria-label="View hint store">
+    <a href="store.html" class="hint-balance-pill" id="hint-balance-nav" aria-label="View daily supply">
       <span class="hint-icon">💡</span>
       <span class="hint-count-nav" id="nav-hint-count">0</span>
       <span>Hints</span>
@@ -102,7 +102,7 @@
         Play
       </button>
       <a href="store.html" class="btn btn--buy-hints btn--full" id="store-btn">
-        💡 Get Hints
+        💡 Daily Supply
       </a>
     </div>
 
@@ -221,6 +221,7 @@
   <!-- ======================================================
        Scripts
        ====================================================== -->
+  <script src="../../assets/fair-play.js" onerror="this.onerror=null;this.src='../assets/fair-play.js';"></script>
   <script src="js/progress.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/mobile-shell.js"></script>
@@ -357,9 +358,7 @@
       function showLevelPicker(difficulty) {
         document.getElementById('diff-modal-title').style.display = 'none';
         modal.querySelector('.modal__subtitle').style.display = 'none';
-        const unlocked = getUnlockedLevel(difficulty);
-        // Default to page containing player's current unlocked level
-        currentPage = Math.max(1, Math.min(20, Math.ceil(unlocked / LEVELS_PER_PAGE)));
+        currentPage = 1;
         const diffLabel = window.Utils.formatDifficulty(difficulty);
         pickerTitle.textContent = `${diffLabel} — Choose Level`;
 

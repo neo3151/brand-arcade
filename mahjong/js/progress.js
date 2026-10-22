@@ -10,22 +10,34 @@ window.Progress = (() => {
   const STATS_KEY = 'mj_stats';
   const INVENTORY_KEY = 'mj_armory';
   const ACTIVE_GAME_KEY = 'mj_active_game';
+  const SUPPLY_KEYS = ['hints', 'shuffles', 'undos', 'lotuses'];
+  const DEFAULT_INVENTORY = {
+    hints: 15,
+    shuffles: 15,
+    undos: 15,
+    lotuses: 15
+  };
 
   // ---------------------------------------------------------------------------
   // Equipment Inventory
   // ---------------------------------------------------------------------------
   function getInventory() {
+    let inv = { ...DEFAULT_INVENTORY };
+    let hadSave = false;
     try {
       const raw = localStorage.getItem(INVENTORY_KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        hadSave = true;
+        inv = { ...DEFAULT_INVENTORY, ...JSON.parse(raw) };
+      }
     } catch (e) {}
-    // Initial grant for new visitors to the sanctuary
-    return {
-      hints: 3,
-      shuffles: 3,
-      undos: 3,
-      lotuses: 2
-    };
+    let saveNeeded = !hadSave;
+    if (window.FairPlay) {
+      const result = window.FairPlay.refillKeys('mahjong', inv, SUPPLY_KEYS);
+      if (Object.keys(result.topped).length) saveNeeded = true;
+    }
+    if (saveNeeded) saveInventory(inv);
+    return inv;
   }
 
   function saveInventory(inv) {
@@ -90,6 +102,11 @@ window.Progress = (() => {
       stats.currentStreak++;
       if (stats.currentStreak > stats.bestStreak) {
         stats.bestStreak = stats.currentStreak;
+      }
+      const inv = getInventory();
+      if (window.FairPlay) {
+        const result = window.FairPlay.milestoneKeys('mahjong', stats.gamesCleared, inv, SUPPLY_KEYS);
+        if (result.granted) saveInventory(inv);
       }
       if (stats.bestTimes && ['turtle', 'dragon', 'fortress'].includes(layoutId)) {
         const prevBest = stats.bestTimes[layoutId];

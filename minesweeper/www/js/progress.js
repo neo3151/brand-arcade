@@ -10,22 +10,34 @@ window.Progress = (() => {
   const STATS_KEY = 'inferno_stats';
   const INVENTORY_KEY = 'inferno_armory';
   const ACTIVE_GAME_KEY = 'inferno_active_game';
+  const SUPPLY_KEYS = ['shields', 'scans', 'orbs', 'strikes'];
+  const DEFAULT_INVENTORY = {
+    shields: 15,
+    scans: 15,
+    orbs: 15,
+    strikes: 15
+  };
 
   // ---------------------------------------------------------------------------
   // Armory Inventory
   // ---------------------------------------------------------------------------
   function getInventory() {
+    let inv = { ...DEFAULT_INVENTORY };
+    let hadSave = false;
     try {
       const raw = localStorage.getItem(INVENTORY_KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        hadSave = true;
+        inv = { ...DEFAULT_INVENTORY, ...JSON.parse(raw) };
+      }
     } catch (e) {}
-    // Initial grant for new recruits
-    return {
-      shields: 3,
-      scans: 3,
-      orbs: 3,
-      strikes: 2
-    };
+    let saveNeeded = !hadSave;
+    if (window.FairPlay) {
+      const result = window.FairPlay.refillKeys('minesweeper', inv, SUPPLY_KEYS);
+      if (Object.keys(result.topped).length) saveNeeded = true;
+    }
+    if (saveNeeded) saveInventory(inv);
+    return inv;
   }
 
   function saveInventory(inv) {
@@ -90,6 +102,11 @@ window.Progress = (() => {
       stats.currentStreak++;
       if (stats.currentStreak > stats.bestStreak) {
         stats.bestStreak = stats.currentStreak;
+      }
+      const inv = getInventory();
+      if (window.FairPlay) {
+        const result = window.FairPlay.milestoneKeys('minesweeper', stats.gamesWon, inv, SUPPLY_KEYS);
+        if (result.granted) saveInventory(inv);
       }
       if (['recruit', 'marine', 'nightmare'].includes(difficulty)) {
         const prevBest = stats.bestTimes[difficulty];

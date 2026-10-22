@@ -430,7 +430,7 @@ function handleHint() {
   const { showToast } = window.Utils;
 
   if (getHints() <= 0) {
-    showToast('No hints left! <a href="store.html">Get more hints →</a>', 3000, 'warning');
+    showToast('No hints left. The morning refill restores them. <a href="store.html">Daily Supply →</a>', 3000, 'warning');
     return;
   }
 

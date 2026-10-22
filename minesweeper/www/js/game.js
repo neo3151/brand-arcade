@@ -572,7 +572,7 @@ window.Game = (() => {
 
     if (window.Progress.getItemCount('shields') <= 0) {
       window.Utils.sound.play('click');
-      window.Utils.showToast('No Bio-Shields in inventory! <a href="store.html">Open Armory →</a>', 3000, 'warning');
+      window.Utils.showToast('No Bio-Shields in inventory! <a href="store.html">Daily Supply →</a>', 3000, 'warning');
       return;
     }
 
@@ -593,7 +593,7 @@ window.Game = (() => {
 
     if (window.Progress.getItemCount('scans') <= 0) {
       window.Utils.sound.play('click');
-      window.Utils.showToast('No Sonar Sweeps left! <a href="store.html">Open Armory →</a>', 3000, 'warning');
+      window.Utils.showToast('No Sonar Sweeps left! <a href="store.html">Daily Supply →</a>', 3000, 'warning');
       return;
     }
 
@@ -656,7 +656,7 @@ window.Game = (() => {
 
     if (window.Progress.getItemCount('orbs') <= 0) {
       window.Utils.sound.play('click');
-      window.Utils.showToast('No Clairvoyance Orbs left! <a href="store.html">Open Armory →</a>', 3000, 'warning');
+      window.Utils.showToast('No Clairvoyance Orbs left! <a href="store.html">Daily Supply →</a>', 3000, 'warning');
       return;
     }
 
@@ -692,7 +692,7 @@ window.Game = (() => {
 
     if (window.Progress.getItemCount('strikes') <= 0) {
       window.Utils.sound.play('click');
-      window.Utils.showToast('No Orbital Strikes left! <a href="store.html">Open Armory →</a>', 3000, 'warning');
+      window.Utils.showToast('No Orbital Strikes left! <a href="store.html">Daily Supply →</a>', 3000, 'warning');
       return;
     }
 
