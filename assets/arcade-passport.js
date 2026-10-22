@@ -131,15 +131,81 @@
         '--arcade-bezel': '#0b0f19',
         '--arcade-border': '#2e1065'
       }
+    },
+    {
+      id: 'vectrex',
+      name: 'Vectrex Vector',
+      desc: '1982 vector-monitor lines on a dark tube',
+      entitlement: 'arcade_crt_vectrex',
+      productId: 'com.gamingempire.benchmarkarcade.arcade.crt.vectrex',
+      colors: ['#d6fff6', '#7CFFCB', '#e8ffff', '#04120e'],
+      vars: {
+        '--neon-cyan': '#7CFFCB',
+        '--neon-pink': '#d6fff6',
+        '--neon-yellow': '#e8ffff',
+        '--neon-green': '#9dffd8',
+        '--arcade-bezel': '#04120e',
+        '--arcade-border': '#1a3d32'
+      }
+    },
+    {
+      id: 'c64',
+      name: 'Commodore 64',
+      desc: '1982 breadbin blue with light-blue text',
+      entitlement: 'arcade_crt_c64',
+      productId: 'com.gamingempire.benchmarkarcade.arcade.crt.c64',
+      colors: ['#6c5eb5', '#352879', '#aeadff', '#70a4b2'],
+      vars: {
+        '--neon-cyan': '#70a4b2',
+        '--neon-pink': '#aeadff',
+        '--neon-yellow': '#b8b8ff',
+        '--neon-green': '#6c5eb5',
+        '--arcade-bezel': '#352879',
+        '--arcade-border': '#6c5eb5'
+      }
+    },
+    {
+      id: 'tron',
+      name: 'Tron Grid',
+      desc: 'Black glass and cyan grid light',
+      entitlement: 'arcade_crt_tron',
+      productId: 'com.gamingempire.benchmarkarcade.arcade.crt.tron',
+      colors: ['#00fff6', '#0a0e17', '#7df9ff', '#ff2bd6'],
+      vars: {
+        '--neon-cyan': '#00fff6',
+        '--neon-pink': '#ff2bd6',
+        '--neon-yellow': '#7df9ff',
+        '--neon-green': '#14f1d5',
+        '--arcade-bezel': '#05070d',
+        '--arcade-border': '#00fff6'
+      }
     }
   ];
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function hasArcadeStore() {
+    return !!(window.ArcadeStore && typeof window.ArcadeStore.owns === 'function');
+  }
 
   class ArcadePassportManager {
     constructor() {
       this.db = null;
       this.state = this.loadLocalBackup();
+      this._previewId = null;
+      this._rendering = false;
+      this._storeNote = '';
       this.initDB();
-      this.applyTheme(this.state.theme || 'default', false);
+      this.reconcileTheme();
+      if (hasArcadeStore() && typeof window.ArcadeStore.on === 'function') {
+        window.ArcadeStore.on('change', () => this.onStoreChange());
+      }
     }
 
     // Default passport state schema
@@ -226,9 +292,11 @@
           if (req.result) {
             // Merge states, prioritizing higher XP
             if (req.result.xp > this.state.xp) {
-              this.state = req.result;
+              const next = Object.assign({}, req.result);
+              delete next.id;
+              this.state = next;
               this.saveLocalBackup();
-              this.applyTheme(this.state.theme || 'default', false);
+              this.reconcileTheme();
             }
           }
         };
@@ -332,26 +400,103 @@
       this.saveLocalBackup();
     }
 
-    // Switch CRT theme across document
-    applyTheme(themeId, notify = true) {
-      const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
-      this.state.theme = theme.id;
-      this.saveLocalBackup();
+    canUseTheme(theme) {
+      if (!theme) return false;
+      if (!theme.entitlement) return true;
+      return hasArcadeStore() && window.ArcadeStore.owns(theme.entitlement);
+    }
 
-      const root = document.documentElement;
+    // Paint phosphor colors. A Patron gold bezel is applied after the theme
+    // so the thank-you frame stays visible on every phosphor.
+    paintTheme(theme) {
+      const rootEl = document.documentElement;
       Object.entries(theme.vars).forEach(([key, val]) => {
-        root.style.setProperty(key, val);
+        rootEl.style.setProperty(key, val);
       });
-
-      // Update body theme attribute
       if (document.body) {
         document.body.setAttribute('data-crt-theme', theme.id);
       }
+      this.applyPatronBezel();
+    }
+
+    applyPatronBezel() {
+      const rootEl = document.documentElement;
+      const patron = hasArcadeStore() && window.ArcadeStore.owns('arcade_patron');
+      if (patron && window.ArcadeStore.PATRON_BEZEL) {
+        rootEl.style.setProperty('--arcade-bezel', window.ArcadeStore.PATRON_BEZEL);
+        rootEl.style.setProperty('--arcade-border', window.ArcadeStore.PATRON_BORDER);
+        rootEl.setAttribute('data-arcade-patron', '1');
+      } else {
+        rootEl.removeAttribute('data-arcade-patron');
+      }
+      const chip = document.getElementById('arcade-patron-chip');
+      if (chip) chip.hidden = !patron;
+    }
+
+    // Keep a saved premium theme when this page has no store (game webviews).
+    // On the hub, a theme the player does not own falls back to the free default.
+    reconcileTheme() {
+      const saved = THEMES.find(t => t.id === (this.state.theme || 'default'));
+      if (saved && saved.entitlement && !hasArcadeStore()) {
+        this.paintTheme(THEMES[0]);
+        return;
+      }
+      if (!saved || !this.canUseTheme(saved)) {
+        this.state.theme = 'default';
+        this.applyTheme('default', false);
+        return;
+      }
+      this.applyTheme(saved.id, false);
+    }
+
+    onStoreChange() {
+      this.reconcileTheme();
+      const modal = document.getElementById('modal-passport');
+      if (modal && modal.open && !this._rendering) this.renderModalContent();
+    }
+
+    previewTheme(themeId) {
+      const theme = THEMES.find(t => t.id === themeId);
+      if (!theme) return false;
+      this._previewId = theme.id;
+      this.paintTheme(theme);
+      return true;
+    }
+
+    restoreAppliedLook() {
+      this._previewId = null;
+      this.reconcileTheme();
+    }
+
+    // Switch CRT theme across document. Locked premium themes are refused.
+    applyTheme(themeId, notify = true) {
+      const theme = THEMES.find(t => t.id === themeId);
+      if (!theme || !this.canUseTheme(theme)) return false;
+      this._previewId = null;
+      this.state.theme = theme.id;
+      this.saveLocalBackup();
+      this.paintTheme(theme);
 
       if (notify) {
         this.unlockAchievement('theme_collector');
         this.playClickSound();
       }
+      return true;
+    }
+
+    storePriceLabel(productId) {
+      if (!hasArcadeStore() || typeof window.ArcadeStore.getPrice !== 'function') return 'Unavailable';
+      const price = window.ArcadeStore.getPrice(productId);
+      return price ? escapeHtml(price) : 'Unavailable';
+    }
+
+    storeResultMessage(result) {
+      if (result && result.ok) return 'Purchases restored.';
+      if (result && result.reason === 'cancelled') return 'Purchase cancelled.';
+      if (result && result.reason === 'unavailable') {
+        return 'This extra is unavailable here. The website and every game stay free.';
+      }
+      return 'That could not be completed.';
     }
 
     // Procedural 8-bit celebratory sound FX using Web Audio API
@@ -468,6 +613,7 @@
     renderModalContent() {
       const modal = document.getElementById('modal-passport');
       if (!modal) return;
+      this._rendering = true;
 
       const levelInfo = this.getPlayerLevel();
       const unlockedCount = this.getUnlockedCount();
@@ -512,6 +658,8 @@
               <span>PLAYED: <strong style="color: #ffffff;">${this.state.stats.totalSessions} SESSIONS</strong></span>
             </div>
           </div>
+
+          ${this.renderPatronRow()}
 
           <!-- Trophy Matrix (8 Badges) -->
           <div>
@@ -569,42 +717,16 @@
 
           <!-- CRT Phosphor Theme Selector -->
           <div style="border-top: 1px solid var(--arcade-border); padding-top: 14px;">
-            <div style="font-family: var(--font-arcade); font-size: 0.82rem; font-weight: 700; color: #ffffff; letter-spacing: 0.08em; margin-bottom: 10px;">
-              <span>UNLOCKABLE CRT PHOSPHOR THEMES:</span>
+            <div style="font-family: var(--font-arcade); font-size: 0.82rem; font-weight: 700; color: #ffffff; letter-spacing: 0.08em; margin-bottom: 6px;">
+              <span>CRT PHOSPHOR THEMES:</span>
             </div>
+            <p style="font-size: 0.75rem; color: #94a3b8; margin: 0 0 10px 0;">
+              Four phosphors are free. Vectrex Vector, Commodore 64, and Tron Grid are optional one-time cabinet extras. XP and trophies are never for sale.
+            </p>
+            ${this._previewId ? `<p style="font-size: 0.75rem; color: var(--neon-cyan); margin: 0 0 10px 0;">Previewing ${escapeHtml((THEMES.find(t => t.id === this._previewId) || {}).name || '')}. Close the passport to return to the equipped phosphor.</p>` : ''}
 
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px;">
-              ${THEMES.map(t => {
-                const active = (this.state.theme || 'default') === t.id;
-                return `
-                  <button type="button" class="btn-select-crt-theme" data-theme="${t.id}" style="
-                    background: ${active ? 'rgba(6, 182, 212, 0.15)' : '#090e1a'};
-                    border: 1.5px solid ${active ? 'var(--neon-cyan)' : '#1e293b'};
-                    border-radius: 6px;
-                    padding: 12px;
-                    text-align: left;
-                    cursor: pointer;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 6px;
-                    transition: all 0.2s ease;
-                    box-shadow: ${active ? '0 0 16px rgba(6, 182, 212, 0.25)' : 'none'};
-                  ">
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                      <span style="font-family: var(--font-arcade); font-size: 0.85rem; font-weight: 700; color: ${active ? '#ffffff' : '#94a3b8'};">
-                        ${t.name}
-                      </span>
-                      ${active ? '<span style="color: var(--neon-cyan); font-size: 0.72rem; font-weight: 700;">ACTIVE</span>' : ''}
-                    </div>
-                    <div style="display: flex; gap: 6px; margin: 2px 0;">
-                      ${t.colors.map(c => `<div style="width: 14px; height: 14px; border-radius: 3px; background: ${c}; border: 1px solid rgba(255,255,255,0.2);"></div>`).join('')}
-                    </div>
-                    <div style="font-size: 0.72rem; color: #64748b;">
-                      ${t.desc}
-                    </div>
-                  </button>
-                `;
-              }).join('')}
+              ${THEMES.map(t => this.renderThemeCard(t)).join('')}
             </div>
           </div>
 
@@ -619,6 +741,12 @@
             <button type="button" id="btn-reset-passport" class="btn-push-sub" style="flex: 1; justify-content: center; font-size: 0.82rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);" title="Reset all achievements back to 0/8">
               <span>🔄</span> RESET (0/8)
             </button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <button type="button" id="btn-restore-purchases-passport" class="btn-push-sub" style="width: 100%; justify-content: center; font-size: 0.82rem;">
+              ↺ RESTORE PURCHASES
+            </button>
+            <p id="arcade-store-note" style="font-size: 0.75rem; color: #94a3b8; margin: 0; min-height: 1em;">${escapeHtml(this._storeNote || '')}</p>
           </div>
         </div>
       `;
@@ -638,6 +766,31 @@
           this.renderModalContent();
         });
       });
+
+      modal.querySelectorAll('.btn-preview-crt').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.previewTheme(btn.getAttribute('data-theme'));
+          this.renderModalContent();
+        });
+      });
+
+      modal.querySelectorAll('.btn-buy-crt').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.buyProduct(btn.getAttribute('data-product'), btn.getAttribute('data-theme'));
+        });
+      });
+
+      const patronBuy = modal.querySelector('#btn-buy-patron');
+      if (patronBuy) {
+        patronBuy.addEventListener('click', () => {
+          this.buyProduct(patronBuy.getAttribute('data-product'), null);
+        });
+      }
+
+      const restorePassportBtn = modal.querySelector('#btn-restore-purchases-passport');
+      if (restorePassportBtn) {
+        restorePassportBtn.addEventListener('click', () => this.restorePurchases());
+      }
 
       // Bind backup button
       const exportBtn = modal.querySelector('#btn-export-passport');
@@ -674,9 +827,107 @@
           }
         });
       }
+      this._rendering = false;
+    }
+
+    renderPatronRow() {
+      const catalog = (hasArcadeStore() && window.ArcadeStore.CATALOG) || [];
+      const patron = catalog.find(item => item.kind === 'patron') || {
+        productId: 'com.gamingempire.benchmarkarcade.arcade.patron',
+        entitlementId: 'arcade_patron',
+        name: 'Arcade Patron'
+      };
+      const owned = hasArcadeStore() && window.ArcadeStore.owns(patron.entitlementId);
+      const rawPrice = hasArcadeStore() ? window.ArcadeStore.getPrice(patron.productId) : null;
+      if (owned) {
+        return `
+          <div style="background: linear-gradient(135deg, #3d2b08 0%, #090e1a 100%); border: 1.5px solid #e6b325; border-radius: 8px; padding: 14px; display: flex; gap: 12px; align-items: center;">
+            <div style="font-size: 1.8rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(230, 179, 37, 0.18); border: 1px solid #e6b325; border-radius: 6px;">🏅</div>
+            <div>
+              <div style="font-family: var(--font-arcade); font-size: 0.9rem; font-weight: 800; color: #e6b325;">ARCADE PATRON</div>
+              <div style="font-size: 0.75rem; color: #f8e7b0; line-height: 1.4; margin-top: 2px;">Thank you for keeping the marquee lit. This badge is a thank-you, not a trophy — 0 XP. Your cabinet bezel is gold.</div>
+            </div>
+          </div>
+        `;
+      }
+      return `
+        <div style="background: #090e1a; border: 1.5px solid #1e293b; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: var(--font-arcade); font-size: 0.9rem; font-weight: 800; color: #e6b325;">ARCADE PATRON</div>
+          <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.4;">A one-time thank-you. It adds this badge and a gold cabinet bezel. It grants 0 XP and does not unlock trophies.</div>
+          <button type="button" id="btn-buy-patron" class="btn-push-sub" data-product="${patron.productId}" ${rawPrice ? '' : 'disabled'} style="justify-content: center; font-size: 0.8rem;">
+            ${rawPrice ? 'BUY ' + escapeHtml(rawPrice) : 'Unavailable'}
+          </button>
+        </div>
+      `;
+    }
+
+    renderThemeCard(theme) {
+      const active = !this._previewId && (this.state.theme || 'default') === theme.id;
+      const previewing = this._previewId === theme.id;
+      const unlocked = this.canUseTheme(theme);
+      const rawPrice = theme.productId && hasArcadeStore() ? window.ArcadeStore.getPrice(theme.productId) : null;
+      const border = active || previewing ? 'var(--neon-cyan)' : '#1e293b';
+      const actions = unlocked
+        ? `<button type="button" class="btn-select-crt-theme btn-push-sub" data-theme="${theme.id}" style="justify-content: center; font-size: 0.75rem;">${active ? 'EQUIPPED' : 'USE THIS PHOSPHOR'}</button>`
+        : `<div style="display: flex; gap: 6px;">
+            <button type="button" class="btn-preview-crt btn-push-sub" data-theme="${theme.id}" style="flex: 1; justify-content: center; font-size: 0.75rem;">PREVIEW</button>
+            <button type="button" class="btn-buy-crt btn-push-sub" data-theme="${theme.id}" data-product="${theme.productId || ''}" ${rawPrice ? '' : 'disabled'} style="flex: 1; justify-content: center; font-size: 0.75rem;">${rawPrice ? 'BUY ' + escapeHtml(rawPrice) : 'Unavailable'}</button>
+          </div>`;
+      const badge = active
+        ? '<span style="color: var(--neon-cyan); font-size: 0.72rem; font-weight: 700;">ACTIVE</span>'
+        : (previewing
+          ? '<span style="color: var(--neon-yellow); font-size: 0.72rem; font-weight: 700;">PREVIEW</span>'
+          : (unlocked ? '<span style="color: #64748b; font-size: 0.72rem; font-weight: 700;">FREE</span>' : `<span style="color: #e6b325; font-size: 0.72rem; font-weight: 700;">${rawPrice ? escapeHtml(rawPrice) : 'Unavailable'}</span>`));
+      return `
+        <div style="background: ${active ? 'rgba(6, 182, 212, 0.15)' : '#090e1a'}; border: 1.5px solid ${border}; border-radius: 6px; padding: 12px; text-align: left; display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">
+            <span style="font-family: var(--font-arcade); font-size: 0.85rem; font-weight: 700; color: ${active ? '#ffffff' : '#94a3b8'};">${escapeHtml(theme.name)}</span>
+            ${badge}
+          </div>
+          <div style="display: flex; gap: 6px; margin: 2px 0;">
+            ${theme.colors.map(c => `<div style="width: 14px; height: 14px; border-radius: 3px; background: ${c}; border: 1px solid rgba(255,255,255,0.2);"></div>`).join('')}
+          </div>
+          <div style="font-size: 0.72rem; color: #64748b;">${escapeHtml(theme.desc)}</div>
+          ${actions}
+        </div>
+      `;
+    }
+
+    buyProduct(productId, themeId) {
+      if (!hasArcadeStore()) {
+        this._storeNote = this.storeResultMessage({ reason: 'unavailable' });
+        this.renderModalContent();
+        return;
+      }
+      window.ArcadeStore.purchase(productId).then(result => {
+        if (result && result.ok && themeId) this.applyTheme(themeId, true);
+        this._storeNote = result && result.ok ? '' : this.storeResultMessage(result);
+        this.applyPatronBezel();
+        this.renderModalContent();
+      }).catch(() => {
+        this._storeNote = this.storeResultMessage({ reason: 'failed' });
+        this.renderModalContent();
+      });
+    }
+
+    restorePurchases() {
+      if (!hasArcadeStore()) {
+        this._storeNote = this.storeResultMessage({ reason: 'unavailable' });
+        this.renderModalContent();
+        return;
+      }
+      window.ArcadeStore.restore().then(result => {
+        this._storeNote = this.storeResultMessage(result);
+        this.reconcileTheme();
+        this.renderModalContent();
+      }).catch(() => {
+        this._storeNote = this.storeResultMessage({ reason: 'failed' });
+        this.renderModalContent();
+      });
     }
 
     resetPassport() {
+      // Passport only. Purchases stay in arcade_entitlements.
       this.state = this.getDefaultState();
       localStorage.removeItem('arcade_passport_state');
       if (this.db) {
@@ -719,6 +970,11 @@
 
     const openBtn = document.getElementById('btn-open-passport');
     const modal = document.getElementById('modal-passport');
+    if (modal) {
+      modal.addEventListener('close', () => {
+        window.ArcadePassport.restoreAppliedLook();
+      });
+    }
     if (openBtn && modal) {
       openBtn.addEventListener('click', () => {
         window.ArcadePassport.renderModalContent();
