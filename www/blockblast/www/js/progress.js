@@ -106,12 +106,25 @@
 
     getSelectedTheme() {
       const stored = localStorage.getItem(STORAGE_KEYS.SELECTED_THEME);
+      // Paid cabinet skins live in arcade_cosmetic_v1, never in the coin theme slot.
+      if (stored === 'marble' || stored === 'walnut' || stored === 'stainedglass') return 'aurora';
       // Migrate everyone off the old default to the new look
       return (!stored || stored === 'timber') ? 'aurora' : stored;
     },
 
     setSelectedTheme(themeId) {
+      if (themeId === 'marble' || themeId === 'walnut' || themeId === 'stainedglass') return false;
+      if (window.ArcadeCosmetics && window.ArcadeCosmetics.isPaidTheme &&
+          window.ArcadeCosmetics.isPaidTheme('blockblast', themeId)) {
+        return false;
+      }
       localStorage.setItem(STORAGE_KEYS.SELECTED_THEME, themeId);
+      if (window.ArcadeCosmetics && window.ArcadeCosmetics.clearEquip) {
+        window.ArcadeCosmetics.clearEquip('blockblast');
+      } else if (document.body) {
+        document.body.dataset.theme = themeId;
+      }
+      return true;
     },
 
     // Powerups Inventory

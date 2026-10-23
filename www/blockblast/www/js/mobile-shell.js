@@ -11,7 +11,11 @@
     //    ?theme=<id> previews a theme without changing the saved selection
     if (window.Progress) {
       const preview = new URLSearchParams(window.location.search).get('theme');
-      document.body.dataset.theme = preview || window.Progress.getSelectedTheme();
+      let equipped = '';
+      if (!preview && window.ArcadeCosmetics && window.ArcadeCosmetics.equippedId) {
+        equipped = window.ArcadeCosmetics.equippedId('blockblast') || '';
+      }
+      document.body.dataset.theme = preview || equipped || window.Progress.getSelectedTheme();
     }
 
     // 1. Clock in status bar

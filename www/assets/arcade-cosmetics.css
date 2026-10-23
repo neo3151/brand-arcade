@@ -1,0 +1,880 @@
+/* Paid cabinet skins. Colors and patterns only — no layout or hit-target changes. */
+
+.paid-shelf {
+  margin: 0.85rem 0 1rem;
+  padding: 0.85rem;
+  border-radius: 18px;
+  color: #f6efe2;
+  background:
+    radial-gradient(circle at 0 0, rgba(230, 190, 110, 0.16), transparent 42%),
+    linear-gradient(180deg, rgba(18, 16, 22, 0.94), rgba(8, 8, 12, 0.94));
+  border: 1px solid rgba(230, 196, 120, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  font-family: Georgia, "Iowan Old Style", Palatino, serif;
+}
+
+.paid-shelf h2,
+.paid-shelf h3,
+.paid-shelf p { margin: 0; }
+
+.paid-shelf__lead h2 {
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+}
+
+.paid-shelf__lead p,
+.paid-pack__bar p {
+  margin-top: 0.3rem;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #d9d0c2;
+}
+
+.paid-pack {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(230, 196, 120, 0.22);
+}
+
+.paid-pack__bar,
+.paid-skin,
+.paid-skin__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.paid-pack__bar { justify-content: space-between; align-items: flex-start; }
+.paid-pack__bar h3 { font-size: 0.98rem; }
+.paid-skin-row { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 0.65rem; }
+.paid-skin__copy { min-width: 0; }
+.paid-skin__copy h3 { font-size: 0.92rem; }
+.paid-skin__actions { margin-top: 0.35rem; flex-wrap: wrap; }
+
+.paid-buy,
+.paid-equip,
+.paid-preview,
+.paid-owned {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.38rem 0.75rem;
+  text-decoration: none;
+  line-height: 1.2;
+}
+
+.paid-buy,
+.paid-equip {
+  border: 0;
+  background: linear-gradient(#f8e2a8, #c4923a);
+  color: #2a1c08;
+  cursor: pointer;
+}
+
+.paid-buy:disabled,
+.paid-equip:disabled {
+  background: #3a3a3a;
+  color: #d0d0d0;
+  cursor: default;
+}
+
+.paid-preview {
+  color: #f6e7c1;
+  border: 1px solid rgba(246, 231, 193, 0.45);
+}
+
+.paid-owned {
+  color: #d8f5c8;
+  background: rgba(74, 140, 74, 0.25);
+  border: 1px solid rgba(168, 214, 140, 0.4);
+}
+
+.paid-includes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.65rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.72rem;
+}
+
+.paid-includes li {
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.paid-swatch {
+  width: 64px;
+  height: 84px;
+  border-radius: 10px;
+  flex: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28), 0 8px 16px rgba(0, 0, 0, 0.28);
+}
+
+.paid-swatch--marble {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.85), transparent 40%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,0.35) 0 2px, transparent 2px 8px),
+    linear-gradient(160deg, #f4f7f5, #b7c4be);
+}
+.paid-swatch--walnut {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 210, 150, 0.18) 0 1px, transparent 1px 9px),
+    linear-gradient(180deg, #8a5a32, #2a160d);
+}
+.paid-swatch--stainedglass {
+  background:
+    linear-gradient(#1a120c, #1a120c) 0 0 / 100% 3px no-repeat,
+    linear-gradient(#1a120c, #1a120c) 0 100% / 100% 3px no-repeat,
+    linear-gradient(90deg, #e11d48 0 33%, #2563eb 33% 66%, #f59e0b 66% 100%);
+  box-shadow: inset 0 0 0 3px #1a120c;
+}
+.paid-swatch--solitaire-noir {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,255,255,0.28), transparent 36%),
+    repeating-linear-gradient(45deg, #2a2a30 0 3px, #101014 3px 8px);
+  box-shadow: inset 0 0 0 3px #0a0a0c, inset 0 0 0 4px #c8c8d0;
+}
+.paid-swatch--solitaire-burgundy {
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 220, 160, 0.35), transparent 32%),
+    repeating-radial-gradient(circle at 50% 50%, #7f1d1d 0 3px, #4c0519 3px 8px);
+  box-shadow: inset 0 0 0 3px #3f0a18, inset 0 0 0 4px #f0d48a;
+}
+.paid-swatch--spider-violet {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2), transparent 28%),
+    repeating-linear-gradient(60deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 7px),
+    linear-gradient(160deg, #7c3aed, #2e1064);
+}
+.paid-swatch--spider-emerald {
+  background:
+    repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.35) 0 1px, transparent 1px 7px),
+    linear-gradient(160deg, #047857, #022c22);
+  box-shadow: inset 0 0 0 3px #022c22, inset 0 0 0 4px #e6c56a;
+}
+.paid-swatch--montecarlo {
+  background:
+    radial-gradient(circle at 50% 45%, #1d4ed8, #0b1d3a 70%);
+  box-shadow: inset 0 0 0 3px #d4af37;
+}
+.paid-swatch--artdeco {
+  background:
+    repeating-linear-gradient(90deg, rgba(198, 161, 91, 0.7) 0 2px, transparent 2px 10px),
+    repeating-linear-gradient(0deg, rgba(198, 161, 91, 0.7) 0 2px, transparent 2px 10px),
+    linear-gradient(#1a1a1a, #1a1a1a);
+}
+.paid-swatch--ivory {
+  background: linear-gradient(160deg, #fffaf2, #e7d7b8);
+  box-shadow: inset 0 0 0 1px #c4b49a, -3px 3px 0 #b7a588;
+}
+.paid-swatch--bamboo {
+  background:
+    repeating-linear-gradient(90deg, rgba(6, 50, 28, 0.18) 0 2px, transparent 2px 8px),
+    linear-gradient(#d9f99d, #65a30d);
+}
+.paid-swatch--porcelain {
+  background:
+    radial-gradient(circle at 70% 30%, #1d4ed8 0 6px, transparent 7px),
+    linear-gradient(#f8fbff, #dbeafe);
+  box-shadow: inset 0 0 0 3px #1e3a8a;
+}
+.paid-swatch--europa {
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.45) 0 2px, transparent 2px 8px),
+    linear-gradient(#f8fdff, #7dd3fc);
+}
+.paid-swatch--venus {
+  background:
+    radial-gradient(circle at 30% 70%, rgba(255,255,255,0.25), transparent 30%),
+    linear-gradient(#ecfccb, #65a30d 40%, #3f6212);
+}
+.paid-swatch--phosphor {
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0 1px, transparent 1px 3px),
+    radial-gradient(circle, rgba(57,255,20,0.45), #021408 70%);
+}
+.paid-swatch--amber {
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(circle, rgba(251,191,36,0.5), #1c1002 70%);
+}
+.paid-swatch--hacker {
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.28) 0 1px, transparent 1px 3px),
+    radial-gradient(circle, rgba(248,113,113,0.5), #1a0508 70%);
+}
+.paid-swatch--washi {
+  background:
+    repeating-linear-gradient(90deg, rgba(120, 90, 40, 0.08) 0 1px, transparent 1px 5px),
+    linear-gradient(#f7f1e4, #e7d3a8);
+}
+.paid-swatch--nightink {
+  background:
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.35) 0 2px, transparent 3px),
+    linear-gradient(#1e293b, #0b1224);
+  box-shadow: inset 0 0 0 2px #e7e2d4;
+}
+.paid-swatch--sumie {
+  background:
+    radial-gradient(circle at 78% 18%, rgba(159, 43, 43, 0.85) 0 8px, transparent 9px),
+    linear-gradient(#f7f3ea, #d9d3c5);
+}
+.paid-swatch--kintsugi {
+  background:
+    linear-gradient(115deg, transparent 42%, #f6e27a 43% 48%, transparent 49%),
+    linear-gradient(20deg, transparent 60%, #e6c56a 61% 64%, transparent 65%),
+    #3a2a22;
+}
+.paid-swatch--indigo {
+  background:
+    linear-gradient(#e0e7ff, #e0e7ff) 50% 50% / 2px 100% no-repeat,
+    linear-gradient(#1d4ed8, #1e1b4b);
+}
+.paid-swatch--atlas {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(180, 83, 9, 0.2), transparent 55%),
+    linear-gradient(#f4e7c8, #e7d3a8);
+  box-shadow: inset 0 0 0 3px #6b4f2a;
+}
+.paid-swatch--neonink {
+  background: #0c0a18;
+  box-shadow: inset 0 0 0 2px #e879f9, 0 0 12px rgba(34, 211, 238, 0.45);
+}
+
+/* Block Blast cabinets. Coin themes stay on their own data-theme values. */
+body[data-theme="marble"],
+html[data-paid-skin="marble"] {
+  --timber-deep: #d9e2dc;
+  --timber-bg: #eef3ef;
+  --timber-surface: #f7f8f6;
+  --timber-surface-light: #ffffff;
+  --timber-border: rgba(120, 116, 110, 0.45);
+  --board-bg: #c5d0ca;
+  --board-border: #8d8680;
+  --amber-gold: #7d756c;
+  --amber-light: #2c2825;
+  --amber-glow: rgba(125, 117, 108, 0.35);
+  --text-main: #2a2622;
+  --text-muted: #5e584f;
+  --text-dim: #8a8178;
+  --cell-bg: #e7eeea;
+  --frame-bg: #f7f4ef;
+  --frame-border: #c8bfb4;
+  --panel-bg: rgba(247, 244, 239, 0.94);
+  --screen-bg:
+    radial-gradient(ellipse at 18% 8%, rgba(255,255,255,0.95), transparent 42%),
+    radial-gradient(ellipse at 88% 92%, rgba(150, 166, 160, 0.55), transparent 48%),
+    repeating-linear-gradient(118deg, rgba(255,255,255,0.28) 0 2px, transparent 2px 9px),
+    linear-gradient(165deg, #f7f5f1 0%, #d5ded8 48%, #b7c3bc 100%);
+  --wrapper-bg: #cfc8c0;
+  --modal-card-bg: linear-gradient(180deg, #f7f5f1, #e4e0d8);
+}
+body[data-theme="marble"] .piece-tile,
+body[data-theme="marble"] .grid-cell.filled,
+html[data-paid-skin="marble"] .piece-tile,
+html[data-paid-skin="marble"] .grid-cell.filled {
+  background-image: linear-gradient(125deg, rgba(255,255,255,0.62), rgba(255,255,255,0) 42%, rgba(90, 104, 112, 0.22));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.75), inset 0 -6px 8px rgba(80, 96, 104, 0.2);
+}
+
+body[data-theme="walnut"],
+html[data-paid-skin="walnut"] {
+  --timber-deep: #1a0e08;
+  --timber-bg: #2a160e;
+  --timber-surface: #3b2416;
+  --timber-surface-light: #5a3822;
+  --timber-border: rgba(230, 194, 122, 0.45);
+  --board-bg: #2c1810;
+  --board-border: #e6c27a;
+  --amber-gold: #e6c27a;
+  --amber-light: #f6e3bc;
+  --amber-glow: rgba(230, 194, 122, 0.4);
+  --text-main: #f6e7c8;
+  --text-muted: #d7b98a;
+  --text-dim: #a88455;
+  --cell-bg: #4a2e1c;
+  --frame-bg: #3a2416;
+  --frame-border: #8a6234;
+  --panel-bg: rgba(36, 20, 12, 0.92);
+  --screen-bg:
+    repeating-linear-gradient(90deg, rgba(255, 206, 140, 0.06) 0 1px, transparent 1px 13px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.2) 0 2px, transparent 2px 6px),
+    radial-gradient(ellipse at 28% 12%, rgba(176, 112, 58, 0.45), transparent 46%),
+    linear-gradient(180deg, #5a341c, #2a160d 58%, #140b07);
+  --wrapper-bg: #140c08;
+  --modal-card-bg: linear-gradient(180deg, #4a2e1c, #24150e);
+}
+body[data-theme="walnut"] .piece-tile,
+body[data-theme="walnut"] .grid-cell.filled,
+html[data-paid-skin="walnut"] .piece-tile,
+html[data-paid-skin="walnut"] .grid-cell.filled {
+  background-image: linear-gradient(rgba(92, 48, 16, 0.28), rgba(40, 18, 8, 0.18));
+  box-shadow: inset 0 0 0 1px rgba(230, 194, 122, 0.75), inset 0 1px 0 rgba(255, 226, 170, 0.35);
+}
+
+body[data-theme="stainedglass"],
+html[data-paid-skin="stainedglass"] {
+  --timber-deep: #100910;
+  --timber-bg: #1a1020;
+  --timber-surface: #241428;
+  --timber-surface-light: #321c38;
+  --timber-border: rgba(246, 217, 138, 0.35);
+  --board-bg: #120c10;
+  --board-border: #1a120c;
+  --amber-gold: #f6d98a;
+  --amber-light: #fff4d2;
+  --amber-glow: rgba(246, 217, 138, 0.35);
+  --text-main: #fff6e0;
+  --text-muted: #f0c98a;
+  --text-dim: #c084fc;
+  --cell-bg: #1a1216;
+  --frame-bg: #1c1218;
+  --frame-border: #3a2a22;
+  --panel-bg: rgba(16, 10, 16, 0.9);
+  --screen-bg:
+    radial-gradient(circle at 18% 18%, rgba(225, 29, 72, 0.55), transparent 26%),
+    radial-gradient(circle at 78% 24%, rgba(37, 99, 235, 0.5), transparent 24%),
+    radial-gradient(circle at 40% 78%, rgba(245, 158, 11, 0.42), transparent 22%),
+    radial-gradient(circle at 82% 80%, rgba(16, 185, 129, 0.36), transparent 20%),
+    linear-gradient(#140c18, #0c0810);
+  --wrapper-bg: #07060a;
+  --modal-card-bg: linear-gradient(180deg, #2a1830, #120c14);
+}
+body[data-theme="stainedglass"] .grid-cell,
+html[data-paid-skin="stainedglass"] .grid-cell {
+  box-shadow: inset 0 0 0 2px #1a120c;
+}
+body[data-theme="stainedglass"] .piece-tile,
+body[data-theme="stainedglass"] .grid-cell.filled,
+html[data-paid-skin="stainedglass"] .piece-tile,
+html[data-paid-skin="stainedglass"] .grid-cell.filled {
+  background-image: linear-gradient(160deg, rgba(255,255,255,0.5), transparent 46%, rgba(0,0,0,0.28));
+  box-shadow: inset 0 0 0 2px #1a120c, 0 0 12px rgba(255, 255, 255, 0.16);
+}
+
+/* Solitaire felts and backs */
+html[data-paid-skin="solitaire-noir"] {
+  --felt-green-dark: #050506;
+  --felt-green-base: #141418;
+  --felt-green-light: #22222a;
+  --felt-green-border: #3a3a44;
+  --gold-500: #d5d7de;
+  --gold-400: #eeeef4;
+  --midnight-900: #050506;
+}
+html[data-paid-skin="solitaire-noir"] .game-header,
+html[data-paid-skin="solitaire-noir"] .pile-slot {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(220, 220, 230, 0.38);
+}
+html[data-paid-skin="solitaire-noir"] .card__back {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,255,255,0.22), transparent 36%),
+    repeating-linear-gradient(45deg, #2c2c32 0 3px, #101014 3px 8px);
+  border: 1px solid #e8e8ee;
+  box-shadow: inset 0 0 0 4px #0a0a0c, inset 0 0 0 5px #b8b8c0;
+}
+
+html[data-paid-skin="solitaire-burgundy"] {
+  --felt-green-dark: #2a0610;
+  --felt-green-base: #6e1228;
+  --felt-green-light: #8e1d38;
+  --felt-green-border: #c45a6e;
+  --gold-500: #f0d48a;
+  --gold-400: #ffe7ad;
+  --midnight-900: #3f0a18;
+}
+html[data-paid-skin="solitaire-burgundy"] .game-header {
+  background: rgba(42, 6, 16, 0.78);
+  border-color: rgba(240, 212, 138, 0.45);
+}
+html[data-paid-skin="solitaire-burgundy"] .pile-slot {
+  background: rgba(90, 12, 28, 0.45);
+  border-color: rgba(240, 212, 138, 0.4);
+}
+html[data-paid-skin="solitaire-burgundy"] .card__back {
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 220, 160, 0.32), transparent 34%),
+    repeating-radial-gradient(circle at 50% 50%, #7f1d1d 0 4px, #4c0519 4px 9px);
+  border: 1px solid #f0d48a;
+  box-shadow: inset 0 0 0 4px #3f0a18, inset 0 0 0 5px #e6c56a;
+}
+
+/* Spider cloth and backs */
+html[data-paid-skin="spider-violet"] {
+  --bg-deep: #16081f;
+  --bg-card-table: #2a1248;
+  --bg-surface: #3b1764;
+  --card-back-grad: linear-gradient(160deg, #7c3aed, #2e1064);
+  --card-back-border: #e9d5ff;
+  --gold-candle: #e9d5ff;
+}
+html[data-paid-skin="spider-violet"] .card.face-down,
+html[data-paid-skin="spider-violet"] .stock-card-slot:not(.empty) {
+  background-color: #2e1064;
+  background-image:
+    radial-gradient(circle at 50% 42%, rgba(255,255,255,0.22), transparent 34%),
+    repeating-linear-gradient(60deg, rgba(255,255,255,0.14) 0 1px, transparent 1px 7px),
+    linear-gradient(160deg, #7c3aed, #2e1064);
+  border-color: #e9d5ff;
+}
+
+html[data-paid-skin="spider-emerald"] {
+  --bg-deep: #022c22;
+  --bg-card-table: #065f46;
+  --bg-surface: #047857;
+  --card-back-grad: linear-gradient(160deg, #059669, #022c22);
+  --card-back-border: #e6c56a;
+  --gold-candle: #e6c56a;
+}
+html[data-paid-skin="spider-emerald"] .card.face-down,
+html[data-paid-skin="spider-emerald"] .stock-card-slot:not(.empty) {
+  background-color: #022c22;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(230, 197, 106, 0.4) 0 1px, transparent 1px 7px),
+    linear-gradient(160deg, #10b981, #022c22);
+  border-color: #e6c56a;
+}
+
+/* Spades salon. The stock felt is painted with literals, so these override it. */
+html[data-paid-skin="montecarlo"] .game-viewport {
+  background: radial-gradient(circle at 50% 42%, #0f8a4e, #064e32 58%, #02150f 100%) !important;
+}
+html[data-paid-skin="montecarlo"] .game-top-bar {
+  background: rgba(2, 40, 24, 0.9) !important;
+}
+html[data-paid-skin="montecarlo"] .trick-center-disc {
+  border-color: rgba(212, 175, 55, 0.45);
+  background: radial-gradient(circle, rgba(16, 138, 78, 0.45), rgba(2, 40, 24, 0.2)) !important;
+}
+html[data-paid-skin="montecarlo"] .card {
+  background: linear-gradient(180deg, #fffdf8, #f4e7c4);
+  border-color: #d4af37;
+  color: #1a140c;
+}
+html[data-paid-skin="montecarlo"] .card.suit-hearts,
+html[data-paid-skin="montecarlo"] .card.suit-diamonds { color: #b91c1c; }
+html[data-paid-skin="montecarlo"] .card.suit-spades,
+html[data-paid-skin="montecarlo"] .card.suit-clubs { color: #111827; }
+html[data-paid-skin="montecarlo"] .card.face-down {
+  background-color: #0b1d3a;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.4) 0 2px, transparent 2px 8px),
+    radial-gradient(circle at 50% 50%, #1d4ed8, #0b1d3a);
+  border: 1px solid #e6c56a;
+}
+
+html[data-paid-skin="artdeco"] .game-viewport {
+  background:
+    repeating-linear-gradient(90deg, rgba(198, 161, 91, 0.22) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(0deg, rgba(198, 161, 91, 0.22) 0 1px, transparent 1px 18px),
+    radial-gradient(circle at 50% 40%, #2c261c, #0c0b0a 72%) !important;
+}
+html[data-paid-skin="artdeco"] .game-top-bar {
+  background: rgba(12, 11, 10, 0.94) !important;
+  border-bottom-color: #c6a15b;
+}
+html[data-paid-skin="artdeco"] .trick-center-disc {
+  border-color: rgba(198, 161, 91, 0.55);
+  background: radial-gradient(circle, rgba(198, 161, 91, 0.16), rgba(12, 11, 10, 0.2)) !important;
+}
+html[data-paid-skin="artdeco"] .card {
+  background: linear-gradient(180deg, #fbf6ea, #f0e2c4);
+  border: 1px solid #1a1a1a;
+  box-shadow: inset 0 0 0 3px #c6a15b, 0 6px 14px rgba(0, 0, 0, 0.45);
+  color: #1a1a1a;
+}
+html[data-paid-skin="artdeco"] .card.suit-hearts,
+html[data-paid-skin="artdeco"] .card.suit-diamonds { color: #9f1239; }
+html[data-paid-skin="artdeco"] .card.suit-spades,
+html[data-paid-skin="artdeco"] .card.suit-clubs { color: #111111; }
+html[data-paid-skin="artdeco"] .card.face-down {
+  background-color: #111111;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(198, 161, 91, 0.75) 0 2px, transparent 2px 10px),
+    repeating-linear-gradient(0deg, rgba(198, 161, 91, 0.75) 0 2px, transparent 2px 10px);
+  border: 1px solid #c6a15b;
+}
+
+/* Mahjong faces */
+html[data-paid-skin="ivory"] {
+  --bg-sanctuary: #efe6d4;
+  --bg-surface: #f6efe2;
+  --bg-panel: #e7dcc6;
+  --tile-face-bg: #fbf6ec;
+  --tile-back-bg: #c4b49a;
+  --color-text-main: #3a2e22;
+  --color-text-muted: #7c6a55;
+  --border-jade: #c4b49a;
+}
+html[data-paid-skin="ivory"] .board-viewport {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.7), transparent 60%),
+    linear-gradient(#f7f1e4, #e6d8c0) !important;
+}
+html[data-paid-skin="ivory"] .mj-tile__body {
+  background: linear-gradient(#fffaf2, #eadcc4);
+  border-color: #c4b49a;
+  box-shadow: -1px 1px 0 #d9cbb4, -2px 2px 0 #c4b49a, -3px 3px 0 #a89880, -4px 4px 8px rgba(80, 60, 30, 0.28);
+}
+html[data-paid-skin="ivory"] .hud-counter { background: #f3eadb; color: #3a2e22; }
+
+html[data-paid-skin="bamboo"] {
+  --bg-sanctuary: #102416;
+  --bg-surface: #163222;
+  --bg-panel: #1d4630;
+  --tile-face-bg: #ecfccb;
+  --tile-back-bg: #3f6212;
+  --color-text-main: #ecfccb;
+  --border-jade: #4d7c0f;
+}
+html[data-paid-skin="bamboo"] .board-viewport {
+  background:
+    repeating-linear-gradient(90deg, rgba(6, 60, 24, 0.18) 0 3px, transparent 3px 14px),
+    linear-gradient(#14532d, #052e16) !important;
+}
+html[data-paid-skin="bamboo"] .mj-tile__body {
+  background:
+    repeating-linear-gradient(90deg, rgba(22, 80, 30, 0.16) 0 2px, transparent 2px 7px),
+    linear-gradient(#f7fee7, #bef264);
+  border-color: #3f6212;
+  box-shadow: -1px 1px 0 #4d7c0f, -2px 2px 0 #3f6212, -3px 3px 0 #365314, -4px 4px 8px rgba(0, 0, 0, 0.4);
+}
+html[data-paid-skin="bamboo"] .hud-counter { background: #052e16; }
+
+html[data-paid-skin="porcelain"] {
+  --bg-sanctuary: #0b1c3a;
+  --bg-surface: #12305c;
+  --bg-panel: #1e3a8a;
+  --tile-face-bg: #f8fbff;
+  --tile-back-bg: #1e3a8a;
+  --color-text-main: #e0ecff;
+  --border-jade: #93c5fd;
+  --color-gold-leaf: #dbeafe;
+}
+html[data-paid-skin="porcelain"] .board-viewport {
+  background:
+    radial-gradient(circle at 70% 20%, rgba(147, 197, 253, 0.25), transparent 30%),
+    linear-gradient(#0f2748, #071428) !important;
+}
+html[data-paid-skin="porcelain"] .mj-tile__body {
+  background:
+    radial-gradient(circle at 72% 28%, #1d4ed8 0 5px, transparent 6px),
+    linear-gradient(#ffffff, #dbeafe);
+  border-color: #1e3a8a;
+  box-shadow: -1px 1px 0 #1d4ed8, -2px 2px 0 #1e3a8a, -3px 3px 0 #172554, -4px 4px 8px rgba(0, 0, 0, 0.45);
+}
+html[data-paid-skin="porcelain"] .hud-counter { background: #0b1c3a; }
+
+/* Minesweeper sectors, flags, and blasts. Cell metrics stay put. */
+html[data-paid-skin="europa"] {
+  --bg-primary: #e0f2fe;
+  --bg-surface: #f0f9ff;
+  --bg-panel: #e0f2fe;
+  --color-text-main: #0c4a6e;
+  --color-text-muted: #0369a1;
+  --border-metal: #7dd3fc;
+}
+html[data-paid-skin="europa"] .mine-grid { background: #bae6fd !important; border-color: #7dd3fc !important; }
+html[data-paid-skin="europa"] .cell {
+  background: linear-gradient(180deg, #f8fdff, #d7eefc) !important;
+  border-top-color: #ffffff !important;
+  border-left-color: #ffffff !important;
+  border-bottom-color: #7dd3fc !important;
+  border-right-color: #7dd3fc !important;
+  color: #075985;
+}
+html[data-paid-skin="europa"] .cell--revealed {
+  background: #e0f2fe !important;
+  border-color: #bae6fd !important;
+}
+html[data-paid-skin="europa"] .cell--flagged { background: #cffafe !important; }
+html[data-paid-skin="europa"] .flag-icon {
+  filter: hue-rotate(170deg) saturate(1.5) drop-shadow(0 0 6px #38bdf8);
+}
+html[data-paid-skin="europa"] .cell--exploded {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 18px #7dd3fc, inset 0 0 8px rgba(255, 255, 255, 0.8) !important;
+}
+
+html[data-paid-skin="venus"] {
+  --bg-primary: #142006;
+  --bg-surface: #1a2e0a;
+  --bg-panel: #24380c;
+  --color-text-main: #ecfccb;
+  --color-text-muted: #bef264;
+  --border-metal: #4d7c0f;
+}
+html[data-paid-skin="venus"] .mine-grid { background: #14532d !important; border-color: #3f6212 !important; }
+html[data-paid-skin="venus"] .cell {
+  background: linear-gradient(180deg, #ecfccb, #84cc16) !important;
+  border-top-color: #f7fee7 !important;
+  border-left-color: #f7fee7 !important;
+  border-bottom-color: #3f6212 !important;
+  border-right-color: #3f6212 !important;
+  color: #1a2e05;
+}
+html[data-paid-skin="venus"] .cell--revealed {
+  background: #365314 !important;
+  border-color: #4d7c0f !important;
+  color: #ecfccb;
+}
+html[data-paid-skin="venus"] .cell--flagged { background: #65a30d !important; }
+html[data-paid-skin="venus"] .flag-icon {
+  filter: hue-rotate(70deg) saturate(2.2) drop-shadow(0 0 6px #d9f99d);
+}
+html[data-paid-skin="venus"] .cell--exploded {
+  background: #d9f99d !important;
+  border-color: #fef08a !important;
+  box-shadow: 0 0 20px #bef264, inset 0 0 10px rgba(0, 0, 0, 0.35) !important;
+}
+html[data-paid-skin="europa"] .cell--num-1,
+html[data-paid-skin="europa"] .cell--num-2,
+html[data-paid-skin="europa"] .cell--num-3,
+html[data-paid-skin="europa"] .cell--num-4,
+html[data-paid-skin="europa"] .cell--num-5,
+html[data-paid-skin="europa"] .cell--num-6,
+html[data-paid-skin="europa"] .cell--num-7,
+html[data-paid-skin="europa"] .cell--num-8 { color: #0f172a; text-shadow: none; }
+html[data-paid-skin="venus"] .cell--num-1,
+html[data-paid-skin="venus"] .cell--num-2,
+html[data-paid-skin="venus"] .cell--num-3,
+html[data-paid-skin="venus"] .cell--num-4,
+html[data-paid-skin="venus"] .cell--num-5,
+html[data-paid-skin="venus"] .cell--num-6,
+html[data-paid-skin="venus"] .cell--num-7,
+html[data-paid-skin="venus"] .cell--num-8 { color: #f7fee7; text-shadow: none; }
+
+/* Codebreaker terminals. Peg colors stay so clues remain distinct. */
+html[data-paid-skin="phosphor"] {
+  --bg-primary: #010a04;
+  --bg-surface: #021408;
+  --bg-panel: #03210e;
+  --bg-panel-light: #063318;
+  --color-text-main: #bbf7d0;
+  --color-green-crt: #39ff14;
+  --color-amber-crt: #86efac;
+  --border-steel: #166534;
+  --bg-manila: #d9f99d;
+  --color-ink: #052e16;
+}
+html[data-paid-skin="phosphor"] .terminal-viewport {
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px),
+    radial-gradient(circle at 50% 30%, rgba(57, 255, 20, 0.16), transparent 55%),
+    #010a04 !important;
+}
+html[data-paid-skin="phosphor"] .terminal-frame,
+html[data-paid-skin="phosphor"] .vault-header {
+  background: #021208;
+  color: #bbf7d0;
+  box-shadow: 0 0 22px rgba(57, 255, 20, 0.16);
+}
+
+html[data-paid-skin="amber"] {
+  --bg-primary: #140c02;
+  --bg-surface: #241606;
+  --bg-panel: #3a2408;
+  --bg-panel-light: #5a3810;
+  --color-text-main: #fde68a;
+  --color-green-crt: #fbbf24;
+  --color-amber-crt: #f59e0b;
+  --border-steel: #92400e;
+  --bg-manila: #fef3c7;
+  --color-ink: #451a03;
+}
+html[data-paid-skin="amber"] .terminal-viewport {
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px),
+    radial-gradient(circle at 50% 30%, rgba(251, 191, 36, 0.18), transparent 55%),
+    #140c02 !important;
+}
+html[data-paid-skin="amber"] .terminal-frame,
+html[data-paid-skin="amber"] .vault-header {
+  background: #241606;
+  color: #fde68a;
+  box-shadow: 0 0 22px rgba(245, 158, 11, 0.2);
+}
+
+html[data-paid-skin="hacker"] {
+  --bg-primary: #140206;
+  --bg-surface: #2a060c;
+  --bg-panel: #450a12;
+  --bg-panel-light: #7f1d1d;
+  --color-text-main: #fecaca;
+  --color-green-crt: #fb7185;
+  --color-amber-crt: #f87171;
+  --border-steel: #be123c;
+  --bg-manila: #ffe4e6;
+  --color-ink: #4c0519;
+}
+html[data-paid-skin="hacker"] .terminal-viewport {
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0 1px, transparent 1px 3px),
+    radial-gradient(circle at 50% 30%, rgba(248, 113, 113, 0.2), transparent 55%),
+    #140206 !important;
+}
+html[data-paid-skin="hacker"] .terminal-frame,
+html[data-paid-skin="hacker"] .vault-header {
+  background: #2a060c;
+  color: #fecaca;
+  box-shadow: 0 0 22px rgba(225, 29, 72, 0.25);
+}
+
+/* Sudoku paper */
+html[data-paid-skin="washi"] {
+  --color-bg: #f7f1e4;
+  --color-bg-subtle: #efe2c8;
+  --color-bg-muted: #e7d3a8;
+  --color-text: #243056;
+  --color-text-muted: #5c4a32;
+  --color-border: #d6c4a2;
+  --gray-800: #2a3348;
+  --gray-700: #3f4d68;
+  --gray-300: #d9c7a4;
+  --gray-200: #e7d7b8;
+  --blue-600: #1e3a8a;
+  --blue-100: #e7eefc;
+  --blue-200: #d5e2f8;
+  --color-primary: #1e3a8a;
+}
+html[data-paid-skin="washi"] .game-page,
+html[data-paid-skin="washi"] body {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(120, 90, 40, 0.05) 0 1px, transparent 1px 6px),
+    linear-gradient(#f7f1e4, #efe2c8);
+}
+
+html[data-paid-skin="nightink"] {
+  --color-bg: #0e1428;
+  --color-bg-subtle: #090e1c;
+  --color-bg-muted: #172038;
+  --color-text: #e7e2d4;
+  --color-text-muted: #9aa4bf;
+  --color-border: #2a3658;
+  --gray-800: #f3ead4;
+  --gray-700: #e7dcc4;
+  --gray-300: #31405f;
+  --gray-200: #283656;
+  --blue-600: #93c5fd;
+  --blue-100: #1d2c4e;
+  --blue-200: #243860;
+  --color-primary: #93c5fd;
+  --color-primary-light: #172038;
+}
+html[data-paid-skin="nightink"] .cell--highlight { background: #1a2744 !important; }
+html[data-paid-skin="nightink"] .game-page {
+  background:
+    radial-gradient(circle at 80% 12%, rgba(255,255,255,0.16) 0 2px, transparent 3px),
+    #090e1c;
+}
+
+html[data-paid-skin="sumie"] {
+  --color-bg: #f4efe6;
+  --color-bg-subtle: #e7e1d4;
+  --color-bg-muted: #ddd4c4;
+  --color-text: #1a1a1a;
+  --color-text-muted: #44403c;
+  --color-border: #d6d3d1;
+  --gray-800: #111111;
+  --gray-700: #292524;
+  --gray-300: #d6d3d1;
+  --gray-200: #e7e5e4;
+  --blue-600: #1c1917;
+  --blue-100: #f5f5f4;
+  --blue-200: #e7e5e4;
+  --color-primary: #9f2b2b;
+  --color-primary-light: #fee2e2;
+}
+html[data-paid-skin="sumie"] .game-page {
+  background:
+    radial-gradient(circle at 88% 8%, rgba(159, 43, 43, 0.22), transparent 16%),
+    linear-gradient(#f7f3ea, #e6e0d2);
+}
+
+/* Nonogram mosaic */
+html[data-paid-skin="kintsugi"] {
+  --slate-950: #1a120e;
+  --slate-900: #241812;
+  --slate-800: #3a2a22;
+  --slate-100: #f6e7c1;
+  --cell-empty: #3a2a22;
+  --cell-empty-hover: #4a382c;
+  --cell-filled: #e6c56a;
+  --cell-filled-gradient: linear-gradient(135deg, #f6e27a, #b8860b 42%, #fff4c2 50%, #8a5a12);
+  --grid-bg: #2a1c16;
+  --grid-border-thick: rgba(246, 226, 122, 0.7);
+}
+html[data-paid-skin="indigo"] {
+  --slate-950: #070b1e;
+  --slate-900: #0b1028;
+  --slate-800: #172554;
+  --slate-100: #e0e7ff;
+  --cell-empty: #12183a;
+  --cell-empty-hover: #1e2a5a;
+  --cell-filled: #60a5fa;
+  --cell-filled-gradient: linear-gradient(135deg, #bfdbfe, #2563eb 55%, #1e1b4b);
+  --grid-bg: #0f172a;
+  --grid-border-thick: rgba(191, 219, 254, 0.7);
+}
+
+/* Word search */
+html[data-paid-skin="atlas"] {
+  --color-bg: #f4e7c8;
+  --color-bg-subtle: #e7d3a8;
+  --color-bg-muted: #dec49a;
+  --color-text: #3a2a16;
+  --color-text-muted: #6b4f2a;
+  --color-border: #c4a574;
+  --gray-800: #3f2e1c;
+  --gray-700: #6b4f2a;
+  --gray-300: #e7d3a8;
+  --gray-200: #f0e0c0;
+  --blue-600: #7c2d12;
+  --color-primary: #7c2d12;
+}
+html[data-paid-skin="atlas"] #ws-grid {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(180, 83, 9, 0.12), transparent 58%),
+    #6b4f2a;
+  border-color: #6b4f2a;
+}
+html[data-paid-skin="atlas"] .ws-cell {
+  background: #f4e7c8;
+  color: #3f2a14;
+  border-color: #e7d3a8;
+}
+
+html[data-paid-skin="neonink"] {
+  --color-bg: #0c0a18;
+  --color-bg-subtle: #070612;
+  --color-bg-muted: #1a1030;
+  --color-text: #fae8ff;
+  --color-text-muted: #e9d5ff;
+  --color-border: #581c87;
+  --gray-800: #f0abfc;
+  --gray-700: #e879f9;
+  --gray-300: #3b0764;
+  --gray-200: #2e1064;
+  --blue-600: #22d3ee;
+  --color-primary: #22d3ee;
+}
+html[data-paid-skin="neonink"] #ws-grid {
+  background: #02010a;
+  border-color: #e879f9;
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.25);
+}
+html[data-paid-skin="neonink"] .ws-cell {
+  background: #0c0a18;
+  color: #f0abfc;
+  border-color: #2e1064;
+  text-shadow: 0 0 6px rgba(232, 121, 249, 0.7);
+}

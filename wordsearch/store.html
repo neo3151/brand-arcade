@@ -2,6 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+<script id="arcade-cosmetics-loader">
+(function () {
+  var parts = location.pathname.split('/').filter(Boolean);
+  if (parts.length && /\.[a-z0-9]+$/i.test(parts[parts.length - 1])) parts.pop();
+  if (parts.length < 1) return;
+  var prefix = '';
+  for (var i = 0; i < parts.length; i++) prefix += '../';
+  document.write(
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-cosmetics.css">' +
+    '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>'
+  );
+})();
+</script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="description" content="Daily Supply for Word Search. Hints refill every morning. Every category and level is open. No purchases." />
   <title>Daily Supply — Word Search</title>
@@ -95,7 +112,8 @@
   <!-- ======================================================
        Footer
        ====================================================== -->
-  <footer class="store-footer">
+  <div id="paid-cosmetic-shelf"></div>
+<footer class="store-footer">
     <p class="store-legal">
       This game is 100% free and ad-free. Hints are stored on this device and topped up every local morning.
     </p>
