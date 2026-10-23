@@ -42,14 +42,17 @@
           top: 0;
           right: 0;
           width: 480px;
-          max-width: 95vw;
-          height: 100vh;
+          max-width: 100vw;
+          height: 100dvh;
+          padding-top: var(--safe-top, env(safe-area-inset-top, 0px));
+          padding-right: var(--safe-right, env(safe-area-inset-right, 0px));
+          padding-bottom: var(--safe-bottom, env(safe-area-inset-bottom, 0px));
           background: rgba(6, 10, 20, 0.96);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           border-left: 2px solid #06b6d4;
           box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(6, 182, 212, 0.15);
-          z-index: 999999;
+          z-index: 1000002;
           transform: translateX(105%);
           transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
           display: flex;
@@ -104,12 +107,15 @@
           color: #94a3b8;
           cursor: pointer;
           font-size: 1.1rem;
-          width: 32px;
-          height: 32px;
+          width: 44px;
+          height: 44px;
+          min-width: 44px;
+          min-height: 44px;
           border-radius: 6px;
           display: flex;
           align-items: center;
           justify-content: center;
+          flex: 0 0 auto;
           transition: all 0.15s ease;
         }
 
@@ -123,8 +129,11 @@
           display: flex;
           background: rgba(10, 16, 30, 0.9);
           border-bottom: 1px solid #1e293b;
-          padding: 0 16px;
+          padding: 0 12px;
           gap: 6px;
+          overflow-x: auto;
+          flex-wrap: nowrap;
+          -webkit-overflow-scrolling: touch;
         }
 
         .ai-tab-btn {
@@ -136,12 +145,15 @@
           font-size: 0.82rem;
           font-weight: 700;
           letter-spacing: 0.06em;
-          padding: 12px 14px;
+          padding: 8px 12px;
+          min-height: 44px;
           cursor: pointer;
           transition: all 0.2s ease;
           display: flex;
           align-items: center;
           gap: 6px;
+          flex: 0 0 auto;
+          white-space: nowrap;
         }
 
         .ai-tab-btn:hover {
@@ -299,6 +311,7 @@
           border: 1px solid #334155;
           color: #f8fafc;
           padding: 10px 14px;
+          min-height: 44px;
           border-radius: 6px;
           font-family: inherit;
           font-size: 0.82rem;
@@ -332,9 +345,11 @@
         /* Floating Pill Button */
         #arcade-inspector-pill {
           position: fixed;
-          bottom: 18px;
-          right: 18px;
-          z-index: 99998;
+          bottom: calc(var(--safe-bottom, env(safe-area-inset-bottom, 0px)) + 16px);
+          right: calc(var(--safe-right, env(safe-area-inset-right, 0px)) + 12px);
+          z-index: 99990;
+          min-height: 44px;
+          box-sizing: border-box;
           background: rgba(15, 23, 42, 0.9);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
@@ -382,7 +397,7 @@
           inset: 0;
           background: rgba(0, 0, 0, 0.5);
           backdrop-filter: blur(4px);
-          z-index: 999998;
+          z-index: 1000001;
           opacity: 0;
           pointer-events: none;
           transition: opacity 0.3s ease;

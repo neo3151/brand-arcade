@@ -13,10 +13,13 @@ const fallback = {
   appName: 'Benchmark Arcade',
   webDir: 'www',
   server: { androidScheme: 'https', iosScheme: 'https' },
+  ios: { contentInset: 'never' },
   packageClassList: []
 };
 
 const config = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : fallback;
+config.ios = Object.assign({ contentInset: 'never' }, config.ios || {});
+config.ios.contentInset = 'never';
 const list = Array.isArray(config.packageClassList) ? config.packageClassList : [];
 if (!list.includes('ArcadeIslandPlugin')) list.push('ArcadeIslandPlugin');
 if (!list.includes('PurchasesPlugin')) list.unshift('PurchasesPlugin');

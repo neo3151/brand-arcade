@@ -8,12 +8,21 @@ body {
 }
 
 .shop {
-  width: min(720px, calc(100% - 1.5rem));
+  width: min(720px, calc(100% - var(--safe-left, 0px) - var(--safe-right, 0px) - 1.5rem));
   margin: 0 auto;
-  padding: 1rem 0 2.5rem;
+  padding: calc(var(--safe-top, env(safe-area-inset-top, 0px)) + 1rem) 0 calc(var(--safe-bottom, env(safe-area-inset-bottom, 0px)) + 2.5rem);
+  box-sizing: border-box;
 }
 
-.shop-back a { color: #9fb4d8; }
+.shop-back a {
+  color: #9fb4d8;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 4px;
+  box-sizing: border-box;
+}
 
 h1 {
   margin: 0.35rem 0 0.25rem;
@@ -62,6 +71,8 @@ h1 {
   flex: 0 0 auto;
   border-radius: 999px;
   padding: 0.45rem 0.75rem;
+  min-height: 44px;
+  box-sizing: border-box;
   font-weight: 700;
 }
 

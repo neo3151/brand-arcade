@@ -14,6 +14,8 @@ Live Activities for the hub app (`com.gamingempire.benchmarkarcade`). Each of th
 - A win, or a Block Blast score that passes the shown best, sets `chime`. The app then updates the activity with `alertConfiguration` (title, caption, default sound). Minesweeper danger stays a visual pulse so a near-miss does not fire a banner on every tick.
 - `NSSupportsLiveActivities` is set on the app. The pending button action is the only thing stored in the App Group. The activity content itself still travels in `ContentState`.
 
+The web view is edge to edge (`ios.contentInset` `never` in `capacitor.config.json`). Pages use `viewport-fit=cover` and `assets/arcade-safe.css`. The return bar on a phone is a full-width strip under the island, each control at least 44pt, and the strip does not take taps inside the island band. The DEV HUD opens from that bar. The bottom DEV HUD pill is hidden while that button is on screen. If `env(safe-area-inset-*)` measures 0 on an iPhone, the page uses a 59pt top and 34pt bottom inset so controls are not drawn under the island.
+
 Live Activities use `ActivityContent`, which needs iOS 16.2. Earlier systems, including iOS 16.1, take the same no-op path. A phone without a Dynamic Island (status-bar inset under 51pt, including notch phones and iPad) also no-ops. The Lock Screen layout is part of the same activity, so it appears on Island phones together with the Island. Buttons render only on iOS 17. iOS 16.2 still shows the score, caption, pieces, pegs, pixel preview, numeric text transitions, and the progress animation.
 
 ## How a button reaches the game
