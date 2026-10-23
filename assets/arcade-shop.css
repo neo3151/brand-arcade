@@ -84,6 +84,18 @@ h1 {
 
 .shop-note { min-height: 1.2em; }
 
+.shop-dev-unlock {
+  display: inline-block;
+  margin: 0 0 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #7f1d1d;
+  color: #fecaca;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
 .shop-stamp {
   margin: 0.2rem 0 0.6rem;
   color: #e0f2fe;

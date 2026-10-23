@@ -180,4 +180,18 @@ Enter the **store price** in App Store Connect and Play Console. The shop shows 
 | Lunch | `com.gamingempire.benchmarkarcade.tip.lunch` | — | Consumable | $4.99 | No |
 | Dinner | `com.gamingempire.benchmarkarcade.tip.dinner` | — | Consumable | $9.99 | No |
 
+## Developer unlock
+
+`ARCADE_DEV_UNLOCK_ALL` in `assets/arcade-store-config.js` is `true` on this branch so a dev iPhone build can equip every catalog item. `ArcadeStore.owns()` then returns true for every catalog entitlement (Patron, CRT themes, skins, content packs, and bundles). The tip stamp shows House Favorite. The flag does not call RevenueCat and does not write `arcade_entitlements`, so setting it back to `false` restores the real cache.
+
+The Arcade Shop and the Passport show a **DEV UNLOCK** badge while the flag is on. Shelves and games already ask `owns()`, so those themes, skins, and packs can be applied and played.
+
+TODO: set `ARCADE_DEV_UNLOCK_ALL = false` before a release build, then run `node sync-hub.js` so `www/assets/arcade-store-config.js` matches. Before shipping, run:
+
+```
+node scripts/check-dev-unlock.js
+```
+
+That script exits with an error while the flag is `true` or missing in either config copy. It passes only when both copies set it to `false`.
+
 Offering `arcade` (current) maps one package to each row: `patron`, `vectrex`, `c64`, `tron`, `marble`, `walnut`, `stainedglass`, `solitaire-atelier`, `spider-atelier`, `cardroom`, `spades-salon`, `mahjong-tiles`, `minesweeper-sectors`, `codebreaker-terminals`, `sudoku-ink`, `nonogram-mosaic`, `wordsearch-atlas`, `explorer`, `layouts`, `holiday`, `animals`, `curated`, `heist`, `puzzler`, `complete`, `tip-coffee`, `tip-lunch`, `tip-dinner`.

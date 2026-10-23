@@ -595,11 +595,29 @@
       }
     }
 
+    function devUnlockAll() {
+      return root.ARCADE_DEV_UNLOCK_ALL === true;
+    }
+
+    function catalogEntitlement(entitlementId) {
+      for (let i = 0; i < CATALOG.length; i++) {
+        if (CATALOG[i].entitlementId === entitlementId) return true;
+      }
+      return false;
+    }
+
     function owns(entitlementId) {
       if (!entitlementId) return false;
+      if (devUnlockAll() && catalogEntitlement(entitlementId)) return true;
       if (state.entitlements[entitlementId]) return true;
       if (state.entitlements.bundle_complete && completeGrants().indexOf(entitlementId) !== -1) return true;
       return false;
+    }
+
+    function visibleTipCount() {
+      const real = state.tips.count || 0;
+      if (devUnlockAll() && real < 3) return 3;
+      return real;
     }
 
     function savings() {
@@ -695,13 +713,14 @@
       PATRON_BORDER: PATRON_BORDER,
       init: init,
       owns: owns,
+      devUnlockAll: devUnlockAll,
       purchase: purchase,
       restore: restore,
       getPrice: getPrice,
       completeGrants: completeGrants,
       savings: savings,
-      tipCount: function () { return state.tips.count || 0; },
-      supporterTier: function () { return supporterTier(state.tips.count || 0); },
+      tipCount: function () { return visibleTipCount(); },
+      supporterTier: function () { return supporterTier(visibleTipCount()); },
       lastTipMessage: function () { return state.tips.lastMessage || ''; },
       on: on,
       loadCache: loadCache

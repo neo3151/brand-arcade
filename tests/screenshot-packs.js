@@ -157,6 +157,7 @@ async function main() {
             sample: /sample/i.test(text),
             price: /\\$\\d+\\.\\d{2}/.test(text),
             overlay: !!document.getElementById('content-lock-overlay'),
+            devUnlock: window.ARCADE_DEV_UNLOCK_ALL === true,
             grid: !!document.getElementById('ws-grid') || !!document.getElementById('board-viewport') || !!document.querySelector('.nonogram-grid, .grid-wrapper, #grid-board') || !!document.getElementById('tableau-area') || !!document.querySelector('.terminal-viewport')
           };
         })()`,
@@ -168,14 +169,15 @@ async function main() {
       if (value && value.price) failures.push(name + ' showed a hard-coded price');
       if (kind === 'picker') {
         if (!value.unavailable) failures.push(name + ' missing Unavailable');
-        if (!value.locked) failures.push(name + ' missing Locked');
-        if (!value.sample) failures.push(name + ' missing Sample');
+        if (!value.devUnlock && !value.locked) failures.push(name + ' missing Locked');
+        if (!value.devUnlock && !value.sample) failures.push(name + ' missing Sample');
       }
       if (kind === 'picker' || name === 'sample_holiday' || name === 'sample_heist' || name === 'locked_parks') {
         const shot = await send('Page.captureScreenshot', { format: 'png' }, page.sessionId);
         fs.writeFileSync(path.join(outDir, name + '.png'), Buffer.from(shot.data, 'base64'));
       }
-      if (kind === 'lock' && value && !value.overlay) failures.push(name + ' did not lock');
+      if (kind === 'lock' && value && value.devUnlock && value.overlay) failures.push(name + ' stayed locked under dev unlock');
+      if (kind === 'lock' && value && !value.devUnlock && !value.overlay) failures.push(name + ' did not lock');
       if (kind === 'play' && value && value.overlay) failures.push(name + ' locked a sample');
       await page.close();
     }

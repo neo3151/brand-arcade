@@ -15,6 +15,13 @@
     androidApiKey: 'REPLACE_WITH_REVENUECAT_ANDROID_PUBLIC_SDK_KEY'
   };
 
+  // TODO: set false before release. While true, owns() treats every catalog
+  // entitlement as owned and the tip stamp shows House Favorite. It does not
+  // call RevenueCat and it does not write arcade_entitlements, so setting it
+  // back to false restores the real cache. Run `node scripts/check-dev-unlock.js`
+  // before shipping. That script fails while this is true.
+  root.ARCADE_DEV_UNLOCK_ALL = true;
+
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = root.ARCADE_STORE_CONFIG;
   }

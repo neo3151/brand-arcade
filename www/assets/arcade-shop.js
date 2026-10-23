@@ -122,7 +122,11 @@
     const note = pendingNote || (api && typeof api.lastTipMessage === 'function' ? api.lastTipMessage() : '');
     const count = api && typeof api.tipCount === 'function' ? api.tipCount() : 0;
 
-    let html = '<button type="button" id="btn-restore-purchases" class="shop-restore">Restore purchases</button>';
+    let html = '';
+    if (api && typeof api.devUnlockAll === 'function' && api.devUnlockAll()) {
+      html += '<p class="shop-dev-unlock" data-dev-unlock="1">DEV UNLOCK</p>';
+    }
+    html += '<button type="button" id="btn-restore-purchases" class="shop-restore">Restore purchases</button>';
     html += '<p id="shop-note" class="shop-note">' + esc(note) + '</p>';
 
     if (patron) {
