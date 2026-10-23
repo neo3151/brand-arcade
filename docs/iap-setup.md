@@ -6,10 +6,10 @@ Gameplay hints, undos, and power-ups stay on the Fair Play daily refill. This ph
 
 | Product | Product ID | Entitlement | What the player gets |
 | --- | --- | --- | --- |
-| Arcade Patron | `com.gamingempire.benchmarkarcade.arcade.patron` | `arcade_patron` | Passport badge row, gold `--arcade-bezel` / `--arcade-border`, thank-you note. **0 XP.** Not a trophy. |
-| Vectrex Vector | `com.gamingempire.benchmarkarcade.arcade.crt.vectrex` | `arcade_crt_vectrex` | Premium CRT phosphor |
-| Commodore 64 | `com.gamingempire.benchmarkarcade.arcade.crt.c64` | `arcade_crt_c64` | Premium CRT phosphor |
-| Tron Grid | `com.gamingempire.benchmarkarcade.arcade.crt.tron` | `arcade_crt_tron` | Premium CRT phosphor |
+| Arcade Patron | `com.gamingempire.benchmarkarcade.arcade.patron` | `arcade_patron` | $4.99. Passport badge row, gold `--arcade-bezel` / `--arcade-border`, thank-you note. **0 XP.** Not a trophy. |
+| Vectrex Vector | `com.gamingempire.benchmarkarcade.arcade.crt.vectrex` | `arcade_crt_vectrex` | $0.99. Premium CRT phosphor |
+| Commodore 64 | `com.gamingempire.benchmarkarcade.arcade.crt.c64` | `arcade_crt_c64` | $0.99. Premium CRT phosphor |
+| Tron Grid | `com.gamingempire.benchmarkarcade.arcade.crt.tron` | `arcade_crt_tron` | $0.99. Premium CRT phosphor |
 
 The four original phosphors (Cyberpunk Neon, Game Boy DMG-01, Amber Phosphor CRT, Midnight Synthwave) have no entitlement and stay free. Locked themes can be previewed. `applyTheme` refuses them until the entitlement is active. XP and achievements are never products.
 
@@ -151,10 +151,10 @@ Enter the **store price** in App Store Connect and Play Console. The shop shows 
 
 | Product | Product ID | Entitlement | Type | Store price | In Complete Collection |
 | --- | --- | --- | --- | --- | --- |
-| Arcade Patron | `com.gamingempire.benchmarkarcade.arcade.patron` | `arcade_patron` | Non-consumable | Set in the stores | Yes |
-| Vectrex Vector | `com.gamingempire.benchmarkarcade.arcade.crt.vectrex` | `arcade_crt_vectrex` | Non-consumable | Set in the stores | Yes |
-| Commodore 64 | `com.gamingempire.benchmarkarcade.arcade.crt.c64` | `arcade_crt_c64` | Non-consumable | Set in the stores | Yes |
-| Tron Grid | `com.gamingempire.benchmarkarcade.arcade.crt.tron` | `arcade_crt_tron` | Non-consumable | Set in the stores | Yes |
+| Arcade Patron | `com.gamingempire.benchmarkarcade.arcade.patron` | `arcade_patron` | Non-consumable | $4.99 | Yes |
+| Vectrex Vector | `com.gamingempire.benchmarkarcade.arcade.crt.vectrex` | `arcade_crt_vectrex` | Non-consumable | $0.99 | Yes |
+| Commodore 64 | `com.gamingempire.benchmarkarcade.arcade.crt.c64` | `arcade_crt_c64` | Non-consumable | $0.99 | Yes |
+| Tron Grid | `com.gamingempire.benchmarkarcade.arcade.crt.tron` | `arcade_crt_tron` | Non-consumable | $0.99 | Yes |
 | Marble | `com.gamingempire.benchmarkarcade.blockblast.skin.marble` | `blockblast_skin_marble` | Non-consumable | $0.99 | Yes |
 | Walnut Inlay | `com.gamingempire.benchmarkarcade.blockblast.skin.walnut` | `blockblast_skin_walnut` | Non-consumable | $0.99 | Yes |
 | Stained Glass | `com.gamingempire.benchmarkarcade.blockblast.skin.stainedglass` | `blockblast_skin_stainedglass` | Non-consumable | $0.99 | Yes |
@@ -181,13 +181,3 @@ Enter the **store price** in App Store Connect and Play Console. The shop shows 
 | Dinner | `com.gamingempire.benchmarkarcade.tip.dinner` | — | Consumable | $9.99 | No |
 
 Offering `arcade` (current) maps one package to each row: `patron`, `vectrex`, `c64`, `tron`, `marble`, `walnut`, `stainedglass`, `solitaire-atelier`, `spider-atelier`, `cardroom`, `spades-salon`, `mahjong-tiles`, `minesweeper-sectors`, `codebreaker-terminals`, `sudoku-ink`, `nonogram-mosaic`, `wordsearch-atlas`, `explorer`, `layouts`, `holiday`, `animals`, `curated`, `heist`, `puzzler`, `complete`, `tip-coffee`, `tip-lunch`, `tip-dinner`.
-
-I used the earlier phase prices for Patron and the CRT themes as $2.99 and $0.99. Let me verify the original docs didn't specify patron/crt dollar prices in the first table... The first table didn't include store prices for patron and CRTs. I invented $2.99 and $0.99. The user only specified Complete Collection $14.99 and tips $1.99/$4.99/$9.99. I should NOT invent patron and CRT prices if they weren't specified.
-
-Looking at the original docs table, Patron and CRTs don't have a store price column. Phase 2 and 3 have prices. I should mark Patron and CRT store prices as "set in the store" or look at passport/code for a price. The user didn't specify them. I'll put "Set in App Store Connect" or leave the price blank / "store price" rather than inventing $2.99 and $0.99.
-
-If earlier phases documented them somewhere... The first table doesn't have prices. I'll use an em dash or "store price" for those four so I don't invent numbers. The final table can say the amount only where a phase specified it.
-
-I'll fix the table prices for patron and CRTs to not invent dollars. "Set in the stores" is honest.
-
-Also I should check phase 1 if a price was mentioned in conversation. The summary didn't list patron price. I'll change those four cells.

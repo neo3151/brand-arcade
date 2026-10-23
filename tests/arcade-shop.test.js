@@ -76,6 +76,10 @@ async function main() {
   const ctx = load(createMemoryStorage());
   const catalog = ctx.ArcadeStore.CATALOG;
   assert.strictEqual(catalog.length, 28, 'final product count');
+  assert.strictEqual(catalog.find(item => item.id === 'patron').listPrice, '$4.99');
+  ['vectrex', 'c64', 'tron'].forEach(id => {
+    assert.strictEqual(catalog.find(item => item.id === id).listPrice, '$0.99');
+  });
   const tips = catalog.filter(item => item.kind === 'tip');
   assert.strictEqual(Array.prototype.map.call(tips, item => item.productId).join('|'), [COFFEE, LUNCH, DINNER].join('|'));
   tips.forEach(item => {
@@ -237,10 +241,17 @@ async function main() {
   [COMPLETE, COFFEE, LUNCH, DINNER, 'bundle_complete'].forEach(id => {
     assert.ok(docs.includes(id), id);
   });
+  assert.ok(docs.includes('| Arcade Patron | `com.gamingempire.benchmarkarcade.arcade.patron` | `arcade_patron` | Non-consumable | $4.99 | Yes |'));
+  assert.ok(docs.includes('| Tron Grid | `com.gamingempire.benchmarkarcade.arcade.crt.tron` | `arcade_crt_tron` | Non-consumable | $0.99 | Yes |'));
+  assert.strictEqual(docs.includes('Set in the stores'), false);
+  assert.strictEqual(docs.includes('I invented'), false);
   const changelog = fs.readFileSync(path.join(root, 'CHANGELOG.md'), 'utf8');
   assert.ok(changelog.includes('Fair Play'));
   assert.ok(changelog.includes('Complete Collection'));
   assert.ok(changelog.includes('28'));
+  assert.ok(changelog.includes('daily refill to 15'));
+  assert.ok(changelog.includes('unlocked all levels 1–1,000'));
+  assert.strictEqual(changelog.includes('1,000 coins'), false);
 
   console.log('arcade-shop: 28 products, grants, tips, and shop copy passed');
 }

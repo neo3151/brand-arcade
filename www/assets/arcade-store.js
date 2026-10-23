@@ -21,12 +21,15 @@
   const PATRON_BEZEL = '#3d2b08';
   const PATRON_BORDER = '#e6b325';
 
+  // listPrice is the planned App Store / Play amount for setup. The shop
+  // never reads it. getPrice() stays the localized store string, or null on the web.
   const CATALOG = [
     {
       id: 'patron',
       productId: 'com.gamingempire.benchmarkarcade.arcade.patron',
       entitlementId: 'arcade_patron',
       kind: 'patron',
+      listPrice: '$4.99',
       name: 'Arcade Patron'
     },
     {
@@ -35,6 +38,7 @@
       entitlementId: 'arcade_crt_vectrex',
       kind: 'theme',
       themeId: 'vectrex',
+      listPrice: '$0.99',
       name: 'Vectrex Vector'
     },
     {
@@ -43,6 +47,7 @@
       entitlementId: 'arcade_crt_c64',
       kind: 'theme',
       themeId: 'c64',
+      listPrice: '$0.99',
       name: 'Commodore 64'
     },
     {
@@ -51,6 +56,7 @@
       entitlementId: 'arcade_crt_tron',
       kind: 'theme',
       themeId: 'tron',
+      listPrice: '$0.99',
       name: 'Tron Grid'
     },
     {

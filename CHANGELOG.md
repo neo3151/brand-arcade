@@ -4,7 +4,7 @@ Hub app only (`com.gamingempire.benchmarkarcade`). Standalone game apps stay fre
 
 ## Phase 0 — Fair Play
 
-Replaced simulated coin shops for hints and power-ups with a morning refill of 15 consumables. Level unlocks sit at 1,000 coins. No real-money products.
+PR #1 removed the simulated real-money shops, added a daily refill to 15 and milestone grants, and unlocked all levels 1–1,000. Play-earned coin cosmetics stay. No real-money products.
 
 ## Phase 1 — Hub store
 
