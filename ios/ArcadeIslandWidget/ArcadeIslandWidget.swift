@@ -21,9 +21,10 @@ struct ArcadeIslandLiveActivity: Widget {
                     IslandMark(gameId: context.attributes.gameId, accent: context.state.accent)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text(context.state.primary)
+                    Text(context.state.celebrate ? "Won" : context.state.primary)
                         .font(.headline.monospacedDigit())
                         .foregroundStyle(Color(hex: context.state.alert ? "#ff5a5a" : context.state.ink))
+                        .contentTransition(.numericText())
                         .lineLimit(1)
                 }
                 DynamicIslandExpandedRegion(.center) {
@@ -47,6 +48,7 @@ struct ArcadeIslandLiveActivity: Widget {
                 Text(context.state.primary)
                     .font(.caption.monospacedDigit().weight(.bold))
                     .foregroundStyle(Color(hex: context.state.alert ? "#ff5a5a" : context.state.ink))
+                    .contentTransition(.numericText())
             } minimal: {
                 IslandMark(gameId: context.attributes.gameId, accent: context.state.accent)
             }
@@ -73,9 +75,10 @@ struct IslandLockScreen: View {
                     .font(.headline)
                     .foregroundStyle(Color(hex: state.ink))
                 Spacer()
-                Text(state.primary)
+                Text(state.celebrate ? "Won" : state.primary)
                     .font(.title3.monospacedDigit().weight(.bold))
                     .foregroundStyle(Color(hex: state.alert ? "#ff5a5a" : state.ink))
+                    .contentTransition(.numericText())
             }
             IslandExpanded(gameId: gameId, state: state)
             if state.streak > 0 {
@@ -95,6 +98,15 @@ struct IslandExpanded: View {
     let state: ArcadeIslandAttributes.ContentState
 
     var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            gameBody
+            IslandFooter(gameId: gameId, state: state)
+        }
+        .animation(.easeInOut(duration: 0.35), value: state.progress)
+    }
+
+    @ViewBuilder
+    private var gameBody: some View {
         switch gameId {
         case "blockblast":
             BlockBlastIsland(state: state)
@@ -253,14 +265,14 @@ private struct NonogramIsland: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            LazyVGrid(columns: Array(repeating: GridItem(.fixed(5), spacing: 1), count: 8), spacing: 1) {
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(8), spacing: 1), count: 8), spacing: 1) {
                 ForEach(0..<64, id: \.self) { index in
                     Rectangle()
                         .fill(cell(index))
-                        .frame(width: 5, height: 5)
+                        .frame(width: 8, height: 8)
                 }
             }
-            .frame(width: 47)
+            .frame(width: 71)
             Text(state.secondary)
                 .font(.caption2)
                 .foregroundStyle(Color(hex: state.ink))
@@ -284,9 +296,10 @@ private struct MinesweeperIsland: View {
         HStack(spacing: 8) {
             TimelineView(.periodic(from: .now, by: 0.7)) { timeline in
                 let on = state.alert && Int(timeline.date.timeIntervalSinceReferenceDate / 0.7) % 2 == 0
-                Circle()
-                    .fill(state.alert ? Color(hex: on ? "#ff2a2a" : "#7a1818") : Color(hex: state.accent))
-                    .frame(width: 10, height: 10)
+                Image(systemName: state.alert ? "exclamationmark.triangle.fill" : "flag.fill")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color(hex: state.alert ? (on ? "#ff2a2a" : "#7a1818") : state.accent))
+                    .modifier(IslandPulse(on: state.alert))
             }
             Text(state.secondary)
                 .font(.caption.monospacedDigit())
@@ -325,18 +338,35 @@ private struct CodebreakerIsland: View {
     let state: ArcadeIslandAttributes.ContentState
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 4) {
-            ForEach(0..<6, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color(hex: state.accent).opacity(mark(index) > 0.5 ? 1 : 0.28))
-                    .frame(width: 8, height: 6 + CGFloat(mark(index)) * 12)
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .bottom, spacing: 4) {
+                ForEach(0..<6, id: \.self) { index in
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color(hex: state.accent).opacity(mark(index) > 0.5 ? 1 : 0.28))
+                        .frame(width: 8, height: 6 + CGFloat(mark(index)) * 12)
+                }
+                Spacer(minLength: 4)
+                Text(state.secondary)
+                    .font(.caption2)
+                    .foregroundStyle(Color(hex: state.ink))
+                    .lineLimit(2)
             }
-            Spacer(minLength: 4)
-            Text(state.secondary)
-                .font(.caption2)
-                .foregroundStyle(Color(hex: state.ink))
-                .lineLimit(2)
+            if !state.pieces.isEmpty {
+                HStack(spacing: 3) {
+                    ForEach(Array(state.pieces.prefix(8).enumerated()), id: \.offset) { _, peg in
+                        Circle()
+                            .fill(pegColor(peg))
+                            .frame(width: 7, height: 7)
+                    }
+                }
+            }
         }
+    }
+
+    private func pegColor(_ peg: String) -> Color {
+        if peg == "exact" { return Color(hex: state.accent) }
+        if peg == "partial" { return Color(hex: state.ink) }
+        return Color(hex: state.ink).opacity(0.28)
     }
 
     private func mark(_ index: Int) -> Double {
@@ -422,6 +452,111 @@ private struct SpadesIsland: View {
                     .font(.caption.monospacedDigit().weight(.bold))
                     .foregroundStyle(Color(hex: state.ink))
             }
+        }
+    }
+}
+
+private struct IslandFooter: View {
+    let gameId: String
+    let state: ArcadeIslandAttributes.ContentState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if gameId == "blockblast" {
+                HStack(spacing: 6) {
+                    ForEach(Array(state.pieces.prefix(3).enumerated()), id: \.offset) { _, code in
+                        PieceGlyph(code: code, accent: state.accent)
+                    }
+                }
+            }
+            if !state.caption.isEmpty {
+                Text(state.caption)
+                    .font(.caption2)
+                    .foregroundStyle(Color(hex: state.ink))
+                    .lineLimit(2)
+            }
+            if state.supply > 0 {
+                Text("\(state.supply) left")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(Color(hex: state.accent))
+                    .contentTransition(.numericText())
+            }
+            IslandControls(gameId: gameId, state: state)
+        }
+    }
+}
+
+private struct PieceGlyph: View {
+    let code: String
+    let accent: String
+
+    var body: some View {
+        let rows = code.split(separator: "/")
+        VStack(spacing: 1) {
+            ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                HStack(spacing: 1) {
+                    ForEach(Array(row.enumerated()), id: \.offset) { _, bit in
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(Color(hex: accent).opacity(bit == "1" ? 1 : 0.18))
+                            .frame(width: 4, height: 4)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct IslandControls: View {
+    let gameId: String
+    let state: ArcadeIslandAttributes.ContentState
+
+    var body: some View {
+        if #available(iOS 17.0, *) {
+            HStack(spacing: 6) {
+                ForEach(state.actions.prefix(3), id: \.self) { action in
+                    if action == "pause" || action == "flag" {
+                        Toggle(isOn: action == "flag" ? state.flagMode : state.paused, intent: ArcadeIslandActionIntent(gameId: gameId, action: action)) {
+                            Text(action == "pause" && state.paused ? "Resume" : IslandControls.label(action))
+                                .font(.caption2.weight(.bold))
+                        }
+                        .toggleStyle(.button)
+                    } else {
+                        Button(intent: ArcadeIslandActionIntent(gameId: gameId, action: action)) {
+                            Text(IslandControls.label(action))
+                                .font(.caption2.weight(.bold))
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
+            }
+        }
+    }
+
+    static func label(_ action: String) -> String {
+        switch action {
+        case "rotate": return "Rotate"
+        case "pause": return "Pause"
+        case "hint": return "Hint"
+        case "draw": return "Draw"
+        case "row": return "Hint"
+        case "flag": return "Flag"
+        case "shuffle": return "Shuffle"
+        case "decrypt": return "Decrypt"
+        case "cycle": return "Next"
+        case "deal": return "Deal"
+        case "play": return "Play"
+        default: return action
+        }
+    }
+}
+
+private struct IslandPulse: ViewModifier {
+    var on: Bool
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, *), on {
+            content.symbolEffect(.pulse)
+        } else {
+            content
         }
     }
 }

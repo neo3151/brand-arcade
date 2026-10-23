@@ -3,8 +3,11 @@
  *
  * window.ArcadeIsland.start / update / end talk to the local Capacitor
  * plugin. On the web, on Android, and when the phone cannot show an Island,
- * every call resolves and does not throw. Nothing here changes rules, hints,
- * scores, or offers a purchase.
+ * every call resolves and does not throw.
+ *
+ * iOS 17 Live Activity buttons call applyIntent. That clicks the same
+ * on-screen control the game already uses, so a hint or power-up spends the
+ * daily supply once. It does not add hints and it does not offer a purchase.
  */
 (function (root) {
   'use strict';
@@ -99,6 +102,8 @@
       if (v === 1 || v === 2) return v;
       return 0;
     }) : [];
+    const actions = Array.isArray(src.actions) ? src.actions.slice(0, 4).map(item => clip(item, 16)) : [];
+    const pieces = Array.isArray(src.pieces) ? src.pieces.slice(0, 8).map(item => clip(item, 48)) : [];
     return {
       gameId: game,
       gameName: meta.name,
@@ -115,7 +120,15 @@
       grid: grid,
       accent: tone.accent,
       surface: tone.surface,
-      ink: tone.ink
+      ink: tone.ink,
+      paused: !!src.paused,
+      flagMode: !!src.flagMode,
+      celebrate: !!src.celebrate || phase === 'won',
+      chime: !!src.chime,
+      supply: Math.max(0, parseInt(src.supply, 10) || 0),
+      actions: actions,
+      pieces: pieces,
+      caption: clip(src.caption, 80)
     };
   }
 
@@ -163,7 +176,9 @@
       lastSent = Date.now();
       lastKey = JSON.stringify([
         payload.phase, payload.primary, payload.secondary, payload.detail,
-        payload.alert, payload.progress, payload.streak
+        payload.alert, payload.progress, payload.streak, payload.caption,
+        payload.paused, payload.flagMode, payload.chime, payload.supply,
+        (payload.pieces || []).join(','), (payload.actions || []).join(',')
       ]);
       return nativeCall(method, payload);
     }
@@ -185,7 +200,9 @@
       if (!body || !generation) return Promise.resolve({ ok: false, reason: 'idle' });
       const key = JSON.stringify([
         body.phase, body.primary, body.secondary, body.detail,
-        body.alert, body.progress, body.streak
+        body.alert, body.progress, body.streak, body.caption,
+        body.paused, body.flagMode, body.chime, body.supply,
+        (body.pieces || []).join(','), (body.actions || []).join(',')
       ]);
       const urgent = !!immediate || body.phase !== 'playing' || body.alert;
       if (!urgent && key === lastKey) return Promise.resolve({ ok: true, throttled: true });
@@ -248,6 +265,94 @@
     return '';
   }
 
+  function countText(doc, id) {
+    const n = parseInt(textOf(doc, id).replace(/[^0-9]/g, ''), 10);
+    return isFinite(n) ? n : 0;
+  }
+
+  function countClass(doc, className) {
+    const nodes = list(doc, '.' + className);
+    if (!nodes.length) return 0;
+    const n = parseInt(String(nodes[0].textContent || '').replace(/[^0-9]/g, ''), 10);
+    return isFinite(n) ? n : 0;
+  }
+
+  function flagged(doc, id, name) {
+    const el = doc && doc.getElementById ? doc.getElementById(id) : null;
+    return !!(el && el.dataset && el.dataset[name]);
+  }
+
+  function classed(doc, id, token) {
+    const el = doc && doc.getElementById ? doc.getElementById(id) : null;
+    if (!el) return false;
+    return String(el.className || '').split(/\s+/).indexOf(token) !== -1;
+  }
+
+  function pieceCodes(doc) {
+    const out = [];
+    for (let i = 0; i < 3; i++) {
+      const slot = doc && doc.getElementById ? doc.getElementById('tray-slot-' + i) : null;
+      const piece = slot && slot.querySelector ? slot.querySelector('.tray-piece') : null;
+      if (!piece) { out.push(''); continue; }
+      const cols = parseInt(String(piece.style && piece.style.gridTemplateColumns || '').replace(/\D/g, ''), 10) || 0;
+      const tiles = piece.querySelectorAll ? piece.querySelectorAll('.piece-tile') : [];
+      const rows = [];
+      let row = '';
+      for (let t = 0; t < tiles.length; t++) {
+        const bg = tiles[t] && tiles[t].style && tiles[t].style.backgroundColor;
+        row += bg ? '1' : '0';
+        if (cols && (t + 1) % cols === 0) { rows.push(row); row = ''; }
+      }
+      if (row) rows.push(row);
+      out.push(rows.join('/'));
+    }
+    return out;
+  }
+
+  function hintedTiles(doc) {
+    return list(doc, '.mj-tile--hint').map(function (el) {
+      return String(el.textContent || '').trim();
+    }).filter(Boolean).slice(0, 2).join(' + ');
+  }
+
+  function pegMarks(doc) {
+    const rows = list(doc, '.guess-row--submitted');
+    const last = rows.length ? rows[rows.length - 1] : null;
+    if (!last || !last.querySelectorAll) return [];
+    return Array.prototype.slice.call(last.querySelectorAll('.feedback-peg')).slice(0, 8).map(function (peg) {
+      const cls = String(peg.className || '');
+      if (cls.indexOf('exact') !== -1) return 1;
+      if (cls.indexOf('partial') !== -1) return 0.5;
+      return 0.15;
+    });
+  }
+
+  function pegCaption(doc) {
+    const marks = pegMarks(doc);
+    if (!marks.length) return '';
+    const exact = marks.filter(function (n) { return n === 1; }).length;
+    const partial = marks.filter(function (n) { return n === 0.5; }).length;
+    return exact + ' exact · ' + partial + ' partial';
+  }
+
+  function focusedWord(doc) {
+    const focused = list(doc, '.word-item.island-next');
+    const word = focused.length ? String(focused[0].textContent || '').trim() : '';
+    if (!word) return '';
+    return 'Next ' + word.charAt(0);
+  }
+
+  function handCaption(doc) {
+    const cards = list(doc, '#human-hand .playable, #human-hand .card');
+    const hand = list(doc, '#human-hand .card');
+    const status = textOf(doc, 'trick-status-text');
+    const played = ['north', 'west', 'east', 'south'].map(function (seat) {
+      return textOf(doc, 'trick-slot-' + seat);
+    }).filter(Boolean).join(' ');
+    const count = hand.length || cards.length;
+    return (count ? (count + ' in hand') : 'Hand') + (status ? ' · ' + status : '') + (played ? ' · ' + played : '');
+  }
+
   function read(doc, game) {
     const skinId = skinFrom(doc);
     if (game === 'blockblast') {
@@ -262,7 +367,13 @@
         detail: combo > 1 ? ('x' + combo) : '',
         progress: clamp(parseInt(score, 10) / 4000),
         marks: [clamp(combo / 5)],
-        alert: false
+        alert: false,
+        actions: ['rotate', 'pause'],
+        pieces: pieceCodes(doc),
+        paused: shown(doc.getElementById('pause-modal')),
+        supply: countText(doc, 'badge-rotate'),
+        caption: combo > 1 ? ('Combo x' + combo) : '',
+        highScore: (parseInt(score, 10) || 0) > countText(doc, 'hud-best-score') && countText(doc, 'hud-best-score') > 0
       };
     }
     if (game === 'solitaire') {
@@ -280,7 +391,10 @@
         secondary: placed + ' to foundation',
         detail: textOf(doc, 'hud-timer'),
         progress: placed / 52,
-        marks: marks
+        marks: marks,
+        actions: ['hint', 'draw'],
+        supply: countText(doc, 'badge-hints'),
+        caption: textOf(doc, 'hint-text')
       };
     }
     if (game === 'sudoku') {
@@ -294,7 +408,11 @@
         primary: textOf(doc, 'timer') || '00:00',
         secondary: left + ' cells left',
         detail: 'Ink',
-        progress: filled / 81
+        progress: filled / 81,
+        actions: ['pause', 'hint'],
+        paused: flagged(doc, 'timer', 'paused'),
+        supply: countText(doc, 'hint-count') || countClass(doc, 'hint-count'),
+        caption: textOf(doc, 'hint-explanation-text')
       };
     }
     if (game === 'nonogram') {
@@ -322,7 +440,10 @@
         secondary: 'Picture',
         detail: textOf(doc, 'game-timer-val'),
         progress: cells.length ? filled / cells.length : 0,
-        grid: grid
+        grid: grid,
+        actions: ['row'],
+        supply: countText(doc, 'badge-hints'),
+        caption: textOf(doc, 'hint-text')
       };
     }
     if (game === 'minesweeper') {
@@ -337,7 +458,11 @@
         secondary: (mines.replace(/^0+/, '') || '0') + ' mines',
         detail: textOf(doc, 'led-timer'),
         progress: 0,
-        alert: !won && (exploded || hot > 0)
+        alert: !won && (exploded || hot > 0),
+        actions: ['flag', 'pause'],
+        flagMode: classed(doc, 'mode-flag', 'is-active'),
+        paused: flagged(doc, 'led-timer', 'paused'),
+        caption: classed(doc, 'mode-flag', 'is-active') ? 'Flag mode' : 'Dig mode'
       };
     }
     if (game === 'mahjong') {
@@ -349,7 +474,10 @@
         primary: String(left),
         secondary: left + ' pairs',
         detail: textOf(doc, 'timer-display'),
-        progress: clamp(1 - left / 72)
+        progress: clamp(1 - left / 72),
+        actions: ['shuffle', 'hint'],
+        supply: countText(doc, 'badge-hint'),
+        caption: hintedTiles(doc)
       };
     }
     if (game === 'codebreaker') {
@@ -368,7 +496,15 @@
         secondary: left + ' attempts',
         detail: 'Vault',
         progress: max ? used / max : 0,
-        marks: marks
+        marks: marks,
+        pieces: pegMarks(doc).map(function (n) {
+          if (n === 1) return 'exact';
+          if (n === 0.5) return 'partial';
+          return 'miss';
+        }),
+        actions: ['decrypt'],
+        supply: countText(doc, 'badge-decrypt'),
+        caption: pegCaption(doc)
       };
     }
     if (game === 'wordsearch') {
@@ -384,7 +520,10 @@
         primary: found + '/' + total,
         secondary: found + ' / ' + total,
         detail: latest,
-        progress: total ? found / total : 0
+        progress: total ? found / total : 0,
+        actions: ['cycle', 'hint'],
+        supply: countText(doc, 'hint-count'),
+        caption: focusedWord(doc)
       };
     }
     if (game === 'spidersolitaire') {
@@ -396,7 +535,10 @@
         secondary: done + ' runs',
         detail: textOf(doc, 'timer-val'),
         progress: done / 8,
-        marks: [done / 8]
+        marks: [done / 8],
+        actions: ['deal', 'hint'],
+        supply: countText(doc, 'badge-hints'),
+        caption: textOf(doc, 'stock-deals-count')
       };
     }
     if (game === 'spades') {
@@ -414,7 +556,9 @@
         primary: us,
         secondary: them,
         detail: (tricks || '0/0') + ' vs ' + (theirs || '0/0'),
-        progress: 0
+        progress: 0,
+        actions: ['play'],
+        caption: handCaption(doc)
       };
     }
     return null;
@@ -432,6 +576,117 @@
     return /(?:^|\/)game\.html$/.test(String(path || '').split('?')[0]);
   }
 
+  function clickId(doc, id) {
+    const el = doc && doc.getElementById ? doc.getElementById(id) : null;
+    if (!el || typeof el.click !== 'function') return false;
+    el.click();
+    return true;
+  }
+
+  function clickFirst(doc, selector) {
+    const nodes = list(doc, selector);
+    const el = nodes[0];
+    if (!el || typeof el.click !== 'function') return false;
+    el.click();
+    return true;
+  }
+
+  const ROUTES = {
+    blockblast: {
+      rotate: function (doc) { return clickId(doc, 'powerup-rotate-btn'); },
+      pause: function (doc) {
+        return shown(doc.getElementById('pause-modal')) ? clickId(doc, 'resume-btn') : clickId(doc, 'pause-btn');
+      }
+    },
+    solitaire: {
+      hint: function (doc) { return clickId(doc, 'btn-hint'); },
+      draw: function (doc) { return clickId(doc, 'stock-slot'); }
+    },
+    sudoku: {
+      hint: function (doc) {
+        const first = clickId(doc, 'hint-btn');
+        if (doc.getElementById && doc.getElementById('reveal-btn')) clickId(doc, 'reveal-btn');
+        return first;
+      },
+      pause: function (doc) {
+        const hooks = root.ArcadeIslandHooks;
+        if (!hooks || typeof hooks.togglePause !== 'function') return false;
+        return hooks.togglePause(doc) !== false;
+      }
+    },
+    nonogram: {
+      row: function (doc) {
+        const opened = clickId(doc, 'pwr-hint-btn');
+        if (doc.getElementById && doc.getElementById('hint-apply-btn')) clickId(doc, 'hint-apply-btn');
+        return opened;
+      }
+    },
+    minesweeper: {
+      flag: function (doc) {
+        return classed(doc, 'mode-flag', 'is-active') ? clickId(doc, 'mode-dig') : clickId(doc, 'mode-flag');
+      },
+      pause: function (doc) {
+        const game = root.Game;
+        const timer = game && game.State && game.State.timer;
+        if (!timer || typeof timer.pause !== 'function') return false;
+        if (timer.running) timer.pause();
+        else if (typeof timer.start === 'function') timer.start();
+        const led = doc.getElementById && doc.getElementById('led-timer');
+        if (led && led.dataset) led.dataset.paused = timer.running ? '' : '1';
+        return true;
+      }
+    },
+    mahjong: {
+      hint: function (doc) { return clickId(doc, 'btn-hint'); },
+      shuffle: function (doc) { return clickId(doc, 'btn-shuffle'); }
+    },
+    codebreaker: {
+      decrypt: function (doc) { return clickId(doc, 'btn-equip-decrypt'); }
+    },
+    wordsearch: {
+      hint: function (doc) { return clickId(doc, 'hint-btn'); },
+      cycle: function (doc) {
+        const items = list(doc, '.word-item').filter(function (el) {
+          return String(el.className || '').indexOf('found') === -1;
+        });
+        if (!items.length) return false;
+        let index = 0;
+        for (let i = 0; i < items.length; i++) {
+          if (String(items[i].className || '').indexOf('island-next') !== -1) {
+            index = (i + 1) % items.length;
+          }
+          items[i].className = String(items[i].className || '').replace(/\bisland-next\b/g, '').trim();
+        }
+        items[index].className = (items[index].className ? items[index].className + ' ' : '') + 'island-next';
+        return true;
+      }
+    },
+    spidersolitaire: {
+      deal: function (doc) { return clickId(doc, 'stock-card-slot'); },
+      hint: function (doc) { return clickId(doc, 'pwr-hint-btn'); }
+    },
+    spades: {
+      play: function (doc) { return clickFirst(doc, '#human-hand .playable'); }
+    }
+  };
+
+  function applyIntent(request, doc) {
+    const page = doc || root.document;
+    const action = typeof request === 'string' ? request : (request && request.action);
+    const path = (root.location && root.location.pathname) || '';
+    const game = (request && request.game) || gameFromPath(path);
+    const routes = ROUTES[game];
+    const run = routes && action && routes[action];
+    if (!run) return Promise.resolve({ ok: false, reason: 'unknown-action', game: game || '', action: action || '' });
+    let clicked = false;
+    try { clicked = !!run(page); } catch (e) { clicked = false; }
+    const reading = read(page, game) || { game: game };
+    if (!clicked) reading.caption = reading.caption || 'Nothing to do';
+    return bridge.update(reading, true).then(function () {
+      return { ok: clicked, reason: clicked ? 'applied' : 'unavailable', game: game, action: action };
+    });
+  }
+
   let watching = false;
 
   function watch(doc) {
@@ -442,6 +697,7 @@
     watching = true;
     let started = false;
     let lastPhase = '';
+    let cheered = false;
 
     let timer = null;
 
@@ -455,6 +711,11 @@
         return;
       }
       const immediate = reading.phase !== lastPhase;
+      if ((reading.phase === 'won' || reading.highScore) && !cheered) {
+        reading.chime = true;
+        reading.celebrate = reading.phase === 'won' || !!reading.highScore;
+        cheered = true;
+      }
       lastPhase = reading.phase;
       if (reading.phase === 'won' || reading.phase === 'lost') {
         if (timer) clearInterval(timer);
@@ -482,6 +743,8 @@
     update: function (reading) { return bridge.update(reading, !!(reading && reading.immediate)); },
     end: function (reading) { return bridge.end(reading || {}); },
     support: function () { return nativeCall('support', {}); },
+    applyIntent: applyIntent,
+    routes: ROUTES,
     watch: watch
   };
 

@@ -1,3 +1,4 @@
+import ArcadeIslandKit
 import Capacitor
 import UIKit
 
@@ -17,6 +18,24 @@ enum ArcadeIslandRouter {
         attempts = 0
         flush()
         return true
+    }
+
+    static func flushIntent() {
+        guard let payload = ArcadeIslandInbox.take(), let action = payload["action"] else { return }
+        let game = payload["game"] ?? ""
+        let token = payload["id"] ?? ""
+        let js = "window.ArcadeIsland&&window.ArcadeIsland.applyIntent({game:'\(game)',action:'\(action)',id:'\(token)'})"
+        deliver(js, attempts: 0)
+    }
+
+    private static func deliver(_ js: String, attempts: Int) {
+        guard let webView = bridgeController()?.bridge?.webView else {
+            if attempts < 15 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { deliver(js, attempts: attempts + 1) }
+            }
+            return
+        }
+        webView.evaluateJavaScript(js, completionHandler: nil)
     }
 
     static func flush() {

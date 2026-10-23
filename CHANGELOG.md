@@ -28,4 +28,4 @@ The tip jar is three consumables: Coffee $1.99, Lunch $4.99, Dinner $9.99. Each 
 
 ## Dynamic Island
 
-Each of the 10 hub games can show an iPhone Live Activity while a round is in progress. The Island is a status display only: it does not change rules, hints, scores, or sell anything. Web, Android, and iPhones without a Dynamic Island leave it idle. Setup is in `docs/dynamic-island.md`.
+Each of the 10 hub games can show an iPhone Live Activity while a round is in progress. On iOS 17 the expanded Island can press the same hint, power-up, or board control the game already uses, and that spends the daily supply once. iOS 16.2 stays read-only. A win or a new Block Blast best plays an alert. Web, Android, and iPhones without a Dynamic Island leave it idle. Setup is in `docs/dynamic-island.md`.

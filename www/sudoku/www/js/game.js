@@ -828,6 +828,17 @@ function moveSelection(delta) {
 // ---------------------------------------------------------------------------
 // DOMContentLoaded
 // ---------------------------------------------------------------------------
+window.ArcadeIslandHooks = {
+  togglePause() {
+    if (!State.timer || State.gameOver || State.won) return false;
+    if (State.timer.running) State.timer.pause();
+    else State.timer.resume();
+    const el = document.getElementById('timer');
+    if (el && el.dataset) el.dataset.paused = State.timer.running ? '' : '1';
+    return !State.timer.running;
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   initGame();
   bindControls();

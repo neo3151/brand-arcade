@@ -68,8 +68,13 @@ public enum ArcadeIslandClient {
         if claimed != ticket { return ["ok": true, "stale": true] }
         let state = contentState(from: payload)
         let content = ActivityContent(state: state, staleDate: nil)
+        let banner = chime(for: state)
         for activity in Activity<ArcadeIslandAttributes>.activities {
-            await activity.update(content)
+            if let banner {
+                await activity.update(content, alertConfiguration: banner)
+            } else {
+                await activity.update(content)
+            }
         }
         return ["ok": true]
     }
@@ -118,8 +123,41 @@ public enum ArcadeIslandClient {
             grid: ints(payload["grid"]).prefix(64).map { min(2, max(0, $0)) },
             accent: clip(payload["accent"] as? String ?? "#e6b325", 9),
             surface: clip(payload["surface"] as? String ?? "#140e09", 9),
-            ink: clip(payload["ink"] as? String ?? "#f6e7c1", 9)
+            ink: clip(payload["ink"] as? String ?? "#f6e7c1", 9),
+            paused: boolValue(payload["paused"]),
+            flagMode: boolValue(payload["flagMode"]),
+            celebrate: boolValue(payload["celebrate"]),
+            chime: boolValue(payload["chime"]),
+            supply: max(0, intValue(payload["supply"]) ?? 0),
+            actions: strings(payload["actions"]).prefix(4).map { clip($0, 16) },
+            pieces: strings(payload["pieces"]).prefix(8).map { clip($0, 48) },
+            caption: clip(payload["caption"] as? String ?? "", 80)
         )
+    }
+
+    @available(iOS 16.2, *)
+    private static func chime(for state: ArcadeIslandAttributes.ContentState) -> AlertConfiguration? {
+        guard state.chime else { return nil }
+        let body = state.caption.isEmpty ? state.headline : state.caption
+        return AlertConfiguration(
+            title: LocalizedStringResource(stringLiteral: state.headline.isEmpty ? "Benchmark Arcade" : state.headline),
+            body: LocalizedStringResource(stringLiteral: body),
+            sound: .default
+        )
+    }
+
+    private static func boolValue(_ raw: Any?) -> Bool {
+        if let flag = raw as? Bool { return flag }
+        if let number = raw as? NSNumber { return number.boolValue }
+        return false
+    }
+
+    private static func strings(_ raw: Any?) -> [String] {
+        guard let list = raw as? [Any] else { return [] }
+        return list.compactMap { item in
+            if let text = item as? String { return text }
+            return nil
+        }
     }
 
     private static func intValue(_ raw: Any?) -> Int? {

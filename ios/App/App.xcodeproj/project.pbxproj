@@ -20,6 +20,8 @@
 		A15A1102A000000000000003 /* ArcadeIslandPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000003 /* ArcadeIslandPlugin.swift */; };
 		A15A1102A000000000000004 /* ArcadeIslandRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000004 /* ArcadeIslandRouter.swift */; };
 		A15A1102A000000000000005 /* ArcadeIslandWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000005 /* ArcadeIslandWidget.swift */; };
+		A15A1102A00000000000000A /* ArcadeIslandInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A1101A00000000000000B /* ArcadeIslandInbox.swift */; };
+		A15A1102A00000000000000B /* ArcadeIslandIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A1101A00000000000000C /* ArcadeIslandIntent.swift */; };
 		A15A1102A000000000000006 /* ArcadeIslandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000007 /* ArcadeIslandKit.framework */; };
 		A15A1102A000000000000007 /* ArcadeIslandKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000007 /* ArcadeIslandKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A15A1102A000000000000008 /* ArcadeIslandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000007 /* ArcadeIslandKit.framework */; };
@@ -47,6 +49,10 @@
 		A15A1101A000000000000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A15A1101A000000000000007 /* ArcadeIslandKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ArcadeIslandKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A15A1101A000000000000008 /* ArcadeIslandWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ArcadeIslandWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A15A1101A000000000000009 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
+		A15A1101A00000000000000A /* ArcadeIslandWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ArcadeIslandWidget.entitlements; sourceTree = "<group>"; };
+		A15A1101A00000000000000B /* ArcadeIslandInbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcadeIslandInbox.swift; sourceTree = "<group>"; };
+		A15A1101A00000000000000C /* ArcadeIslandIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcadeIslandIntent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +118,7 @@
 			children = (
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
+				A15A1101A000000000000009 /* App.entitlements */,
 				A15A1101A000000000000003 /* ArcadeIslandPlugin.swift */,
 				A15A1101A000000000000004 /* ArcadeIslandRouter.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
@@ -129,6 +136,7 @@
 			children = (
 				A15A1101A000000000000001 /* ArcadeIslandAttributes.swift */,
 				A15A1101A000000000000002 /* ArcadeIslandClient.swift */,
+				A15A1101A00000000000000B /* ArcadeIslandInbox.swift */,
 			);
 			path = "../ArcadeIslandKit";
 			sourceTree = "<group>";
@@ -137,6 +145,8 @@
 			isa = PBXGroup;
 			children = (
 				A15A1101A000000000000005 /* ArcadeIslandWidget.swift */,
+				A15A1101A00000000000000C /* ArcadeIslandIntent.swift */,
+				A15A1101A00000000000000A /* ArcadeIslandWidget.entitlements */,
 				A15A1101A000000000000006 /* Info.plist */,
 			);
 			path = "../ArcadeIslandWidget";
@@ -393,6 +403,7 @@
 			files = (
 				A15A1102A000000000000001 /* ArcadeIslandAttributes.swift in Sources */,
 				A15A1102A000000000000002 /* ArcadeIslandClient.swift in Sources */,
+				A15A1102A00000000000000A /* ArcadeIslandInbox.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +412,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A15A1102A000000000000005 /* ArcadeIslandWidget.swift in Sources */,
+				A15A1102A00000000000000B /* ArcadeIslandIntent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -550,6 +562,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				DEVELOPMENT_TEAM = X5H4YHJUU6;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -571,6 +584,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				DEVELOPMENT_TEAM = X5H4YHJUU6;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -635,6 +649,7 @@
 		A15A1107A000000000000004 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "../ArcadeIslandWidget/ArcadeIslandWidget.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = X5H4YHJUU6;
@@ -655,6 +670,7 @@
 		A15A1107A000000000000005 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "../ArcadeIslandWidget/ArcadeIslandWidget.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = X5H4YHJUU6;

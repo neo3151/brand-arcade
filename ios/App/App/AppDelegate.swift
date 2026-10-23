@@ -1,3 +1,4 @@
+import ArcadeIslandKit
 import UIKit
 import Capacitor
 
@@ -7,7 +8,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        ArcadeIslandInbox.onPending = { ArcadeIslandRouter.flushIntent() }
+        ArcadeIslandInbox.start()
         return true
     }
 
@@ -73,6 +75,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidBecomeActive(_ scene: UIScene) {
         ArcadeIslandRouter.flush()
+        ArcadeIslandRouter.flushIntent()
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

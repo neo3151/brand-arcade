@@ -19,9 +19,18 @@ public struct ArcadeIslandAttributes: ActivityAttributes {
         public var accent: String
         public var surface: String
         public var ink: String
+        public var paused: Bool
+        public var flagMode: Bool
+        public var celebrate: Bool
+        public var chime: Bool
+        public var supply: Int
+        public var actions: [String]
+        public var pieces: [String]
+        public var caption: String
 
         enum CodingKeys: String, CodingKey {
             case phase, headline, primary, secondary, detail, progress, alert, streak, marks, grid, accent, surface, ink
+            case paused, flagMode, celebrate, chime, supply, actions, pieces, caption
         }
 
         public init(from decoder: Decoder) throws {
@@ -39,6 +48,14 @@ public struct ArcadeIslandAttributes: ActivityAttributes {
             accent = try c.decode(String.self, forKey: .accent)
             surface = try c.decode(String.self, forKey: .surface)
             ink = try c.decode(String.self, forKey: .ink)
+            paused = try c.decodeIfPresent(Bool.self, forKey: .paused) ?? false
+            flagMode = try c.decodeIfPresent(Bool.self, forKey: .flagMode) ?? false
+            celebrate = try c.decodeIfPresent(Bool.self, forKey: .celebrate) ?? false
+            chime = try c.decodeIfPresent(Bool.self, forKey: .chime) ?? false
+            supply = try c.decodeIfPresent(Int.self, forKey: .supply) ?? 0
+            actions = try c.decodeIfPresent([String].self, forKey: .actions) ?? []
+            pieces = try c.decodeIfPresent([String].self, forKey: .pieces) ?? []
+            caption = try c.decodeIfPresent(String.self, forKey: .caption) ?? ""
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -56,6 +73,14 @@ public struct ArcadeIslandAttributes: ActivityAttributes {
             try c.encode(accent, forKey: .accent)
             try c.encode(surface, forKey: .surface)
             try c.encode(ink, forKey: .ink)
+            try c.encode(paused, forKey: .paused)
+            try c.encode(flagMode, forKey: .flagMode)
+            try c.encode(celebrate, forKey: .celebrate)
+            try c.encode(chime, forKey: .chime)
+            try c.encode(supply, forKey: .supply)
+            try c.encode(actions, forKey: .actions)
+            try c.encode(pieces, forKey: .pieces)
+            try c.encode(caption, forKey: .caption)
         }
 
         public static func == (lhs: ContentState, rhs: ContentState) -> Bool {
@@ -63,7 +88,9 @@ public struct ArcadeIslandAttributes: ActivityAttributes {
                 && lhs.secondary == rhs.secondary && lhs.detail == rhs.detail && lhs.progress == rhs.progress
                 && lhs.alert == rhs.alert && lhs.streak == rhs.streak && lhs.marks == rhs.marks
                 && lhs.grid == rhs.grid && lhs.accent == rhs.accent && lhs.surface == rhs.surface
-                && lhs.ink == rhs.ink
+                && lhs.ink == rhs.ink && lhs.paused == rhs.paused && lhs.flagMode == rhs.flagMode
+                && lhs.celebrate == rhs.celebrate && lhs.chime == rhs.chime && lhs.supply == rhs.supply
+                && lhs.actions == rhs.actions && lhs.pieces == rhs.pieces && lhs.caption == rhs.caption
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -80,6 +107,14 @@ public struct ArcadeIslandAttributes: ActivityAttributes {
             hasher.combine(accent)
             hasher.combine(surface)
             hasher.combine(ink)
+            hasher.combine(paused)
+            hasher.combine(flagMode)
+            hasher.combine(celebrate)
+            hasher.combine(chime)
+            hasher.combine(supply)
+            hasher.combine(actions)
+            hasher.combine(pieces)
+            hasher.combine(caption)
         }
 
         public init(
@@ -95,7 +130,15 @@ public struct ArcadeIslandAttributes: ActivityAttributes {
             grid: [Int],
             accent: String,
             surface: String,
-            ink: String
+            ink: String,
+            paused: Bool = false,
+            flagMode: Bool = false,
+            celebrate: Bool = false,
+            chime: Bool = false,
+            supply: Int = 0,
+            actions: [String] = [],
+            pieces: [String] = [],
+            caption: String = ""
         ) {
             self.phase = phase
             self.headline = headline
@@ -110,6 +153,14 @@ public struct ArcadeIslandAttributes: ActivityAttributes {
             self.accent = accent
             self.surface = surface
             self.ink = ink
+            self.paused = paused
+            self.flagMode = flagMode
+            self.celebrate = celebrate
+            self.chime = chime
+            self.supply = supply
+            self.actions = actions
+            self.pieces = pieces
+            self.caption = caption
         }
     }
 
