@@ -134,14 +134,15 @@ async function testOwnershipPreviewAndCoins() {
   assert.strictEqual(cosmetics.ownsSkin('marble'), false);
   assert.strictEqual(cosmetics.equip('marble').reason, 'locked');
   assert.strictEqual(storage.getItem('arcade_cosmetic_v1'), null);
-  assert.ok(page.shelf.innerHTML.includes('Unavailable'));
+  assert.ok(page.shelf.innerHTML.includes('Arcade Shop'));
   assert.ok(page.shelf.innerHTML.includes('Preview'));
   assert.ok(page.shelf.innerHTML.includes('Marble'));
   assert.ok(!page.shelf.innerHTML.match(/\$\d+\.\d{2}/));
+  assert.strictEqual(page.shelf.innerHTML.includes('data-paid-action="buy"'), false);
 
   page.ArcadeStore.getPrice = () => '¥480';
   cosmetics.renderShelf();
-  assert.ok(page.shelf.innerHTML.includes('¥480 · Buy'));
+  assert.strictEqual(page.shelf.innerHTML.includes('¥480'), false);
   page.ArcadeStore.getPrice = () => null;
 
   const webBuy = await cosmetics.buy(MARBLE);

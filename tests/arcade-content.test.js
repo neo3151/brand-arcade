@@ -169,7 +169,8 @@ function testGating() {
     page.ArcadeStore.loadCache();
     page.shelf.game = 'solitaire';
     content.mount(page.shelf);
-    assert.ok(page.shelf.innerHTML.includes('Unavailable'));
+    assert.ok(page.shelf.innerHTML.includes('Arcade Shop'));
+    assert.strictEqual(page.shelf.innerHTML.includes('Unavailable'), false);
     assert.ok(page.shelf.innerHTML.includes('Sample'));
     assert.ok(page.shelf.innerHTML.includes('Locked'));
     assert.ok(page.shelf.innerHTML.includes('Deal ' + curated.deals[0]));

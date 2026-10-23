@@ -159,7 +159,10 @@ async function main() {
   assert.ok(configSrc.includes('REPLACE_WITH_REVENUECAT_ANDROID_PUBLIC_SDK_KEY'));
 
   const hub = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  assert.ok(hub.includes('id="btn-restore-purchases"'));
+  const shop = fs.readFileSync(path.join(root, 'shop.html'), 'utf8');
+  assert.ok(shop.includes('id="arcade-shop"'));
+  assert.ok(fs.readFileSync(path.join(root, 'assets/arcade-shop.js'), 'utf8').includes('id="btn-restore-purchases"'));
+  assert.strictEqual(hub.includes('id="btn-restore-purchases"'), false);
   assert.strictEqual(/localStorage\.removeItem\('arcade_entitlements'\)/.test(hub), false);
   assert.strictEqual(/localStorage\.clear\(/.test(hub), false);
 
@@ -329,8 +332,9 @@ async function main() {
     assert.ok(modal.innerHTML.includes('Tron Grid'));
     assert.ok(modal.innerHTML.includes('Thank you for keeping the marquee lit'));
     assert.ok(modal.innerHTML.includes('0 XP'));
-    assert.ok(modal.innerHTML.includes('RESTORE PURCHASES'));
-    assert.ok(modal.innerHTML.includes('Unavailable'));
+    assert.ok(modal.innerHTML.includes('Arcade Shop'));
+    assert.strictEqual(modal.innerHTML.includes('RESTORE PURCHASES'), false);
+    assert.strictEqual(modal.innerHTML.includes('btn-buy-patron'), false);
     assert.strictEqual(/\$\d+\.\d{2}/.test(modal.innerHTML), false);
     assert.strictEqual(modal.innerHTML.includes('arcade_entitlements'), false);
 

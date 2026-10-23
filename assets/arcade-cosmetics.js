@@ -386,14 +386,12 @@
     }[ch]));
   }
 
-  function buyButton(productId) {
-    const price = priceText(productId);
-    const id = ' data-product-id="' + esc(productId) + '"';
-    if (!price) {
-      return '<button type="button" class="paid-buy"' + id + ' disabled>Unavailable</button>';
-    }
-    return '<button type="button" class="paid-buy" data-paid-action="buy"' + id + '>' +
-      esc(price) + ' · Buy</button>';
+  function shopLink(productId) {
+    const href = (root.ArcadeStore && typeof root.ArcadeStore.shopHref === 'function')
+      ? root.ArcadeStore.shopHref()
+      : 'shop.html';
+    const id = productId ? ' data-product-id="' + esc(productId) + '"' : '';
+    return '<a class="paid-shop-link"' + id + ' href="' + esc(href) + '">Arcade Shop</a>';
   }
 
   function skinActions(item, owned) {
@@ -435,14 +433,14 @@
     const packs = packsFor(game);
     let html = '<section class="paid-shelf"><header class="paid-shelf__lead">' +
       '<h2>Cabinet skins</h2>' +
-      '<p>Optional looks beside the coin cosmetics. They do not change the rules. On the website the price stays unavailable.</p>' +
+      '<p>Optional looks beside the coin cosmetics. They do not change the rules. Buying stays on the Arcade Shop.</p>' +
       '</header>';
     solos.forEach(item => {
       const owned = ownsSkin(item);
       html += '<article class="paid-pack">' +
         '<header class="paid-pack__bar"><div><h3>' + esc(item.name) + '</h3><p>' +
         esc(product(item.packId).blurb) + '</p></div>' +
-        (owned ? '<span class="paid-owned">Owned</span>' : buyButton(item.productId)) +
+        (owned ? '<span class="paid-owned">Owned</span>' : shopLink(item.productId)) +
         '</header>' + skinCard(item, owned) + '</article>';
     });
     packs.forEach(pack => {
@@ -450,7 +448,7 @@
       const skins = SKINS.filter(item => item.game === game && item.packId === pack.id);
       html += '<article class="paid-pack' + (pack.id === 'cardroom' ? ' paid-pack--bundle' : '') + '">' +
         '<header class="paid-pack__bar"><div><h3>' + esc(pack.name) + '</h3><p>' + esc(pack.blurb) + '</p></div>' +
-        (owned ? '<span class="paid-owned">Owned</span>' : buyButton(pack.productId)) +
+        (owned ? '<span class="paid-owned">Owned</span>' : shopLink(pack.productId)) +
         '</header>';
       if (skins.length) {
         html += '<div class="paid-skin-row">';

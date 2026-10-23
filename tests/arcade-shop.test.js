@@ -1,0 +1,251 @@
+/**
+ * Complete Collection, tip jar, and the Arcade Shop.
+ * Run: node tests/arcade-shop.test.js
+ */
+'use strict';
+
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+
+const root = path.join(__dirname, '..');
+const COMPLETE = 'com.gamingempire.benchmarkarcade.bundle.complete';
+const COFFEE = 'com.gamingempire.benchmarkarcade.tip.coffee';
+const LUNCH = 'com.gamingempire.benchmarkarcade.tip.lunch';
+const DINNER = 'com.gamingempire.benchmarkarcade.tip.dinner';
+
+function createMemoryStorage() {
+  const data = new Map();
+  return {
+    getItem(key) { return data.has(key) ? data.get(key) : null; },
+    setItem(key, value) { data.set(String(key), String(value)); },
+    removeItem(key) { data.delete(key); }
+  };
+}
+
+function customerInfo(activeIds, transactions) {
+  const active = {};
+  activeIds.forEach(id => { active[id] = { identifier: id, isActive: true }; });
+  return {
+    entitlements: { active: active, all: active },
+    nonSubscriptionTransactions: transactions || []
+  };
+}
+
+function packageFor(item, amount) {
+  return {
+    identifier: item.productId,
+    product: {
+      identifier: item.productId,
+      priceString: amount == null ? null : ('US$' + amount.toFixed(2)),
+      price: amount,
+      currencyCode: amount == null ? null : 'USD'
+    }
+  };
+}
+
+function load(storage) {
+  const host = {
+    id: 'arcade-shop',
+    innerHTML: '',
+    querySelectorAll() { return []; }
+  };
+  const sandbox = {
+    localStorage: storage,
+    console,
+    setTimeout,
+    clearTimeout,
+    document: {
+      readyState: 'complete',
+      getElementById(id) { return id === 'arcade-shop' ? host : null; },
+      addEventListener() {}
+    }
+  };
+  sandbox.window = sandbox;
+  sandbox.globalThis = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-store-config.js'), 'utf8'), sandbox);
+  vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-store.js'), 'utf8'), sandbox);
+  vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-shop.js'), 'utf8'), sandbox);
+  sandbox.host = host;
+  return sandbox;
+}
+
+async function main() {
+  const ctx = load(createMemoryStorage());
+  const catalog = ctx.ArcadeStore.CATALOG;
+  assert.strictEqual(catalog.length, 28, 'final product count');
+  const tips = catalog.filter(item => item.kind === 'tip');
+  assert.strictEqual(Array.prototype.map.call(tips, item => item.productId).join('|'), [COFFEE, LUNCH, DINNER].join('|'));
+  tips.forEach(item => {
+    assert.strictEqual(item.consumable, true);
+    assert.strictEqual(item.inCompleteCollection, undefined);
+    assert.strictEqual(item.entitlementId, undefined);
+  });
+  const complete = catalog.find(item => item.productId === COMPLETE);
+  assert.strictEqual(complete.entitlementId, 'bundle_complete');
+  assert.strictEqual(complete.inCompleteCollection, undefined);
+
+  const grants = ctx.ArcadeStore.completeGrants();
+  assert.strictEqual(grants.length, 24);
+  assert.ok(grants.includes('arcade_patron'));
+  assert.ok(grants.includes('arcade_crt_vectrex'));
+  assert.ok(grants.includes('arcade_crt_c64'));
+  assert.ok(grants.includes('arcade_crt_tron'));
+  assert.ok(grants.includes('cardroom_pack'));
+  assert.ok(grants.includes('mindful_pack_puzzler'));
+  assert.ok(grants.includes('wordsearch_pack_explorer'));
+  assert.ok(grants.includes('solitaire_pack_curated'));
+  assert.ok(grants.includes('codebreaker_pack_heist'));
+  assert.strictEqual(grants.includes('bundle_complete'), false);
+  catalog.filter(item => item.inCompleteCollection).forEach(item => {
+    assert.ok(grants.includes(item.entitlementId));
+  });
+
+  const future = {
+    id: 'future-skin',
+    productId: 'com.gamingempire.benchmarkarcade.future.skin',
+    entitlementId: 'future_skin',
+    kind: 'cosmetic',
+    name: 'Future'
+  };
+  catalog.push(future);
+  assert.strictEqual(ctx.ArcadeStore.completeGrants().includes('future_skin'), false);
+  future.inCompleteCollection = true;
+  assert.ok(ctx.ArcadeStore.completeGrants().includes('future_skin'));
+  catalog.pop();
+
+  const products = catalog.map(item => ({
+    item: item,
+    amount: item.productId === COMPLETE ? 14.99 : (item.kind === 'tip' ? 1.99 : 2)
+  }));
+  let txSeq = 0;
+  const history = [];
+  const active = ['bundle_complete'];
+  const sdk = {
+    async configure() {},
+    async getCustomerInfo() {
+      return { customerInfo: customerInfo(active, history) };
+    },
+    async getOfferings() {
+      return {
+        current: {
+          identifier: 'arcade',
+          availablePackages: products.filter(row => row.amount != null).map(row => packageFor(row.item, row.amount))
+        }
+      };
+    },
+    async purchasePackage(options) {
+      const productId = options.aPackage.product.identifier;
+      const item = catalog.find(entry => entry.productId === productId);
+      if (item && item.entitlementId && active.indexOf(item.entitlementId) < 0) active.push(item.entitlementId);
+      if (item && item.kind === 'tip') {
+        txSeq += 1;
+        history.push({
+          productIdentifier: productId,
+          transactionIdentifier: 'tx-' + txSeq,
+          purchaseDate: '2026-10-22T00:00:00Z'
+        });
+      }
+      return {
+        customerInfo: customerInfo(active, history),
+        transaction: history[history.length - 1] || null
+      };
+    },
+    async restorePurchases() {
+      return { customerInfo: customerInfo(active, history.slice()) };
+    },
+    async addCustomerInfoUpdateListener() { return 'listener'; }
+  };
+
+  const storage = createMemoryStorage();
+  storage.setItem('arcade_passport_state', JSON.stringify({ xp: 12, theme: 'default', achievements: {} }));
+  const native = load(storage);
+  native.ARCADE_STORE_CONFIG = { iosApiKey: 'test_ios_public_key', androidApiKey: 'test_android_public_key' };
+  native.ArcadeStoreNative = {
+    Capacitor: {
+      isNativePlatform() { return true; },
+      getPlatform() { return 'ios'; }
+    },
+    Purchases: sdk
+  };
+  const store = native.ArcadeStore.createStore();
+  await store.init();
+  assert.strictEqual(store.owns('bundle_complete'), true);
+  assert.strictEqual(store.owns('arcade_patron'), true);
+  assert.strictEqual(store.owns('cardroom_pack'), true);
+  assert.strictEqual(store.owns('nonogram_pack_holiday'), true);
+  assert.strictEqual(store.owns('future_skin'), false);
+  const saved = store.savings();
+  assert.ok(saved);
+  assert.strictEqual(saved.currency, 'USD');
+  assert.strictEqual(saved.pieces, 24);
+  assert.strictEqual(saved.amount, 33.01);
+  assert.ok(saved.formatted.length > 0);
+
+  const passportBefore = storage.getItem('arcade_passport_state');
+  const first = await store.purchase(COFFEE);
+  assert.strictEqual(first.ok, true);
+  assert.strictEqual(first.tip, true);
+  assert.ok(first.message.includes('Thanks for the coffee'));
+  assert.ok(first.message.includes('0 XP'));
+  assert.ok(first.message.includes('nothing') || first.message.includes('does not change gameplay'));
+  assert.strictEqual(first.count, 1);
+  assert.strictEqual(store.supporterTier().name, 'Supporter');
+  assert.strictEqual(storage.getItem('arcade_passport_state'), passportBefore);
+
+  await store.purchase(LUNCH);
+  assert.strictEqual(store.tipCount(), 2);
+  assert.strictEqual(store.supporterTier().id, 'regular');
+  await store.purchase(DINNER);
+  assert.strictEqual(store.tipCount(), 3);
+  assert.strictEqual(store.supporterTier().name, 'House Favorite');
+
+  const persisted = native.ArcadeStore.createStore();
+  assert.strictEqual(persisted.tipCount(), 3);
+
+  history.push({
+    productIdentifier: COFFEE,
+    transactionIdentifier: 'tx-restored',
+    purchaseDate: '2026-10-21T00:00:00Z'
+  });
+  const restored = await store.restore();
+  assert.strictEqual(restored.ok, true);
+  assert.strictEqual(store.tipCount(), 4);
+  assert.strictEqual(store.owns('arcade_crt_tron'), true);
+  assert.strictEqual(native.ArcadeStore.createStore().tipCount(), 4);
+
+  const web = load(createMemoryStorage());
+  web.ArcadeShop.boot();
+  const html = web.host.innerHTML;
+  assert.ok(html.includes('Complete Collection'));
+  assert.ok(html.includes('Coffee'));
+  assert.ok(html.includes('Lunch'));
+  assert.ok(html.includes('Dinner'));
+  assert.ok(html.includes('Card Room'));
+  assert.ok(html.includes('Mindful Puzzler'));
+  assert.ok(html.includes('id="btn-restore-purchases"'));
+  assert.ok(html.includes('Unavailable'));
+  assert.ok(html.includes('blockblast/www/store.html'));
+  assert.ok(html.includes('spades/www/store.html'));
+  assert.ok(html.includes('nothing functional') || html.includes('Nothing functional'));
+  assert.strictEqual(/\$\d+\.\d{2}/.test(html), false);
+  assert.ok(html.includes('localized prices'));
+
+  const docs = fs.readFileSync(path.join(root, 'docs/iap-setup.md'), 'utf8');
+  [COMPLETE, COFFEE, LUNCH, DINNER, 'bundle_complete'].forEach(id => {
+    assert.ok(docs.includes(id), id);
+  });
+  const changelog = fs.readFileSync(path.join(root, 'CHANGELOG.md'), 'utf8');
+  assert.ok(changelog.includes('Fair Play'));
+  assert.ok(changelog.includes('Complete Collection'));
+  assert.ok(changelog.includes('28'));
+
+  console.log('arcade-shop: 28 products, grants, tips, and shop copy passed');
+}
+
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

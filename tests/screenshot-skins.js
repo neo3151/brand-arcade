@@ -230,7 +230,7 @@ async function main() {
           return {
             store: !!window.ArcadeStore,
             price: window.ArcadeStore ? window.ArcadeStore.getPrice('com.gamingempire.benchmarkarcade.blockblast.skin.marble') : 'missing',
-            unavailable: text.includes('Unavailable'),
+            unavailable: text.includes('Arcade Shop'),
             cabinet: text.includes('Cabinet skins'),
             priceText: (text.match(/\\$\\d+\\.\\d{2}/) || [])[0] || '',
             skin: document.documentElement.dataset.paidSkin || ''

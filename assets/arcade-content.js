@@ -101,12 +101,6 @@
     return false;
   }
 
-  function priceText(productId) {
-    if (!root.ArcadeStore || typeof root.ArcadeStore.getPrice !== 'function') return null;
-    const price = root.ArcadeStore.getPrice(productId);
-    return price || null;
-  }
-
   function esc(value) {
     return String(value == null ? '' : value)
       .replace(/&/g, '&amp;')
@@ -115,12 +109,17 @@
       .replace(/"/g, '&quot;');
   }
 
+  function shopLink() {
+    const href = (root.ArcadeStore && typeof root.ArcadeStore.shopHref === 'function')
+      ? root.ArcadeStore.shopHref()
+      : 'shop.html';
+    return '<a class="paid-shop-link" href="' + esc(href) + '">Arcade Shop</a>';
+  }
+
   function buyButton(productId, owned) {
     const id = ' data-product-id="' + esc(productId) + '"';
     if (owned) return '<span class="paid-owned"' + id + '>Owned</span>';
-    const price = priceText(productId);
-    if (!price) return '<button type="button" class="paid-buy"' + id + ' disabled>Unavailable</button>';
-    return '<button type="button" class="paid-buy" data-paid-action="buy"' + id + '>' + esc(price) + ' · Buy</button>';
+    return shopLink();
   }
 
   function allowsWord(category, level, difficulty) {
@@ -326,7 +325,7 @@
       if (pack.game === game) packs.push(pack);
     });
     let html = '<div class="content-shelf"><div class="content-shelf__lead"><h2>Content packs</h2>' +
-      '<p>Optional extra puzzles. Everything already in the game stays free and unlocked. Packs do not add hints, scores, or easier rules. On the website the price says Unavailable.</p></div>';
+      '<p>Optional extra puzzles. Everything already in the game stays free and unlocked. Packs do not add hints, scores, or easier rules. Buying stays on the Arcade Shop.</p></div>';
     packs.forEach(function (pack) { html += renderPack(pack); });
     if (PACKS.puzzler.games.indexOf(game) !== -1) html += renderPuzzler();
     html += '</div>';

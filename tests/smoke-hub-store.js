@@ -67,7 +67,8 @@ async function main() {
   const pages = [
     ['hub', '/index.html'],
     ['hub www copy', '/www/index.html'],
-    ['blockblast menu', '/blockblast/index.html']
+    ['blockblast menu', '/blockblast/index.html'],
+    ['shop', '/shop.html']
   ];
   const failures = [];
 
@@ -93,7 +94,7 @@ async function main() {
         }
         if (msg.method === 'Network.responseReceived') {
           const resp = msg.params.response;
-          if (resp.status >= 400 && /arcade-store|arcade-passport|arcade-purchases|arcade-cosmetics|index\.html/.test(resp.url)) {
+          if (resp.status >= 400 && /arcade-store|arcade-passport|arcade-purchases|arcade-cosmetics|arcade-shop|shop\.html|index\.html/.test(resp.url)) {
             problems.push('http ' + resp.status + ' ' + resp.url);
           }
         }
@@ -102,7 +103,7 @@ async function main() {
       await send('Page.navigate', { url: base + pagePath }, sessionId);
       await new Promise(r => setTimeout(r, 1200));
 
-      if (name !== 'blockblast menu') {
+      if (name !== 'blockblast menu' && name !== 'shop') {
         await send('Runtime.evaluate', {
           expression: `document.getElementById('btn-open-passport').click()`,
           returnByValue: true
@@ -120,7 +121,8 @@ async function main() {
           const text = document.body ? document.body.innerText : '';
           const store = window.ArcadeStore;
           const passport = window.ArcadePassport;
-          const hub = ${name === 'blockblast menu' ? 'false' : 'true'};
+          const hub = ${name === 'hub' || name === 'hub www copy' ? 'true' : 'false'};
+          const shop = ${name === 'shop' ? 'true' : 'false'};
           return {
             store: !!store,
             price: store ? store.getPrice('com.gamingempire.benchmarkarcade.arcade.patron') : 'missing',
@@ -130,8 +132,12 @@ async function main() {
             xp: passport ? passport.state.xp : 'missing',
             hasPatron: text.includes('ARCADE PATRON'),
             hasVectrex: text.includes('Vectrex Vector'),
-            hasRestore: text.includes('RESTORE PURCHASES'),
+            hasShop: text.includes('Arcade Shop'),
+            hasComplete: text.includes('Complete Collection'),
+            hasCoffee: text.includes('Coffee'),
+            hasRestore: text.includes('Restore purchases'),
             hasUnavailable: text.includes('Unavailable'),
+            hasBuy: text.includes('btn-buy-patron') || text.includes('· Buy'),
             priceText: (text.match(/\\$\\d+\\.\\d{2}/) || [])[0] || '',
             hub: hub
           };
@@ -144,15 +150,23 @@ async function main() {
         if (!value.store) problems.push('hub game page did not load ArcadeStore');
         if (value.price !== null) problems.push('web price ' + value.price);
         if (value.priceText) problems.push('price text ' + value.priceText);
+      } else if (name === 'shop') {
+        if (!value.store) problems.push('ArcadeStore missing');
+        if (value.price !== null) problems.push('web price ' + value.price);
+        if (!value.hasComplete || !value.hasCoffee || !value.hasRestore || !value.hasUnavailable) {
+          problems.push('shop copy missing ' + JSON.stringify(value));
+        }
+        if (value.priceText) problems.push('price text ' + value.priceText);
       } else {
         if (!value.store) problems.push('ArcadeStore missing');
         if (!value.native) problems.push('Capacitor bridge did not load');
         if (value.price !== null) problems.push('web price ' + value.price);
         if (value.refused !== false) problems.push('locked theme applied');
         if (value.theme !== 'default') problems.push('theme ' + value.theme);
-        if (!value.hasPatron || !value.hasVectrex || !value.hasRestore || !value.hasUnavailable) {
+        if (!value.hasPatron || !value.hasVectrex || !value.hasShop) {
           problems.push('passport copy missing ' + JSON.stringify(value));
         }
+        if (value.hasBuy) problems.push('purchase prompt outside the shop');
         if (value.priceText) problems.push('price text ' + value.priceText);
       }
       browser.removeEventListener('message', onMessage);

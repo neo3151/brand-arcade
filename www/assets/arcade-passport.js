@@ -660,6 +660,7 @@
           </div>
 
           ${this.renderPatronRow()}
+          ${this.renderSupporterStamp()}
 
           <!-- Trophy Matrix (8 Badges) -->
           <div>
@@ -742,12 +743,7 @@
               <span>🔄</span> RESET (0/8)
             </button>
           </div>
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <button type="button" id="btn-restore-purchases-passport" class="btn-push-sub" style="width: 100%; justify-content: center; font-size: 0.82rem;">
-              ↺ RESTORE PURCHASES
-            </button>
-            <p id="arcade-store-note" style="font-size: 0.75rem; color: #94a3b8; margin: 0; min-height: 1em;">${escapeHtml(this._storeNote || '')}</p>
-          </div>
+          <p style="font-size: 0.75rem; color: #94a3b8; margin: 0;">Purchases and restore live on the <a href="shop.html">Arcade Shop</a>. This passport does not sell anything.</p>
         </div>
       `;
 
@@ -773,24 +769,6 @@
           this.renderModalContent();
         });
       });
-
-      modal.querySelectorAll('.btn-buy-crt').forEach(btn => {
-        btn.addEventListener('click', () => {
-          this.buyProduct(btn.getAttribute('data-product'), btn.getAttribute('data-theme'));
-        });
-      });
-
-      const patronBuy = modal.querySelector('#btn-buy-patron');
-      if (patronBuy) {
-        patronBuy.addEventListener('click', () => {
-          this.buyProduct(patronBuy.getAttribute('data-product'), null);
-        });
-      }
-
-      const restorePassportBtn = modal.querySelector('#btn-restore-purchases-passport');
-      if (restorePassportBtn) {
-        restorePassportBtn.addEventListener('click', () => this.restorePurchases());
-      }
 
       // Bind backup button
       const exportBtn = modal.querySelector('#btn-export-passport');
@@ -830,6 +808,28 @@
       this._rendering = false;
     }
 
+    renderSupporterStamp() {
+      const store = hasArcadeStore() ? window.ArcadeStore : null;
+      const tier = store && typeof store.supporterTier === 'function' ? store.supporterTier() : null;
+      if (!tier) {
+        return `
+          <div style="background: #090e1a; border: 1.5px dashed #334155; border-radius: 8px; padding: 12px;">
+            <div style="font-family: var(--font-arcade); font-size: 0.78rem; color: #94a3b8;">SUPPORTER STAMP</div>
+            <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.4; margin-top: 4px;">Tips add a thank-you stamp here. The stamp grants 0 XP and does not change gameplay. The tip jar is on the <a href="shop.html">Arcade Shop</a>.</div>
+          </div>
+        `;
+      }
+      return `
+        <div data-supporter-stamp="${escapeHtml(tier.id)}" style="background: linear-gradient(135deg, #142033 0%, #090e1a 100%); border: 1.5px solid #7dd3fc; border-radius: 8px; padding: 14px; display: flex; gap: 12px; align-items: center;">
+          <div style="font-size: 1.6rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px dashed #7dd3fc; border-radius: 50%;">☕</div>
+          <div>
+            <div style="font-family: var(--font-arcade); font-size: 0.9rem; font-weight: 800; color: #e0f2fe;">${escapeHtml(tier.name.toUpperCase())}</div>
+            <div style="font-size: 0.75rem; color: #bae6fd; line-height: 1.4; margin-top: 2px;">${tier.count} thank-you ${tier.count === 1 ? 'tip' : 'tips'}. This stamp grants 0 XP and changes nothing about play.</div>
+          </div>
+        </div>
+      `;
+    }
+
     renderPatronRow() {
       const catalog = (hasArcadeStore() && window.ArcadeStore.CATALOG) || [];
       const patron = catalog.find(item => item.kind === 'patron') || {
@@ -838,7 +838,6 @@
         name: 'Arcade Patron'
       };
       const owned = hasArcadeStore() && window.ArcadeStore.owns(patron.entitlementId);
-      const rawPrice = hasArcadeStore() ? window.ArcadeStore.getPrice(patron.productId) : null;
       if (owned) {
         return `
           <div style="background: linear-gradient(135deg, #3d2b08 0%, #090e1a 100%); border: 1.5px solid #e6b325; border-radius: 8px; padding: 14px; display: flex; gap: 12px; align-items: center;">
@@ -853,10 +852,7 @@
       return `
         <div style="background: #090e1a; border: 1.5px solid #1e293b; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: var(--font-arcade); font-size: 0.9rem; font-weight: 800; color: #e6b325;">ARCADE PATRON</div>
-          <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.4;">A one-time thank-you. It adds this badge and a gold cabinet bezel. It grants 0 XP and does not unlock trophies.</div>
-          <button type="button" id="btn-buy-patron" class="btn-push-sub" data-product="${patron.productId}" ${rawPrice ? '' : 'disabled'} style="justify-content: center; font-size: 0.8rem;">
-            ${rawPrice ? 'BUY ' + escapeHtml(rawPrice) : 'Unavailable'}
-          </button>
+          <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.4;">A one-time thank-you. It adds this badge and a gold cabinet bezel. It grants 0 XP and does not unlock trophies. Buy it on the <a href="shop.html">Arcade Shop</a>.</div>
         </div>
       `;
     }
@@ -865,19 +861,18 @@
       const active = !this._previewId && (this.state.theme || 'default') === theme.id;
       const previewing = this._previewId === theme.id;
       const unlocked = this.canUseTheme(theme);
-      const rawPrice = theme.productId && hasArcadeStore() ? window.ArcadeStore.getPrice(theme.productId) : null;
       const border = active || previewing ? 'var(--neon-cyan)' : '#1e293b';
       const actions = unlocked
         ? `<button type="button" class="btn-select-crt-theme btn-push-sub" data-theme="${theme.id}" style="justify-content: center; font-size: 0.75rem;">${active ? 'EQUIPPED' : 'USE THIS PHOSPHOR'}</button>`
         : `<div style="display: flex; gap: 6px;">
             <button type="button" class="btn-preview-crt btn-push-sub" data-theme="${theme.id}" style="flex: 1; justify-content: center; font-size: 0.75rem;">PREVIEW</button>
-            <button type="button" class="btn-buy-crt btn-push-sub" data-theme="${theme.id}" data-product="${theme.productId || ''}" ${rawPrice ? '' : 'disabled'} style="flex: 1; justify-content: center; font-size: 0.75rem;">${rawPrice ? 'BUY ' + escapeHtml(rawPrice) : 'Unavailable'}</button>
+            <a href="shop.html" style="flex: 1; text-align: center; font-size: 0.75rem; color: #e6b325; align-self: center;">Arcade Shop</a>
           </div>`;
       const badge = active
         ? '<span style="color: var(--neon-cyan); font-size: 0.72rem; font-weight: 700;">ACTIVE</span>'
         : (previewing
           ? '<span style="color: var(--neon-yellow); font-size: 0.72rem; font-weight: 700;">PREVIEW</span>'
-          : (unlocked ? '<span style="color: #64748b; font-size: 0.72rem; font-weight: 700;">FREE</span>' : `<span style="color: #e6b325; font-size: 0.72rem; font-weight: 700;">${rawPrice ? escapeHtml(rawPrice) : 'Unavailable'}</span>`));
+          : (unlocked ? '<span style="color: #64748b; font-size: 0.72rem; font-weight: 700;">FREE</span>' : '<span style="color: #e6b325; font-size: 0.72rem; font-weight: 700;">SHOP</span>'));
       return `
         <div style="background: ${active ? 'rgba(6, 182, 212, 0.15)' : '#090e1a'}; border: 1.5px solid ${border}; border-radius: 6px; padding: 12px; text-align: left; display: flex; flex-direction: column; gap: 6px;">
           <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">

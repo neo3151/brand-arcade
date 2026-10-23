@@ -152,7 +152,7 @@ async function main() {
           const text = document.body.innerText || '';
           return {
             hasStore: !!(window.ArcadeStore && window.ArcadeContent),
-            unavailable: /unavailable/i.test(text),
+            unavailable: /Arcade Shop/.test(text),
             locked: /locked/i.test(text) || !!document.querySelector('.content-lock'),
             sample: /sample/i.test(text),
             price: /\\$\\d+\\.\\d{2}/.test(text),
@@ -179,6 +179,34 @@ async function main() {
       if (kind === 'play' && value && value.overlay) failures.push(name + ' locked a sample');
       await page.close();
     }
+
+    const shop = await open(base + '/shop.html');
+    const shopEval = await send('Runtime.evaluate', {
+      expression: `(() => {
+        const text = document.body.innerText || '';
+        return {
+          store: !!window.ArcadeStore,
+          complete: text.includes('Complete Collection'),
+          coffee: text.includes('Coffee'),
+          restore: text.includes('Restore purchases'),
+          unavailable: text.includes('Unavailable'),
+          shelves: text.includes('Block Blast') && text.includes('Spades'),
+          price: /\\$\\d+\\.\\d{2}/.test(text),
+          buy: !!document.querySelector('[data-shop-action="buy"]')
+        };
+      })()`,
+      returnByValue: true
+    }, shop.sessionId);
+    const shopValue = shopEval.result && shopEval.result.value;
+    if (shop.problems.length) failures.push('shop ' + shop.problems.join(' | '));
+    if (!shopValue || !shopValue.store || !shopValue.complete || !shopValue.coffee || !shopValue.restore || !shopValue.unavailable || !shopValue.shelves) {
+      failures.push('shop copy ' + JSON.stringify(shopValue));
+    }
+    if (shopValue && shopValue.price) failures.push('shop showed a hard-coded price');
+    if (shopValue && shopValue.buy) failures.push('shop rendered a live buy button on the web');
+    const shopShot = await send('Page.captureScreenshot', { format: 'png' }, shop.sessionId);
+    fs.writeFileSync(path.join(outDir, 'shop.png'), Buffer.from(shopShot.data, 'base64'));
+    await shop.close();
 
     const solo = await open('http://127.0.0.1:8766/index.html');
     const soloEval = await send('Runtime.evaluate', {

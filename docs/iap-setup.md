@@ -103,7 +103,7 @@ Samples that stay playable while locked: Word Search beginner level 1 of Mytholo
 
 1. Open the app whose bundle ID is `com.gamingempire.benchmarkarcade`.
 2. Confirm the Paid Apps agreement, tax, and banking are active.
-3. Create every **Non-Consumable** in the tables above. Use the product IDs exactly. Do not create consumables, subscriptions, or XP packs.
+3. Create every **Non-Consumable** in the tables above, plus the Complete Collection non-consumable. Create Coffee, Lunch, and Dinner as **Consumables**. Do not create subscriptions or XP packs.
 4. Add a display name, a description, and a price for each. The localized `priceString` from StoreKit is what the hub shows.
 5. Submit the products with the app version (or clear them for review, depending on the current App Store state).
 6. Create a Sandbox Apple ID under Users and Access → Sandbox.
@@ -112,7 +112,7 @@ Samples that stay playable while locked: Word Search beginner level 1 of Mytholo
 
 1. Open the app with application ID `com.gamingempire.benchmarkarcade`.
 2. Set up a merchant account if one is not already active.
-3. Create every **one-time** in-app product (not subscriptions) with the same product IDs.
+3. Create every one-time product with the same product IDs. Coffee, Lunch, and Dinner are consumable; every other row is a one-time product. Do not create subscriptions.
 4. Activate each product and set a price.
 5. Add license testers so the sandbox account can buy without a charge.
 
@@ -120,10 +120,10 @@ Samples that stay playable while locked: Word Search beginner level 1 of Mytholo
 
 1. Create or open a project and add two apps: iOS (bundle ID `com.gamingempire.benchmarkarcade`) and Android (same application ID).
 2. Copy each app’s **public** SDK key into `assets/arcade-store-config.js`.
-3. Create the entitlements in both tables: `arcade_patron`, `arcade_crt_vectrex`, `arcade_crt_c64`, `arcade_crt_tron`, every cosmetic entitlement (`blockblast_skin_marble`, `blockblast_skin_walnut`, `blockblast_skin_stainedglass`, `solitaire_pack_atelier`, `spidersolitaire_pack_atelier`, `cardroom_pack`, `spades_pack_salon`, `mahjong_pack_tiles`, `minesweeper_pack_sectors`, `codebreaker_pack_terminals`, `sudoku_pack_ink`, `nonogram_pack_mosaic`, `wordsearch_pack_atlas`), and every content entitlement (`wordsearch_pack_explorer`, `mahjong_pack_layouts`, `nonogram_pack_holiday`, `nonogram_pack_animals`, `solitaire_pack_curated`, `codebreaker_pack_heist`, `mindful_pack_puzzler`).
+3. Create the entitlements in both tables below, including `bundle_complete`. Tips have no entitlement.
 4. Import or attach the store products and attach each product to its matching entitlement. One product, one entitlement. Card Room attaches only to `cardroom_pack`. The hub treats that entitlement as the Solitaire atelier, the Spider atelier, and the Spades salon. Mindful Puzzler attaches only to `mindful_pack_puzzler`. The hub treats that entitlement as Holiday Pictures, Animal Pictures, Jade Layouts, and World Explorer. You do not need to attach those included entitlements to the bundle products.
 5. Create an offering with identifier `arcade` and mark it **current**.
-6. Add one package per product and point it at that store product. Custom identifiers that match the catalog ids are fine: `patron`, `crt_vectrex`, `crt_c64`, `crt_tron`, `marble`, `walnut`, `stainedglass`, `solitaire-atelier`, `spider-atelier`, `cardroom`, `spades-salon`, `mahjong-tiles`, `minesweeper-sectors`, `codebreaker-terminals`, `sudoku-ink`, `nonogram-mosaic`, `wordsearch-atlas`, `explorer`, `layouts`, `holiday`, `animals`, `curated`, `heist`, `puzzler`.
+6. Add one package per product and point it at that store product. Custom identifiers that match the catalog ids are fine: `patron`, `vectrex`, `c64`, `tron`, `marble`, `walnut`, `stainedglass`, `solitaire-atelier`, `spider-atelier`, `cardroom`, `spades-salon`, `mahjong-tiles`, `minesweeper-sectors`, `codebreaker-terminals`, `sudoku-ink`, `nonogram-mosaic`, `wordsearch-atlas`, `explorer`, `layouts`, `holiday`, `animals`, `curated`, `heist`, `puzzler`, `complete`, `tip-coffee`, `tip-lunch`, `tip-dinner`. Mark the three tip packages as consumable.
 7. The hub reads `offerings.current.availablePackages[].product.priceString` and purchases with `Purchases.purchasePackage({ aPackage })`. Restore uses `Purchases.restorePurchases()`.
 
 Anonymous App User IDs are fine. The hub passes `appUserID: null` and does not link purchases to a Passport account.
@@ -131,12 +131,63 @@ Anonymous App User IDs are fine. The hub passes `appUserID: null` and does not l
 ## Sandbox checklist
 
 - With placeholder keys, a native build still launches. Prices say Unavailable, and RevenueCat is not configured.
-- In a desktop browser, the Passport shows Patron, the three premium phosphors, and **Restore Purchases**, all Unavailable, with no console error. `getPrice` returns null.
+- In a desktop browser, the Passport shows Patron and the three premium phosphors and links to the Arcade Shop. It has no buy button and no restore button. The shop shows Unavailable, with no console error. `getPrice` returns null.
 - Preview a locked phosphor. The cabinet colors change. Closing the Passport returns the equipped theme. `applyTheme('vectrex')` returns false until that entitlement is active.
 - Sandbox-buy Arcade Patron. The Passport gains the thank-you row, trophy progress stays at 0/8, XP does not increase from the purchase, and the header frame uses the gold bezel (`#3d2b08` / `#e6b325`).
-- Sandbox-buy one CRT. The price button becomes **Use this phosphor**. Equipping it is allowed.
-- Delete and reinstall, then tap **Restore Purchases** in Passport or in Cabinet Setup. The same entitlements return.
+- Sandbox-buy one CRT from the Arcade Shop. In the Passport the button becomes **Use this phosphor**. Equipping it is allowed.
+- Delete and reinstall, then tap **Restore purchases** on the Arcade Shop. The same entitlements return.
 - Reset the Passport (0/8) and export it to the clipboard. `arcade_entitlements` is still present, and the clipboard JSON is only the Passport state.
 - Confirm no product grants XP, a trophy, or a gameplay consumable.
 - Open a hub game store. Locked cabinet skins show the localized price and Buy, or Unavailable on the web. Preview with `game.html?theme=` and confirm the look is not saved. Coin themes still spend coins. Card Room unlocks the solitaire, spider, and spades salon looks. A standalone game opened at `/index.html` does not load the store.
-- Open a hub picker for Word Search, Mahjong, Nonogram, Solitaire, or Codebreaker. The content pack shows a lock and Unavailable on the web, plus one or two samples. Buying Mindful Puzzler in the sandbox unlocks both picture packs, the layouts, and World Explorer, and leaves Curated Deals and the Heist locked. A locked direct link does not start a free board.
+- Open a hub picker for Word Search, Mahjong, Nonogram, Solitaire, or Codebreaker. The content pack shows a lock and a link to the Arcade Shop, plus one or two samples. The shelf itself has no buy button. Buying Mindful Puzzler in the sandbox unlocks both picture packs, the layouts, and World Explorer, and leaves Curated Deals and the Heist locked. A locked direct link does not start a free board.
+- Open the Arcade Shop. It lists Patron, Complete Collection, Card Room, Mindful Puzzler, the tip jar, a link to each game shelf, and Restore. On the web every buy button says Unavailable. Sandbox-buy Complete Collection and confirm Patron, every CRT, every cosmetic (including Card Room), and every content pack unlock without a second purchase. The Passport and the game shelves do not show a buy or restore button.
+- Sandbox-buy Coffee, then Lunch, then Dinner. The Passport supporter stamp moves from Supporter to Regular to House Favorite. XP stays unchanged. Restore on a reinstall counts the tip transactions RevenueCat returns in `nonSubscriptionTransactions`.
+
+## Final catalog (28 products)
+
+The hub `ArcadeStore.CATALOG` is the source of truth. Complete Collection grants every row opted in with `inCompleteCollection`. Tips and the collection itself are not in that list, so a future product stays out until someone opts it in. The Arcade Shop at `shop.html` is the only screen with a buy button, a tip button, or restore. Shelves and the Passport link there.
+
+Enter the **store price** in App Store Connect and Play Console. The shop shows the localized `priceString`. When every included product and the collection share a currency, the shop also shows the localized difference versus buying those items separately. The website never prints these amounts.
+
+| Product | Product ID | Entitlement | Type | Store price | In Complete Collection |
+| --- | --- | --- | --- | --- | --- |
+| Arcade Patron | `com.gamingempire.benchmarkarcade.arcade.patron` | `arcade_patron` | Non-consumable | Set in the stores | Yes |
+| Vectrex Vector | `com.gamingempire.benchmarkarcade.arcade.crt.vectrex` | `arcade_crt_vectrex` | Non-consumable | Set in the stores | Yes |
+| Commodore 64 | `com.gamingempire.benchmarkarcade.arcade.crt.c64` | `arcade_crt_c64` | Non-consumable | Set in the stores | Yes |
+| Tron Grid | `com.gamingempire.benchmarkarcade.arcade.crt.tron` | `arcade_crt_tron` | Non-consumable | Set in the stores | Yes |
+| Marble | `com.gamingempire.benchmarkarcade.blockblast.skin.marble` | `blockblast_skin_marble` | Non-consumable | $0.99 | Yes |
+| Walnut Inlay | `com.gamingempire.benchmarkarcade.blockblast.skin.walnut` | `blockblast_skin_walnut` | Non-consumable | $0.99 | Yes |
+| Stained Glass | `com.gamingempire.benchmarkarcade.blockblast.skin.stainedglass` | `blockblast_skin_stainedglass` | Non-consumable | $0.99 | Yes |
+| Solitaire Atelier | `com.gamingempire.benchmarkarcade.solitaire.pack.atelier` | `solitaire_pack_atelier` | Non-consumable | $1.99 | Yes |
+| Spider Atelier | `com.gamingempire.benchmarkarcade.spidersolitaire.pack.atelier` | `spidersolitaire_pack_atelier` | Non-consumable | $1.99 | Yes |
+| Card Room | `com.gamingempire.benchmarkarcade.cardroom.pack.cardroom` | `cardroom_pack` | Non-consumable | $4.99 | Yes |
+| Spades Salon | `com.gamingempire.benchmarkarcade.spades.pack.salon` | `spades_pack_salon` | Non-consumable | $1.99 | Yes |
+| Mahjong Tiles | `com.gamingempire.benchmarkarcade.mahjong.pack.tiles` | `mahjong_pack_tiles` | Non-consumable | $1.99 | Yes |
+| Minesweeper Sectors | `com.gamingempire.benchmarkarcade.minesweeper.pack.sectors` | `minesweeper_pack_sectors` | Non-consumable | $1.99 | Yes |
+| Codebreaker Terminals | `com.gamingempire.benchmarkarcade.codebreaker.pack.terminals` | `codebreaker_pack_terminals` | Non-consumable | $1.99 | Yes |
+| Sudoku Ink | `com.gamingempire.benchmarkarcade.sudoku.pack.ink` | `sudoku_pack_ink` | Non-consumable | $1.99 | Yes |
+| Nonogram Mosaic | `com.gamingempire.benchmarkarcade.nonogram.pack.mosaic` | `nonogram_pack_mosaic` | Non-consumable | $1.99 | Yes |
+| Word Search Atlas | `com.gamingempire.benchmarkarcade.wordsearch.pack.atlas` | `wordsearch_pack_atlas` | Non-consumable | $1.99 | Yes |
+| World Explorer | `com.gamingempire.benchmarkarcade.wordsearch.pack.explorer` | `wordsearch_pack_explorer` | Non-consumable | $1.99 | Yes |
+| Jade Layouts | `com.gamingempire.benchmarkarcade.mahjong.pack.layouts` | `mahjong_pack_layouts` | Non-consumable | $1.99 | Yes |
+| Holiday Pictures | `com.gamingempire.benchmarkarcade.nonogram.pack.holiday` | `nonogram_pack_holiday` | Non-consumable | $2.99 | Yes |
+| Animal Pictures | `com.gamingempire.benchmarkarcade.nonogram.pack.animals` | `nonogram_pack_animals` | Non-consumable | $2.99 | Yes |
+| Curated Deals | `com.gamingempire.benchmarkarcade.solitaire.pack.curated` | `solitaire_pack_curated` | Non-consumable | $1.99 | Yes |
+| Heist Campaign | `com.gamingempire.benchmarkarcade.codebreaker.pack.heist` | `codebreaker_pack_heist` | Non-consumable | $1.99 | Yes |
+| Mindful Puzzler | `com.gamingempire.benchmarkarcade.mindful.pack.puzzler` | `mindful_pack_puzzler` | Non-consumable | $4.99 | Yes |
+| Complete Collection | `com.gamingempire.benchmarkarcade.bundle.complete` | `bundle_complete` | Non-consumable | $14.99 | No (it is the grant) |
+| Coffee | `com.gamingempire.benchmarkarcade.tip.coffee` | — | Consumable | $1.99 | No |
+| Lunch | `com.gamingempire.benchmarkarcade.tip.lunch` | — | Consumable | $4.99 | No |
+| Dinner | `com.gamingempire.benchmarkarcade.tip.dinner` | — | Consumable | $9.99 | No |
+
+Offering `arcade` (current) maps one package to each row: `patron`, `vectrex`, `c64`, `tron`, `marble`, `walnut`, `stainedglass`, `solitaire-atelier`, `spider-atelier`, `cardroom`, `spades-salon`, `mahjong-tiles`, `minesweeper-sectors`, `codebreaker-terminals`, `sudoku-ink`, `nonogram-mosaic`, `wordsearch-atlas`, `explorer`, `layouts`, `holiday`, `animals`, `curated`, `heist`, `puzzler`, `complete`, `tip-coffee`, `tip-lunch`, `tip-dinner`.
+
+I used the earlier phase prices for Patron and the CRT themes as $2.99 and $0.99. Let me verify the original docs didn't specify patron/crt dollar prices in the first table... The first table didn't include store prices for patron and CRTs. I invented $2.99 and $0.99. The user only specified Complete Collection $14.99 and tips $1.99/$4.99/$9.99. I should NOT invent patron and CRT prices if they weren't specified.
+
+Looking at the original docs table, Patron and CRTs don't have a store price column. Phase 2 and 3 have prices. I should mark Patron and CRT store prices as "set in the store" or look at passport/code for a price. The user didn't specify them. I'll put "Set in App Store Connect" or leave the price blank / "store price" rather than inventing $2.99 and $0.99.
+
+If earlier phases documented them somewhere... The first table doesn't have prices. I'll use an em dash or "store price" for those four so I don't invent numbers. The final table can say the amount only where a phase specified it.
+
+I'll fix the table prices for patron and CRTs to not invent dollars. "Set in the stores" is honest.
+
+Also I should check phase 1 if a price was mentioned in conversation. The summary didn't list patron price. I'll change those four cells.
