@@ -55,17 +55,20 @@
   flex-shrink: 0;
 }
 
-/* Stock Pile */
+/* Stock Pile. flex-shrink stays 0 so the deal pile cannot be crushed
+   when the eight foundation slots share a narrow row. */
 .stock-pile-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .stock-card-slot {
-  width: 38px;
-  height: 54px;
+  width: 48px;
+  height: 67px;
+  flex: 0 0 auto;
   border-radius: 6px;
   border: 1px dashed rgba(167, 139, 250, 0.4);
   position: relative;
@@ -104,11 +107,16 @@
 .foundation-container {
   display: flex;
   gap: 3px;
+  min-width: 0;
+  flex: 1 1 auto;
+  justify-content: flex-end;
 }
 
 .foundation-slot {
   width: 32px;
   height: 46px;
+  flex: 0 1 32px;
+  min-width: 0;
   border-radius: 5px;
   border: 1px solid rgba(148, 163, 184, 0.2);
   background: rgba(26, 21, 40, 0.5);
