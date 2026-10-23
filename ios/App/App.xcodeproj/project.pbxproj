@@ -15,6 +15,15 @@
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		A084ECDBA7D38E1E42DFC39D /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */; };
+		A15A1102A000000000000001 /* ArcadeIslandAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000001 /* ArcadeIslandAttributes.swift */; };
+		A15A1102A000000000000002 /* ArcadeIslandClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000002 /* ArcadeIslandClient.swift */; };
+		A15A1102A000000000000003 /* ArcadeIslandPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000003 /* ArcadeIslandPlugin.swift */; };
+		A15A1102A000000000000004 /* ArcadeIslandRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000004 /* ArcadeIslandRouter.swift */; };
+		A15A1102A000000000000005 /* ArcadeIslandWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000005 /* ArcadeIslandWidget.swift */; };
+		A15A1102A000000000000006 /* ArcadeIslandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000007 /* ArcadeIslandKit.framework */; };
+		A15A1102A000000000000007 /* ArcadeIslandKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000007 /* ArcadeIslandKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A15A1102A000000000000008 /* ArcadeIslandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000007 /* ArcadeIslandKit.framework */; };
+		A15A1102A000000000000009 /* ArcadeIslandWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A15A1101A000000000000008 /* ArcadeIslandWidget.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +39,14 @@
 		AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
+		A15A1101A000000000000001 /* ArcadeIslandAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcadeIslandAttributes.swift; sourceTree = "<group>"; };
+		A15A1101A000000000000002 /* ArcadeIslandClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcadeIslandClient.swift; sourceTree = "<group>"; };
+		A15A1101A000000000000003 /* ArcadeIslandPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcadeIslandPlugin.swift; sourceTree = "<group>"; };
+		A15A1101A000000000000004 /* ArcadeIslandRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcadeIslandRouter.swift; sourceTree = "<group>"; };
+		A15A1101A000000000000005 /* ArcadeIslandWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcadeIslandWidget.swift; sourceTree = "<group>"; };
+		A15A1101A000000000000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A15A1101A000000000000007 /* ArcadeIslandKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ArcadeIslandKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A15A1101A000000000000008 /* ArcadeIslandWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ArcadeIslandWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +55,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				A084ECDBA7D38E1E42DFC39D /* Pods_App.framework in Frameworks */,
+				A15A1102A000000000000006 /* ArcadeIslandKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A15A1104A000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A15A1104A000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A15A1102A000000000000008 /* ArcadeIslandKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,6 +89,8 @@
 			isa = PBXGroup;
 			children = (
 				504EC3061FED79650016851F /* App */,
+				A15A1103A000000000000001 /* ArcadeIslandKit */,
+				A15A1103A000000000000002 /* ArcadeIslandWidget */,
 				504EC3051FED79650016851F /* Products */,
 				7F8756D8B27F46E3366F6CEA /* Pods */,
 				27E2DDA53C4D2A4D1A88CE4A /* Frameworks */,
@@ -66,6 +101,8 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
+				A15A1101A000000000000007 /* ArcadeIslandKit.framework */,
+				A15A1101A000000000000008 /* ArcadeIslandWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,6 +112,8 @@
 			children = (
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
+				A15A1101A000000000000003 /* ArcadeIslandPlugin.swift */,
+				A15A1101A000000000000004 /* ArcadeIslandRouter.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
@@ -83,6 +122,24 @@
 				50B271D01FEDC1A000F3C39B /* public */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		A15A1103A000000000000001 /* ArcadeIslandKit */ = {
+			isa = PBXGroup;
+			children = (
+				A15A1101A000000000000001 /* ArcadeIslandAttributes.swift */,
+				A15A1101A000000000000002 /* ArcadeIslandClient.swift */,
+			);
+			path = "../ArcadeIslandKit";
+			sourceTree = "<group>";
+		};
+		A15A1103A000000000000002 /* ArcadeIslandWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A15A1101A000000000000005 /* ArcadeIslandWidget.swift */,
+				A15A1101A000000000000006 /* Info.plist */,
+			);
+			path = "../ArcadeIslandWidget";
 			sourceTree = "<group>";
 		};
 		7F8756D8B27F46E3366F6CEA /* Pods */ = {
@@ -106,15 +163,53 @@
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
 				9592DBEFFC6D2A0C8D5DEB22 /* [CP] Embed Pods Frameworks */,
+				A15A1104A000000000000006 /* Embed Frameworks */,
+				A15A1104A000000000000007 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A15A1106A000000000000001 /* PBXTargetDependency */,
+				A15A1106A000000000000002 /* PBXTargetDependency */,
 			);
 			name = App;
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A15A1105A000000000000001 /* ArcadeIslandKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A15A1107A000000000000003 /* Build configuration list for PBXNativeTarget "ArcadeIslandKit" */;
+			buildPhases = (
+				A15A1104A000000000000001 /* Sources */,
+				A15A1104A000000000000002 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ArcadeIslandKit;
+			productName = ArcadeIslandKit;
+			productReference = A15A1101A000000000000007 /* ArcadeIslandKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		A15A1105A000000000000002 /* ArcadeIslandWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A15A1107A000000000000006 /* Build configuration list for PBXNativeTarget "ArcadeIslandWidget" */;
+			buildPhases = (
+				A15A1104A000000000000003 /* Sources */,
+				A15A1104A000000000000004 /* Frameworks */,
+				A15A1104A000000000000005 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A15A1106A000000000000005 /* PBXTargetDependency */,
+			);
+			name = ArcadeIslandWidget;
+			productName = ArcadeIslandWidget;
+			productReference = A15A1101A000000000000008 /* ArcadeIslandWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -128,6 +223,14 @@
 					504EC3031FED79650016851F = {
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 1100;
+						ProvisioningStyle = Automatic;
+					};
+					A15A1105A000000000000001 = {
+						CreatedOnToolsVersion = 16.0;
+						ProvisioningStyle = Automatic;
+					};
+					A15A1105A000000000000002 = {
+						CreatedOnToolsVersion = 16.0;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -148,6 +251,8 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
+				A15A1105A000000000000001 /* ArcadeIslandKit */,
+				A15A1105A000000000000002 /* ArcadeIslandWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -204,16 +309,112 @@
 		};
 /* End PBXShellScriptBuildPhase section */
 
+/* Begin PBXContainerItemProxy section */
+		A15A1106A000000000000003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A15A1105A000000000000001;
+			remoteInfo = ArcadeIslandKit;
+		};
+		A15A1106A000000000000004 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A15A1105A000000000000002;
+			remoteInfo = ArcadeIslandWidget;
+		};
+		A15A1106A000000000000006 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A15A1105A000000000000001;
+			remoteInfo = ArcadeIslandKit;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A15A1104A000000000000006 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A15A1102A000000000000007 /* ArcadeIslandKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A15A1104A000000000000007 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A15A1102A000000000000009 /* ArcadeIslandWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A15A1106A000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A15A1105A000000000000001 /* ArcadeIslandKit */;
+			targetProxy = A15A1106A000000000000003 /* PBXContainerItemProxy */;
+		};
+		A15A1106A000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A15A1105A000000000000002 /* ArcadeIslandWidget */;
+			targetProxy = A15A1106A000000000000004 /* PBXContainerItemProxy */;
+		};
+		A15A1106A000000000000005 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A15A1105A000000000000001 /* ArcadeIslandKit */;
+			targetProxy = A15A1106A000000000000006 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXSourcesBuildPhase section */
 		504EC3001FED79650016851F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				A15A1102A000000000000003 /* ArcadeIslandPlugin.swift in Sources */,
+				A15A1102A000000000000004 /* ArcadeIslandRouter.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A15A1104A000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A15A1102A000000000000001 /* ArcadeIslandAttributes.swift in Sources */,
+				A15A1102A000000000000002 /* ArcadeIslandClient.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A15A1104A000000000000003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A15A1102A000000000000005 /* ArcadeIslandWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A15A1104A000000000000005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
 		504EC30B1FED79650016851F /* Main.storyboard */ = {
@@ -383,6 +584,94 @@
 			};
 			name = Release;
 		};
+		A15A1107A000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = X5H4YHJUU6;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = ArcadeIslandKit;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "$(inherited) -weak_framework ActivityKit";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gamingempire.benchmarkarcade.ArcadeIslandKit;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A15A1107A000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = X5H4YHJUU6;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = ArcadeIslandKit;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "$(inherited) -weak_framework ActivityKit";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gamingempire.benchmarkarcade.ArcadeIslandKit;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A15A1107A000000000000004 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X5H4YHJUU6;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "../ArcadeIslandWidget/Info.plist";
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gamingempire.benchmarkarcade.ArcadeIsland;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A15A1107A000000000000005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X5H4YHJUU6;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "../ArcadeIslandWidget/Info.plist";
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gamingempire.benchmarkarcade.ArcadeIsland;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -400,6 +689,24 @@
 			buildConfigurations = (
 				504EC3171FED79650016851F /* Debug */,
 				504EC3181FED79650016851F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A15A1107A000000000000003 /* Build configuration list for PBXNativeTarget "ArcadeIslandKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A15A1107A000000000000001 /* Debug */,
+				A15A1107A000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A15A1107A000000000000006 /* Build configuration list for PBXNativeTarget "ArcadeIslandWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A15A1107A000000000000004 /* Debug */,
+				A15A1107A000000000000005 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -8,7 +8,7 @@
     "build": "node sync-hub.js",
     "sync": "node sync-hub.js",
     "bundle:store": "esbuild scripts/arcade-purchases-entry.js --bundle --format=esm --platform=browser --outfile=assets/vendor/arcade-purchases.js",
-    "cap:sync": "node sync-hub.js && cap sync",
+    "cap:sync": "node sync-hub.js && cap sync && node scripts/keep-island-plugin.js",
     "cap:ios": "node sync-hub.js && cap open ios",
     "cap:android": "node sync-hub.js && cap open android"
   },

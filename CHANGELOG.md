@@ -25,3 +25,7 @@ Complete Collection (`com.gamingempire.benchmarkarcade.bundle.complete`, $14.99,
 The tip jar is three consumables: Coffee $1.99, Lunch $4.99, Dinner $9.99. Each tip adds a Passport supporter stamp that upgrades with the tip count (Supporter, Regular, House Favorite), shows a thank-you, and grants 0 XP. Tips do not change gameplay. The count is stored locally and filled in from RevenueCat `nonSubscriptionTransactions` on restore when that history is present.
 
 `shop.html` is the only screen with buy buttons, tip buttons, and restore. It lists Patron, Complete Collection, the bundles, the tip jar, and a link to each game's shelf. Passport and the game shelves do not sell.
+
+## Dynamic Island
+
+Each of the 10 hub games can show an iPhone Live Activity while a round is in progress. The Island is a status display only: it does not change rules, hints, scores, or sell anything. Web, Android, and iPhones without a Dynamic Island leave it idle. Setup is in `docs/dynamic-island.md`.
