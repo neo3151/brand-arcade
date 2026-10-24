@@ -682,9 +682,230 @@
     try { clicked = !!run(page); } catch (e) { clicked = false; }
     const reading = read(page, game) || { game: game };
     if (!clicked) reading.caption = reading.caption || 'Nothing to do';
+    renderLiveIsland(page, game, reading);
     return bridge.update(reading, true).then(function () {
       return { ok: clicked, reason: clicked ? 'applied' : 'unavailable', game: game, action: action };
     });
+  }
+
+  const ACTION_LABELS = {
+    rotate: 'Rotate',
+    pause: 'Pause',
+    hint: 'Hint',
+    draw: 'Draw',
+    row: 'Hint',
+    flag: 'Flag',
+    shuffle: 'Shuffle',
+    decrypt: 'Decrypt',
+    cycle: 'Next',
+    deal: 'Deal',
+    play: 'Play'
+  };
+
+  const GAME_GLYPHS = {
+    blockblast: '▦',
+    solitaire: '♠',
+    sudoku: '#',
+    nonogram: '▦',
+    minesweeper: '⚑',
+    mahjong: '🀄',
+    codebreaker: '🔐',
+    wordsearch: 'A',
+    spidersolitaire: '🕷',
+    spades: '♣'
+  };
+
+  function escHtml(val) {
+    return String(val == null ? '' : val).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function hasHardwareCutout(doc) {
+    try {
+      const rootEl = doc && doc.documentElement;
+      if (!rootEl || typeof getComputedStyle !== 'function') return false;
+      const topVar = parseFloat(rootEl.style.getPropertyValue('--safe-top')) || 0;
+      return topVar >= 51;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function renderTelemetryGraphic(game, state) {
+    const accent = escHtml(state.accent);
+    const ink = escHtml(state.ink);
+    if (game === 'blockblast') {
+      const filled = Math.min(5, Math.floor(((state.marks && state.marks[0]) || 0) * 5));
+      let pips = '';
+      for (let i = 0; i < 5; i++) {
+        pips += '<i style="display:inline-block;width:14px;height:5px;border-radius:99px;background:' +
+          (i < filled ? accent : 'rgba(255,255,255,0.2)') + '"></i>';
+      }
+      const pieces = (state.pieces || []).slice(0, 3).map(function (code) {
+        if (!code) return '';
+        const rows = String(code).split('/');
+        return '<div style="display:inline-flex;flex-direction:column;gap:1px;">' +
+          rows.map(function (r) {
+            return '<div style="display:flex;gap:1px;">' +
+              String(r).split('').map(function (b) {
+                return '<b style="width:4px;height:4px;border-radius:1px;display:block;background:' +
+                  accent + ';opacity:' + (b === '1' ? '1' : '0.18') + '"></b>';
+              }).join('') + '</div>';
+          }).join('') + '</div>';
+      }).join('');
+      return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 7px;border-radius:8px;background:rgba(0,0,0,0.28);">' +
+        '<div><div style="font-size:11px;opacity:0.9;">' + escHtml(state.secondary) + '</div>' +
+        '<div style="display:flex;gap:3px;margin-top:4px;">' + pips + '</div></div>' +
+        '<div style="display:flex;gap:6px;align-items:center;">' + pieces + '</div></div>';
+    }
+    if (game === 'solitaire') {
+      const suits = ['♠', '♥', '♦', '♣'];
+      const suitHtml = suits.map(function (s, idx) {
+        const m = (state.marks && state.marks[idx] != null) ? Math.max(0.25, state.marks[idx]) : 0.25;
+        const col = (idx === 1 || idx === 2) ? '#e23d3d' : ink;
+        return '<span style="display:inline-flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:700;color:' + col + '">' +
+          s + '<i style="width:16px;height:4px;border-radius:99px;background:' + accent + ';opacity:' + m + '"></i></span>';
+      }).join('');
+      return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">' +
+        '<div style="display:flex;gap:8px;">' + suitHtml + '</div>' +
+        '<span style="font-size:11px;opacity:0.9;">' + escHtml(state.secondary) + '</span></div>';
+    }
+    if (game === 'nonogram') {
+      const cells = [];
+      for (let i = 0; i < 64; i++) {
+        const v = (state.grid && state.grid[i]) || 0;
+        const bg = v === 1 ? accent : (v === 2 ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.08)');
+        cells.push('<b style="width:6px;height:6px;display:block;background:' + bg + '"></b>');
+      }
+      return '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<div style="display:grid;grid-template-columns:repeat(8,6px);gap:1px;">' + cells.join('') + '</div>' +
+        '<div style="font-size:11px;opacity:0.9;">' + escHtml(state.secondary) +
+        (state.detail ? ' · ' + escHtml(state.detail) : '') + '</div></div>';
+    }
+    if (game === 'codebreaker') {
+      const tumblers = [0, 1, 2, 3, 4, 5].map(function (i) {
+        const m = (state.marks && state.marks[i]) || 0.2;
+        const h = Math.round(6 + m * 10);
+        return '<i style="width:7px;height:' + h + 'px;border-radius:2px;background:' + accent +
+          ';opacity:' + (m > 0.5 ? '1' : '0.28') + '"></i>';
+      }).join('');
+      const pegs = (state.pieces || []).slice(0, 8).map(function (p) {
+        const c = p === 'exact' ? accent : (p === 'partial' ? ink : 'rgba(255,255,255,0.28)');
+        return '<b style="width:6px;height:6px;border-radius:50%;display:inline-block;background:' + c + '"></b>';
+      }).join('');
+      return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">' +
+        '<div style="display:flex;align-items:flex-end;gap:3px;">' + tumblers + '</div>' +
+        '<div style="display:flex;gap:3px;">' + pegs + '</div>' +
+        '<span style="font-size:11px;opacity:0.9;">' + escHtml(state.secondary) + '</span></div>';
+    }
+    if (game === 'spades') {
+      return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;">' +
+        '<span><strong style="color:' + accent + '">US</strong> ' + escHtml(state.primary) + '</span>' +
+        '<span style="opacity:0.85;">' + escHtml(state.detail) + '</span>' +
+        '<span><strong style="color:#f87171">AI</strong> ' + escHtml(state.secondary) + '</span></div>';
+    }
+    const pct = Math.max(4, Math.min(100, Math.round((state.progress || 0) * 100)));
+    return '<div style="display:flex;flex-direction:column;gap:4px;">' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;opacity:0.9;">' +
+      '<span>' + escHtml(state.secondary) + '</span><span>' + escHtml(state.detail) + '</span></div>' +
+      '<div style="height:4px;border-radius:99px;background:rgba(255,255,255,0.14);overflow:hidden;">' +
+      '<span style="display:block;height:100%;width:' + pct + '%;background:' + accent + '"></span></div></div>';
+  }
+
+  function ensureLiveIslandMount(doc, game) {
+    if (!doc || !doc.body || typeof doc.createElement !== 'function' || typeof doc.getElementById !== 'function') {
+      return null;
+    }
+    let host = doc.getElementById('arcade-live-island');
+    if (host) return host;
+    host = doc.createElement('div');
+    host.id = 'arcade-live-island';
+    host.setAttribute('role', 'region');
+    host.setAttribute('aria-label', 'Live Game Dynamic Island');
+    if (typeof host.addEventListener === 'function') {
+      host.addEventListener('click', function (event) {
+        const target = event && event.target;
+        const actionBtn = target && typeof target.closest === 'function' ? target.closest('[data-island-action]') : null;
+        if (actionBtn) {
+          if (event.stopPropagation) event.stopPropagation();
+          const act = actionBtn.getAttribute('data-island-action');
+          applyIntent({ game: game, action: act }, doc);
+          return;
+        }
+        host.classList.toggle('is-expanded');
+      });
+    }
+    if (typeof doc.addEventListener === 'function') {
+      doc.addEventListener('click', function (event) {
+        if (!host.classList || !host.classList.contains('is-expanded')) return;
+        const target = event && event.target;
+        if (target && host.contains && !host.contains(target)) {
+          host.classList.remove('is-expanded');
+        }
+      });
+    }
+    doc.body.appendChild(host);
+    return host;
+  }
+
+  function renderLiveIsland(doc, game, reading) {
+    const state = present(game, reading);
+    if (!state) return;
+    const host = ensureLiveIslandMount(doc, game);
+    if (!host) return;
+    const cutout = hasHardwareCutout(doc);
+    if (host.classList) {
+      host.classList.toggle('has-hardware-cutout', cutout);
+    }
+    if (host.style && typeof host.style.setProperty === 'function') {
+      host.style.setProperty('--island-accent', state.accent);
+      host.style.setProperty('--island-surface', state.surface);
+      host.style.setProperty('--island-ink', state.ink);
+    }
+
+    const glyph = GAME_GLYPHS[game] || '🕹';
+    const primaryColor = state.alert ? '#ff5a5a' : state.ink;
+    const primaryText = state.celebrate ? 'Won' : state.primary;
+    const dangerDot = state.alert ? '<span class="island-danger-dot" aria-hidden="true"></span>' : '';
+
+    const controlsHtml = (state.actions || []).slice(0, 3).map(function (act) {
+      let label = ACTION_LABELS[act] || act;
+      let active = false;
+      if (act === 'pause' && state.paused) { label = 'Resume'; active = true; }
+      if (act === 'flag' && state.flagMode) { active = true; }
+      return '<button type="button" class="island-action-btn' + (active ? ' is-active' : '') +
+        '" data-island-action="' + escHtml(act) + '">' + escHtml(label) + '</button>';
+    }).join('');
+
+    const supplyBadge = state.supply > 0
+      ? '<span style="font-size:11px;font-weight:700;color:' + escHtml(state.accent) + ';margin-left:auto;">' + state.supply + ' left</span>'
+      : '';
+
+    host.innerHTML =
+      '<div class="island-compact" title="Tap to expand live Dynamic Island controls">' +
+        '<span class="island-wing-left">' +
+          '<span class="island-mark">' + escHtml(glyph) + '</span>' +
+        '</span>' +
+        '<span class="island-cutout-spacer">' + escHtml(state.gameName) + '</span>' +
+        '<span class="island-wing-right">' +
+          dangerDot +
+          '<span class="island-primary" style="color:' + escHtml(primaryColor) + '">' + escHtml(primaryText) + '</span>' +
+        '</span>' +
+      '</div>' +
+      '<div class="island-expanded-body">' +
+        '<div class="island-exp-head">' +
+          '<span class="island-exp-title">' +
+            '<span class="island-mark">' + escHtml(glyph) + '</span>' +
+            '<span>' + escHtml(state.gameName) + '</span>' +
+            (state.streak > 0 ? '<span class="island-exp-streak">🔥 ' + state.streak + '</span>' : '') +
+          '</span>' +
+          '<span class="island-primary" style="color:' + escHtml(primaryColor) + '">' + dangerDot + escHtml(primaryText) + ' ▴</span>' +
+        '</div>' +
+        renderTelemetryGraphic(game, state) +
+        (state.caption ? '<div style="font-size:11px;opacity:0.88;">' + escHtml(state.caption) + '</div>' : '') +
+        '<div class="island-exp-controls">' + controlsHtml + supplyBadge + '</div>' +
+      '</div>';
   }
 
   let watching = false;
@@ -702,8 +923,10 @@
     let timer = null;
 
     function tick() {
-      const reading = read(doc || root.document, game);
+      const page = doc || root.document;
+      const reading = read(page, game);
       if (!reading) return;
+      renderLiveIsland(page, game, reading);
       if (!started) {
         started = true;
         bridge.start(reading);
@@ -720,6 +943,7 @@
       if (reading.phase === 'won' || reading.phase === 'lost') {
         if (timer) clearInterval(timer);
         watching = false;
+        renderLiveIsland(page, game, reading);
         bridge.update(reading, true).then(function () { bridge.end(reading); });
         return;
       }
@@ -745,7 +969,8 @@
     support: function () { return nativeCall('support', {}); },
     applyIntent: applyIntent,
     routes: ROUTES,
-    watch: watch
+    watch: watch,
+    renderLiveIsland: renderLiveIsland
   };
 
   root.ArcadeIsland = api;

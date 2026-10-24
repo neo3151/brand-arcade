@@ -234,6 +234,52 @@ async function main() {
   assert.strictEqual(nonogram.grid.length, 64);
   assert.ok(nonogram.grid.indexOf(1) !== -1);
 
+  // Verify live in-game Dynamic Island HUD renders compact wings + expanded telemetry & action buttons
+  let mountedIsland = null;
+  const liveDoc = {
+    documentElement: {
+      dataset: {},
+      style: { getPropertyValue(k) { return k === '--safe-top' ? '59px' : ''; } }
+    },
+    body: {
+      dataset: {},
+      appendChild(child) { mountedIsland = child; }
+    },
+    getElementById(id) { return id === 'arcade-live-island' ? mountedIsland : null; },
+    createElement() {
+      return {
+        id: '',
+        innerHTML: '',
+        style: { setProperty(k, v) { this[k] = v; } },
+        classList: {
+          _set: new Set(),
+          toggle(cls, on) { if (on) this._set.add(cls); else this._set.delete(cls); },
+          contains(cls) { return this._set.has(cls); },
+          remove(cls) { this._set.delete(cls); }
+        },
+        setAttribute() {},
+        addEventListener() {}
+      };
+    },
+    addEventListener() {}
+  };
+  island.renderLiveIsland(liveDoc, 'blockblast', {
+    game: 'blockblast',
+    primary: '1420',
+    secondary: 'Combo x3',
+    marks: [0.6],
+    pieces: ['11/10', '111', '1'],
+    actions: ['rotate', 'pause'],
+    supply: 12
+  });
+  assert.ok(mountedIsland, 'in-game live island mounted');
+  assert.ok(mountedIsland.innerHTML.includes('island-compact'));
+  assert.ok(mountedIsland.innerHTML.includes('island-expanded-body'));
+  assert.ok(mountedIsland.innerHTML.includes('1420'));
+  assert.ok(mountedIsland.innerHTML.includes('Combo x3'));
+  assert.ok(mountedIsland.innerHTML.includes('data-island-action="rotate"'));
+  assert.ok(mountedIsland.innerHTML.includes('12 left'));
+
   const quiet = load();
   quiet.location = { pathname: '/blockblast/www/store.html' };
   quiet.ArcadeIsland.watch({ getElementById() { return null; }, querySelectorAll() { return []; } });
