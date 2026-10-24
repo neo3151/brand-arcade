@@ -329,8 +329,8 @@ async function main() {
 
   // 6. Tampering with XP or achievements in localStorage is scrubbed by sanitizeState / getPlayerLevel
   engagementCtx.ArcadePassport.state.xp = 999999;
-  assert.strictEqual(engagementCtx.ArcadePassport.getPlayerLevel().level < 5, true);
-  assert.strictEqual(engagementCtx.ArcadePassport.state.xp, 400); // first_coin(50) + speedrun_120(100) + daily_3star(100) + streak_3(150)
+  assert.strictEqual(engagementCtx.ArcadePassport.getPlayerLevel().level <= 5, true);
+  assert.strictEqual(engagementCtx.ArcadePassport.state.xp, 525); // 400 achievement XP + 125 daily task XP (paced + variety_2)
 
   const tamperedRaw = JSON.parse(engagementStorage.getItem('arcade_passport_state'));
   tamperedRaw.xp = 999999;
@@ -345,6 +345,59 @@ async function main() {
   const shareCard = engagementCtx.ArcadeDaily.generateShareCard('2026-10-23');
   assert.ok(shareCard.includes('ACME ARCADE'));
   assert.strictEqual(shareCard.includes('localhost'), false);
+
+  // 8. Seeded Daily Cabinet Tasks & anti-tamper task XP verification
+  engagementCtx.ArcadePassport.resetPassport();
+  assert.strictEqual(engagementCtx.ArcadePassport.state.xp, 0);
+  const todayTasks = engagementCtx.ArcadePassport.getDailyCabinetTasks();
+  assert.strictEqual(todayTasks.length, 3);
+  assert.strictEqual(todayTasks.every(t => !t.completed), true);
+
+  // Playing 2 distinct games completes the Double Feature (variety_2) task (+50 XP) + first_coin (+50 XP)
+  engagementCtx.ArcadePassport.recordPlay('sudoku', 0, 0, false, 'deep', false);
+  engagementCtx.ArcadePassport.recordPlay('solitaire', 0, 0, false, 'coffee', false);
+  const afterVariety = engagementCtx.ArcadePassport.getDailyCabinetTasks();
+  const varietyTask = afterVariety.find(t => t.id === 'variety_2');
+  assert.ok(varietyTask && varietyTask.completed, 'Double Feature task completed after 2 cabinets');
+  assert.strictEqual(engagementCtx.ArcadePassport.state.xp, 250); // first_coin(50) + streak_3(150) + variety_2(50)
+
+  // Forging a completed task in localStorage is stripped by sanitizeState
+  const rawWithForgedTask = JSON.parse(engagementStorage.getItem('arcade_passport_state'));
+  rawWithForgedTask.dailyTasks.completed.forged_task = { completedAt: '2026-10-23T00:00:00Z', xp: 5000, _seal: 'bad' };
+  engagementStorage.setItem('arcade_passport_state', JSON.stringify(rawWithForgedTask));
+  assert.strictEqual(engagementCtx.ArcadePassport.loadLocalBackup().xp, 0);
+
+  // 9. In-Game Victory Banner (Daily Share Button, Brand Sign-Off, and Skin Preview Upsell)
+  const victoryModal = {
+    id: 'victory-modal',
+    children: [],
+    querySelector() { return null; },
+    appendChild(child) { this.children.push(child); }
+  };
+  let bannerEl = null;
+  engagementCtx.location.pathname = '/sudoku/www/game.html';
+  engagementCtx.document.documentElement.dataset = { paidPreview: '1', paidSkin: 'sumie' };
+  engagementCtx.ArcadeCosmetics = ctx.ArcadeCosmetics || {
+    SKINS: [{ id: 'sumie', name: 'Sumi-e', packId: 'sudoku-ink', game: 'sudoku' }]
+  };
+  engagementCtx.ArcadeStore = ctx.ArcadeStore;
+  engagementCtx.document.getElementById = function (id) {
+    if (id === 'victory-modal') return victoryModal;
+    if (id === 'arcade-victory-banner') return bannerEl;
+    return null;
+  };
+  engagementCtx.document.createElement = function () {
+    const node = { id: '', style: {}, innerHTML: '', querySelector() { return null; } };
+    bannerEl = node;
+    return node;
+  };
+  engagementCtx.ArcadePassport.injectVictoryEnhancements('sudoku', 3200, 95, true);
+  assert.ok(bannerEl, 'victory banner injected');
+  assert.ok(bannerEl.innerHTML.includes('DAILY MISSION COMPLETE'));
+  assert.ok(bannerEl.innerHTML.includes('Copy Emoji Scorecard'));
+  assert.ok(bannerEl.innerHTML.includes('data-preview-upsell="sumie"'));
+  assert.ok(bannerEl.innerHTML.includes('shop.html?from=sudoku#shop-sudoku-ink'));
+  assert.ok(bannerEl.innerHTML.includes('ACME'));
 
   console.log('arcade-shop: 28 products, grants, tips, and shop copy passed');
 }

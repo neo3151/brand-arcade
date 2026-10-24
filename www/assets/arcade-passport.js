@@ -225,6 +225,75 @@
     return computePassportSeal('ach:' + id + ':' + String(unlockedAt || ''));
   }
 
+  function computeTaskSeal(dateStr, taskId, completedAt, xp) {
+    return computePassportSeal('task:' + String(dateStr || '') + ':' + String(taskId || '') + ':' + String(completedAt || '') + ':' + (Number(xp) || 0));
+  }
+
+  function mulberry32Seed(str) {
+    let hash = 0;
+    const s = String(str || '');
+    for (let i = 0; i < s.length; i++) {
+      hash = ((hash << 5) - hash) + s.charCodeAt(i);
+      hash |= 0;
+    }
+    let a = Math.abs(hash) || 1;
+    return function () {
+      let t = a += 0x6D2B79F5;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  const GAME_LABELS = {
+    blockblast: 'Timber Block Blast',
+    solitaire: 'Curious Solitaire',
+    sudoku: 'Classic Sudoku',
+    nonogram: 'Zen Nonogram',
+    minesweeper: 'Inferno Sweeper',
+    mahjong: 'Celestial Jade',
+    codebreaker: 'Black Vault',
+    wordsearch: 'Word Search Classic',
+    spidersolitaire: 'Spider Solitaire',
+    spades: 'Royal Spades'
+  };
+
+  function getDailyTasksForDate(dateStr) {
+    const d = dateStr || new Date().toISOString().slice(0, 10);
+    const rand = mulberry32Seed('tasks:' + d);
+    const featuredGame = VALID_GAMES[Math.floor(rand() * VALID_GAMES.length)];
+    const speedTarget = [120, 150, 180][Math.floor(rand() * 3)];
+    return [
+      {
+        id: 'win_' + featuredGame,
+        kind: 'game_win',
+        targetGame: featuredGame,
+        title: `${GAME_LABELS[featuredGame]} Clear`,
+        desc: `Win a round of ${GAME_LABELS[featuredGame]} today.`,
+        xp: 50,
+        href: `${featuredGame}/www/game.html`
+      },
+      {
+        id: 'paced_' + speedTarget,
+        kind: 'speed_win',
+        maxSeconds: speedTarget,
+        title: `Under ${Math.round(speedTarget / 60 * 10) / 10}m Clear`,
+        desc: `Finish any arcade game in ${speedTarget}s or less today.`,
+        xp: 75,
+        href: `${featuredGame}/www/game.html`
+      },
+      {
+        id: 'variety_2',
+        kind: 'variety_play',
+        minGames: 2,
+        title: 'Double Feature',
+        desc: 'Play 2 different arcade cabinets in a single day.',
+        xp: 50,
+        href: 'index.html#wall'
+      }
+    ];
+  }
+
   function computeStateSeal(state) {
     if (!state || typeof state !== 'object') return '';
     const ach = state.achievements && typeof state.achievements === 'object' ? state.achievements : {};
@@ -239,6 +308,13 @@
     const tri = state.triathlon && typeof state.triathlon === 'object' ? state.triathlon : {};
     const vibes = Array.isArray(tri.vibes) ? tri.vibes.slice().sort().join(',') : '';
     const stats = state.stats && typeof state.stats === 'object' ? state.stats : {};
+    const dt = state.dailyTasks && typeof state.dailyTasks === 'object' ? state.dailyTasks : {};
+    const dtDone = dt.completed && typeof dt.completed === 'object' ? dt.completed : {};
+    const dtPart = (dt.date || '') + ':' + (Array.isArray(dt.playedToday) ? dt.playedToday.slice().sort().join(',') : '') + ':' +
+      Object.keys(dtDone).sort().map(k => {
+        const r = dtDone[k] || {};
+        return k + '@' + (r.completedAt || '') + '$' + (r.xp || 0) + '#' + (r._seal || '');
+      }).join(',');
     return computePassportSeal([
       achPart,
       playedPart,
@@ -246,19 +322,30 @@
       (parseInt(stats.totalSessions, 10) || 0),
       (parseInt(stats.totalSeconds, 10) || 0),
       (stats.bestSpeedrunSec == null ? 'null' : Number(stats.bestSpeedrunSec)),
-      state.coinInserted ? '1' : '0'
+      state.coinInserted ? '1' : '0',
+      dtPart
     ].join('|'));
   }
 
-  function computeVerifiedXP(achievements) {
-    if (!achievements || typeof achievements !== 'object') return 0;
+  function computeVerifiedXP(achievements, dailyTasks) {
     let total = 0;
-    ACHIEVEMENTS.forEach(ach => {
-      const entry = achievements[ach.id];
-      if (entry && entry.unlocked === true && entry._seal === computeAchievementSeal(ach.id, entry.unlockedAt)) {
-        total += ach.xp;
-      }
-    });
+    if (achievements && typeof achievements === 'object') {
+      ACHIEVEMENTS.forEach(ach => {
+        const entry = achievements[ach.id];
+        if (entry && entry.unlocked === true && entry._seal === computeAchievementSeal(ach.id, entry.unlockedAt)) {
+          total += ach.xp;
+        }
+      });
+    }
+    if (dailyTasks && typeof dailyTasks === 'object' && dailyTasks.completed && typeof dailyTasks.completed === 'object') {
+      const d = dailyTasks.date || '';
+      Object.keys(dailyTasks.completed).forEach(taskId => {
+        const row = dailyTasks.completed[taskId];
+        if (row && row._seal === computeTaskSeal(d, taskId, row.completedAt, row.xp)) {
+          total += Number(row.xp) || 0;
+        }
+      });
+    }
     return total;
   }
 
@@ -286,6 +373,11 @@
         triathlon: {
           date: '',
           vibes: []
+        },
+        dailyTasks: {
+          date: '',
+          playedToday: [],
+          completed: {}
         },
         stats: {
           totalSessions: 0,
@@ -417,8 +509,31 @@
         });
       }
 
+      const rawDt = candidate.dailyTasks && typeof candidate.dailyTasks === 'object' ? candidate.dailyTasks : {};
+      const dtDate = typeof rawDt.date === 'string' ? rawDt.date : '';
+      const verifiedDtCompleted = {};
+      if (rawDt.completed && typeof rawDt.completed === 'object') {
+        Object.keys(rawDt.completed).forEach(taskId => {
+          const row = rawDt.completed[taskId];
+          if (row && row._seal === computeTaskSeal(dtDate, taskId, row.completedAt, row.xp)) {
+            verifiedDtCompleted[taskId] = {
+              completedAt: row.completedAt,
+              xp: Number(row.xp) || 0,
+              _seal: row._seal
+            };
+          }
+        });
+      }
+      const cleanDailyTasks = {
+        date: dtDate,
+        playedToday: Array.isArray(rawDt.playedToday)
+          ? rawDt.playedToday.filter(g => VALID_GAMES.includes(g))
+          : [],
+        completed: verifiedDtCompleted
+      };
+
       const next = {
-        xp: computeVerifiedXP(verifiedAch),
+        xp: computeVerifiedXP(verifiedAch, cleanDailyTasks),
         theme: typeof candidate.theme === 'string' ? candidate.theme : 'default',
         achievements: verifiedAch,
         playedGames: cleanPlayed,
@@ -429,6 +544,7 @@
             ? candidate.triathlon.vibes.filter(v => ['blitz', 'coffee', 'deep'].includes(v))
             : []
         },
+        dailyTasks: cleanDailyTasks,
         stats: {
           totalSessions: Math.max(0, Math.floor(Number(candidate.stats && candidate.stats.totalSessions) || 0)),
           totalSeconds: Math.max(0, Math.floor(Number(candidate.stats && candidate.stats.totalSeconds) || 0)),
@@ -455,8 +571,21 @@
           verifiedAch[id] = entry;
         }
       });
+      if (!this.state.dailyTasks || typeof this.state.dailyTasks !== 'object') {
+        this.state.dailyTasks = { date: '', playedToday: [], completed: {} };
+      }
+      const dtDate = this.state.dailyTasks.date || '';
+      const rawCompleted = this.state.dailyTasks.completed || {};
+      const verifiedTasks = {};
+      Object.keys(rawCompleted).forEach(taskId => {
+        const row = rawCompleted[taskId];
+        if (row && row._seal === computeTaskSeal(dtDate, taskId, row.completedAt, row.xp)) {
+          verifiedTasks[taskId] = row;
+        }
+      });
+      this.state.dailyTasks.completed = verifiedTasks;
       this.state.achievements = verifiedAch;
-      this.state.xp = computeVerifiedXP(verifiedAch);
+      this.state.xp = computeVerifiedXP(verifiedAch, this.state.dailyTasks);
       this.state._seal = computeStateSeal(this.state);
     }
 
@@ -541,15 +670,69 @@
       }
     }
 
-    // Experience Points & Player Rank Computation (always derived from verified achievements)
+    // Experience Points & Player Rank Computation (includes Prestige Ranks beyond 750 XP)
     getPlayerLevel() {
       this.reconcileIntegrity();
       const xp = this.state.xp || 0;
-      if (xp >= 750) return { level: 5, title: 'Arcade Legend', nextXP: null, progress: 100 };
+      if (xp >= 1750) return { level: 8, title: 'Hall of Fame', nextXP: null, progress: 100 };
+      if (xp >= 1350) return { level: 7, title: 'Grandmaster Patron', nextXP: 1750, progress: Math.round(((xp - 1350) / 400) * 100) };
+      if (xp >= 1000) return { level: 6, title: 'Cabinet Virtuoso', nextXP: 1350, progress: Math.round(((xp - 1000) / 350) * 100) };
+      if (xp >= 750) return { level: 5, title: 'Arcade Legend', nextXP: 1000, progress: Math.round(((xp - 750) / 250) * 100) };
       if (xp >= 500) return { level: 4, title: 'High Roller', nextXP: 750, progress: Math.round(((xp - 500) / 250) * 100) };
       if (xp >= 300) return { level: 3, title: 'Token Master', nextXP: 500, progress: Math.round(((xp - 300) / 200) * 100) };
       if (xp >= 150) return { level: 2, title: 'Quarter Dropper', nextXP: 300, progress: Math.round(((xp - 150) / 150) * 100) };
       return { level: 1, title: 'Rookie Operator', nextXP: 150, progress: Math.round((xp / 150) * 100) };
+    }
+
+    getDailyCabinetTasks(dateStr = null) {
+      const today = dateStr || new Date().toISOString().slice(0, 10);
+      this.reconcileIntegrity();
+      const dt = this.state.dailyTasks || { date: '', playedToday: [], completed: {} };
+      const doneMap = dt.date === today && dt.completed ? dt.completed : {};
+      return getDailyTasksForDate(today).map(task => {
+        const entry = doneMap[task.id];
+        const done = !!(entry && entry._seal === computeTaskSeal(today, task.id, entry.completedAt, entry.xp));
+        return Object.assign({}, task, { completed: done });
+      });
+    }
+
+    evaluateDailyTasks(context) {
+      const ctx = context || {};
+      const today = ctx.dateStr || new Date().toISOString().slice(0, 10);
+      if (!this.state.dailyTasks || this.state.dailyTasks.date !== today) {
+        this.state.dailyTasks = { date: today, playedToday: [], completed: {} };
+      }
+      const dt = this.state.dailyTasks;
+      if (ctx.gameId && VALID_GAMES.includes(ctx.gameId) && !dt.playedToday.includes(ctx.gameId)) {
+        dt.playedToday.push(ctx.gameId);
+      }
+
+      const tasks = getDailyTasksForDate(today);
+      tasks.forEach(task => {
+        if (dt.completed[task.id]) return;
+        let qualified = false;
+        if (task.kind === 'variety_play' && dt.playedToday.length >= task.minGames) {
+          qualified = true;
+        } else if (task.kind === 'game_win' && ctx.won && ctx.gameId === task.targetGame) {
+          qualified = true;
+        } else if (task.kind === 'speed_win' && ctx.won && ctx.elapsedSec >= 3 && ctx.elapsedSec <= task.maxSeconds) {
+          qualified = true;
+        }
+        if (qualified) {
+          const completedAt = new Date().toISOString();
+          dt.completed[task.id] = {
+            completedAt: completedAt,
+            xp: task.xp,
+            _seal: computeTaskSeal(today, task.id, completedAt, task.xp)
+          };
+          this.showUnlockToast({
+            icon: '🎯',
+            title: `DAILY TASK: ${task.title}`,
+            desc: task.desc,
+            xp: task.xp
+          });
+        }
+      });
     }
 
     // Unlock an achievement with XP and toast notification (requires verified preconditions)
@@ -653,6 +836,9 @@
         this.unlockAchievement('streak_3');
       }
 
+      // Evaluate today's seeded cabinet tasks (e.g. Double Feature)
+      this.evaluateDailyTasks({ gameId: gameId, won: completed, elapsedSec: durationSec });
+
       this.saveLocalBackup();
     }
 
@@ -680,6 +866,7 @@
         if (this.getVerifiedStreak() >= 3) {
           this.unlockAchievement('streak_3');
         }
+        this.evaluateDailyTasks({ gameId: gameId, won: true, elapsedSec: elapsed });
       } finally {
         this._activeWinProof = false;
       }
@@ -975,6 +1162,7 @@
 
           ${this.renderPatronRow()}
           ${this.renderSupporterStamp()}
+          ${this.renderDailyTasksSection()}
 
           <!-- Trophy Matrix (8 Badges) -->
           <div>
@@ -1102,6 +1290,32 @@
         });
       }
       this._rendering = false;
+    }
+
+    renderDailyTasksSection() {
+      const tasks = this.getDailyCabinetTasks();
+      const doneCount = tasks.filter(t => t.completed).length;
+      return `
+        <div>
+          <div style="font-family: var(--font-arcade); font-size: 0.82rem; font-weight: 700; color: #ffffff; letter-spacing: 0.08em; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span>TODAY'S CABINET TASKS (${doneCount}/${tasks.length}):</span>
+            <span style="color: var(--neon-green); font-family: var(--font-mono); font-size: 0.72rem;">SEEDED DAILY BONUS XP</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px;">
+            ${tasks.map(t => `
+              <div data-daily-task="${escapeHtml(t.id)}" style="background: ${t.completed ? 'rgba(16, 185, 129, 0.12)' : '#090e1a'}; border: 1.5px solid ${t.completed ? '#10b981' : '#1e293b'}; border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+                    <span style="font-family: var(--font-arcade); font-size: 0.8rem; font-weight: 700; color: ${t.completed ? '#a7f3d0' : '#ffffff'};">${escapeHtml(t.title)}</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; color: ${t.completed ? '#10b981' : 'var(--neon-yellow)'};">${t.completed ? '✓ DONE' : '+' + t.xp + ' XP'}</span>
+                  </div>
+                  <div style="font-size: 0.7rem; color: #94a3b8; line-height: 1.35; margin-top: 3px;">${escapeHtml(t.desc)}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
     }
 
     renderSupporterStamp() {
@@ -1324,10 +1538,106 @@
             this.recordDailyCompletionFromGame(gameId, score, elapsedSec, 3);
           }
           this.recordWin(gameId, elapsedSec, score, isDaily, 3);
+          this.injectVictoryEnhancements(gameId, score, elapsedSec, isDaily);
         }
       };
 
       this._winTimer = setInterval(checkWin, 1000);
+    }
+
+    injectVictoryEnhancements(gameId, score, elapsedSec, isDaily) {
+      if (typeof document === 'undefined' || !document.getElementById) return;
+      if (document.getElementById('arcade-victory-banner')) return;
+
+      const hostIds = ['victory-overlay', 'victory-modal', 'gameover-modal'];
+      let modalEl = null;
+      for (const id of hostIds) {
+        const el = document.getElementById(id);
+        if (el) { modalEl = el; break; }
+      }
+      if (!modalEl) return;
+
+      const targetContainer = (modalEl.querySelector && (
+        modalEl.querySelector('.modal-content, .victory-card, .modal-card, .modal-body, .victory-box')
+      )) || modalEl;
+
+      const htmlEl = document.documentElement;
+      const isPreviewSkin = !!(htmlEl && htmlEl.dataset && htmlEl.dataset.paidPreview === '1');
+      const previewSkinId = (htmlEl && htmlEl.dataset && htmlEl.dataset.paidSkin) ||
+        (document.body && document.body.dataset && document.body.dataset.theme) || '';
+
+      let skinObj = null;
+      if (isPreviewSkin && previewSkinId && window.ArcadeCosmetics && Array.isArray(window.ArcadeCosmetics.SKINS)) {
+        skinObj = window.ArcadeCosmetics.SKINS.find(s => s.id === previewSkinId);
+      }
+
+      const inWww = ((window.location && window.location.pathname) || '').includes('/www/');
+      const hubHref = inWww ? '../../index.html' : '../index.html';
+      const shopHref = (window.ArcadeStore && typeof window.ArcadeStore.shopHref === 'function')
+        ? window.ArcadeStore.shopHref(skinObj ? skinObj.packId : previewSkinId, gameId)
+        : (inWww ? '../../shop.html' : '../shop.html');
+
+      let brandName = 'Brand Arcade';
+      try {
+        const b = localStorage.getItem('arcade_brand_name');
+        if (b && b.trim() && b.trim().toUpperCase() !== 'BRAND') {
+          brandName = b.trim();
+        }
+      } catch (e) {}
+
+      const banner = document.createElement('div');
+      banner.id = 'arcade-victory-banner';
+      banner.style.cssText = 'margin-top:12px;padding:12px;border-radius:10px;background:rgba(9,14,26,0.92);border:1.5px solid rgba(250,204,21,0.45);color:#f8fafc;font-family:system-ui,sans-serif;text-align:left;font-size:0.8rem;line-height:1.4;';
+
+      let inner = '';
+      if (isDaily) {
+        inner += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">' +
+          '<strong style="color:#facc15;letter-spacing:0.05em;">★ DAILY MISSION COMPLETE</strong>' +
+          '<button type="button" id="arcade-victory-share-btn" style="padding:6px 10px;border-radius:999px;border:0;background:#10b981;color:#052e16;font-weight:800;font-size:0.75rem;cursor:pointer;">📋 Copy Emoji Scorecard</button>' +
+          '</div>';
+      }
+
+      if (isPreviewSkin && previewSkinId) {
+        const skinLabel = (skinObj && skinObj.name) ? skinObj.name : previewSkinId;
+        inner += '<div data-preview-upsell="' + escapeHtml(previewSkinId) + '" style="padding:8px 10px;margin-bottom:8px;border-radius:8px;background:rgba(230,179,37,0.14);border:1px solid rgba(230,179,37,0.4);display:flex;justify-content:space-between;align-items:center;gap:8px;">' +
+          '<span>Liked the <strong>' + escapeHtml(skinLabel) + '</strong> look? Unlock it permanently in the Arcade Shop.</span>' +
+          '<a href="' + escapeHtml(shopHref) + '" style="flex-shrink:0;padding:5px 10px;border-radius:999px;background:#e6b325;color:#1b1404;font-weight:800;font-size:0.74rem;text-decoration:none;">Arcade Shop</a>' +
+          '</div>';
+      }
+
+      inner += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;color:#94a3b8;font-size:0.74rem;">' +
+        '<span>100% Free &amp; Ad-Free · Compliments of <strong style="color:#e2e8f0;">' + escapeHtml(brandName) + '</strong></span>' +
+        '<a href="' + escapeHtml(isDaily ? hubHref + '#daily' : hubHref) + '" style="color:#38bdf8;font-weight:700;text-decoration:none;white-space:nowrap;">🕹️ Arcade Hub</a>' +
+        '</div>';
+
+      banner.innerHTML = inner;
+      if (targetContainer && typeof targetContainer.appendChild === 'function') {
+        targetContainer.appendChild(banner);
+      }
+
+      const shareBtn = banner.querySelector && banner.querySelector('#arcade-victory-share-btn');
+      if (shareBtn && typeof shareBtn.addEventListener === 'function') {
+        shareBtn.addEventListener('click', () => {
+          let cardText = '';
+          if (window.ArcadeDaily && typeof window.ArcadeDaily.generateShareCard === 'function') {
+            cardText = window.ArcadeDaily.generateShareCard();
+          } else {
+            const mins = Math.floor((elapsedSec || 120) / 60);
+            const secs = String((elapsedSec || 120) % 60).padStart(2, '0');
+            cardText = [
+              `🕹️ ${brandName.toUpperCase()} — DAILY RUN`,
+              `🏆 ${GAME_LABELS[gameId] || gameId} | ⏱ ${mins}m ${secs}s`,
+              '🟩🟩🟩🟩🟩',
+              'Play 100% free (No Ads): https://brandarcade.games'
+            ].join('\n');
+          }
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            navigator.clipboard.writeText(cardText).then(() => {
+              shareBtn.textContent = '✓ Copied Scorecard!';
+            }).catch(() => {});
+          }
+        });
+      }
     }
 
     recordDailyCompletionFromGame(gameId, score, elapsedSec, stars = 3) {
