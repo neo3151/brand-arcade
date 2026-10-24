@@ -1,5 +1,6 @@
 import ArcadeIslandKit
 import UIKit
+import WebKit
 import Capacitor
 
 @UIApplicationMain
@@ -8,6 +9,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        URLCache.shared.removeAllCachedResponses()
+        let cacheTypes: Set<String> = [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache]
+        WKWebsiteDataStore.default().removeData(ofTypes: cacheTypes, modifiedSince: .distantPast) {}
         ArcadeIslandInbox.onPending = { ArcadeIslandRouter.flushIntent() }
         ArcadeIslandInbox.start()
         return true

@@ -813,9 +813,75 @@
       '<span style="display:block;height:100%;width:' + pct + '%;background:' + accent + '"></span></div></div>';
   }
 
+  const LIVE_ISLAND_CSS = [
+    'html.arcade-bar-on:has(#arcade-live-island:not(.is-minimized)) {',
+    '  --arcade-bar: 92px !important;',
+    '}',
+    '#arcade-live-island {',
+    '  position: fixed !important;',
+    '  top: calc(var(--safe-top, env(safe-area-inset-top, 0px)) + 4px) !important;',
+    '  left: 50% !important;',
+    '  transform: translateX(-50%) !important;',
+    '  z-index: 1000010 !important;',
+    '  background: linear-gradient(180deg, #05070c 0%, var(--island-surface, #141820) 100%) !important;',
+    '  color: var(--island-ink, #f6e7c1) !important;',
+    '  border: 1.5px solid var(--island-accent, #e6b325) !important;',
+    '  border-radius: 22px !important;',
+    '  width: min(326px, calc(100vw - 108px)) !important;',
+    '  padding: 7px 11px !important;',
+    '  box-shadow: 0 8px 24px rgba(0,0,0,0.85), 0 0 12px rgba(0,0,0,0.6) !important;',
+    '  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif !important;',
+    '  font-variant-numeric: tabular-nums !important;',
+    '  user-select: none !important;',
+    '  -webkit-tap-highlight-color: transparent !important;',
+    '  box-sizing: border-box !important;',
+    '  pointer-events: auto !important;',
+    '  display: flex !important;',
+    '  flex-direction: column !important;',
+    '  justify-content: center !important;',
+    '}',
+    '#arcade-live-island.is-minimized {',
+    '  border-radius: 999px !important;',
+    '  min-height: 42px !important;',
+    '  padding: 4px 12px !important;',
+    '  background: #000000 !important;',
+    '}',
+    '@media (max-width: 820px) {',
+    '  body:has(#arcade-live-island) #arcade-hub-floating-btn span:last-child,',
+    '  body:has(#arcade-live-island) #arcade-nav-dev-btn span:last-child,',
+    '  body:has(#arcade-live-island) .arcade-nav-daily { display: none !important; }',
+    '  body:has(#arcade-live-island) #arcade-hub-floating-btn,',
+    '  body:has(#arcade-live-island) #arcade-nav-dev-btn { width: 42px !important; min-width: 42px !important; height: 42px !important; min-height: 42px !important; padding: 0 !important; }',
+    '}',
+    '#arcade-live-island .island-compact { display: none; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 32px; cursor: pointer; }',
+    '#arcade-live-island.is-minimized .island-compact { display: flex !important; }',
+    '#arcade-live-island.is-minimized .island-expanded-body { display: none !important; }',
+    '#arcade-live-island .island-wing-left, #arcade-live-island .island-wing-right { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }',
+    '#arcade-live-island .island-mark { font-size: 13px; font-weight: 800; color: var(--island-accent, #e6b325); line-height: 1; }',
+    '#arcade-live-island .island-cutout-spacer { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; opacity: 0.92; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }',
+    '#arcade-live-island .island-primary { font-size: 12.5px; font-weight: 800; letter-spacing: -0.01em; }',
+    '#arcade-live-island .island-danger-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff2a2a; box-shadow: 0 0 8px #ff2a2a; display: inline-block; }',
+    '#arcade-live-island .island-expanded-body { display: flex; flex-direction: column; gap: 5px; width: 100%; }',
+    '#arcade-live-island .island-exp-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; cursor: pointer; }',
+    '#arcade-live-island .island-exp-title { font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; }',
+    '#arcade-live-island .island-exp-streak { font-size: 10px; font-weight: 700; color: var(--island-accent, #e6b325); margin-left: 3px; }',
+    '#arcade-live-island .island-exp-controls { display: flex; align-items: center; gap: 5px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }',
+    '#arcade-live-island .island-action-btn { appearance: none; border: 1px solid var(--island-accent, #e6b325); background: rgba(255,255,255,0.12); color: var(--island-ink, #f6e7c1); border-radius: 999px; padding: 3px 10px; min-height: 24px; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; }',
+    '#arcade-live-island .island-action-btn.is-active { background: var(--island-accent, #e6b325); color: #0b0d12; }'
+  ].join('\n');
+
   function ensureLiveIslandMount(doc, game) {
     if (!doc || !doc.body || typeof doc.createElement !== 'function' || typeof doc.getElementById !== 'function') {
       return null;
+    }
+    if (!doc.getElementById('arcade-live-island-styles')) {
+      const styleEl = doc.createElement('style');
+      styleEl.id = 'arcade-live-island-styles';
+      styleEl.textContent = LIVE_ISLAND_CSS;
+      const styleTarget = doc.head || doc.body;
+      if (styleTarget && typeof styleTarget.appendChild === 'function') {
+        styleTarget.appendChild(styleEl);
+      }
     }
     let host = doc.getElementById('arcade-live-island');
     if (host) return host;
@@ -833,16 +899,7 @@
           applyIntent({ game: game, action: act }, doc);
           return;
         }
-        host.classList.toggle('is-expanded');
-      });
-    }
-    if (typeof doc.addEventListener === 'function') {
-      doc.addEventListener('click', function (event) {
-        if (!host.classList || !host.classList.contains('is-expanded')) return;
-        const target = event && event.target;
-        if (target && host.contains && !host.contains(target)) {
-          host.classList.remove('is-expanded');
-        }
+        host.classList.toggle('is-minimized');
       });
     }
     doc.body.appendChild(host);
@@ -882,15 +939,23 @@
       ? '<span style="font-size:11px;font-weight:700;color:' + escHtml(state.accent) + ';margin-left:auto;">' + state.supply + ' left</span>'
       : '';
 
+    const firstAction = (state.actions || [])[0] || '';
+    const quickActionBtn = firstAction
+      ? '<button type="button" class="island-action-btn" data-island-action="' + escHtml(firstAction) +
+        '" style="padding:3px 9px;min-height:24px;font-size:10.5px;">' +
+        escHtml(firstAction === 'pause' && state.paused ? 'Resume' : (ACTION_LABELS[firstAction] || firstAction)) + '</button>'
+      : '';
+
     host.innerHTML =
-      '<div class="island-compact" title="Tap to expand live Dynamic Island controls">' +
+      '<div class="island-compact" title="Tap to expand live Dynamic Island">' +
         '<span class="island-wing-left">' +
           '<span class="island-mark">' + escHtml(glyph) + '</span>' +
+          '<span class="island-cutout-spacer">' + escHtml(state.secondary || state.gameName) + '</span>' +
         '</span>' +
-        '<span class="island-cutout-spacer">' + escHtml(state.gameName) + '</span>' +
         '<span class="island-wing-right">' +
           dangerDot +
           '<span class="island-primary" style="color:' + escHtml(primaryColor) + '">' + escHtml(primaryText) + '</span>' +
+          quickActionBtn +
         '</span>' +
       '</div>' +
       '<div class="island-expanded-body">' +
@@ -908,13 +973,33 @@
       '</div>';
   }
 
+  function isMenuPage(path) {
+    return /(?:^|\/)index\.html$/.test(String(path || '').split('?')[0]);
+  }
+
   let watching = false;
 
   function watch(doc) {
     if (watching) return;
     const path = (root.location && root.location.pathname) || '';
     const game = gameFromPath(path);
-    if (!game || !isPlayPage(path)) return;
+    if (!game) return;
+    if (isMenuPage(path)) {
+      const page = doc || root.document;
+      renderLiveIsland(page, game, {
+        game: game,
+        skinId: skinFrom(page),
+        phase: 'playing',
+        primary: 'Ready',
+        secondary: GAMES[game] ? GAMES[game].name : game,
+        detail: 'Tap Play to start',
+        progress: 1,
+        actions: [],
+        caption: 'Live Dynamic Island active for this cabinet'
+      });
+      return;
+    }
+    if (!isPlayPage(path)) return;
     watching = true;
     let started = false;
     let lastPhase = '';
