@@ -557,8 +557,12 @@
       this.renderTab(this.activeTab);
 
       // Passport achievement unlock
-      if (window.ArcadePassport && typeof window.ArcadePassport.unlockAchievement === 'function') {
-        window.ArcadePassport.unlockAchievement('dev_inspector');
+      if (window.ArcadePassport) {
+        if (typeof window.ArcadePassport.notifyInspectorOpened === 'function') {
+          window.ArcadePassport.notifyInspectorOpened();
+        } else if (typeof window.ArcadePassport.unlockAchievement === 'function') {
+          window.ArcadePassport.unlockAchievement('dev_inspector');
+        }
       }
     },
 

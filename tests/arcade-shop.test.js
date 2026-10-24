@@ -290,23 +290,57 @@ async function main() {
   assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('first_coin'), true);
   assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('speedrun_120'), false);
 
-  // 2. Completing a round in <=120s unlocks speedrun_120
+  // 2. Direct console calls to unlockAchievement without meeting preconditions are rejected
+  assert.strictEqual(engagementCtx.ArcadePassport.unlockAchievement('grandmaster'), false);
+  assert.strictEqual(engagementCtx.ArcadePassport.unlockAchievement('speedrun_120'), false);
+  assert.strictEqual(engagementCtx.ArcadePassport.unlockAchievement('arcade_triathlon'), false);
+  assert.strictEqual(engagementCtx.ArcadePassport.unlockAchievement('streak_3'), false);
+  assert.strictEqual(engagementCtx.ArcadePassport.unlockAchievement('daily_3star'), false);
+  assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('grandmaster'), false);
+
+  // 3. Impossible <3s speedrun exploits are rejected, while legitimate <=120s wins unlock speedrun_120
+  engagementCtx.ArcadePassport.recordWin('sudoku', 1, 3200, false, 3);
+  assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('speedrun_120'), false);
   engagementCtx.ArcadePassport.recordWin('sudoku', 95, 3200, false, 3);
   assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('speedrun_120'), true);
 
-  // 3. Completing a Daily Run unlocks daily_3star and updates streak
+  // 4. Forging localStorage streak or daily history without a seal is rejected
+  engagementStorage.setItem('arcade_daily_streak', '99');
+  engagementStorage.setItem('arcade_streak_days', '99');
+  engagementCtx.ArcadePassport.recordWin('sudoku', 150, 3200, false, 3);
+  assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('streak_3'), false);
+  assert.strictEqual(engagementCtx.ArcadeDaily.getDailyStreak(), 1);
+
+  engagementStorage.setItem('arcade_daily_history', JSON.stringify({
+    '2026-10-20': { date: '2026-10-20', dayNumber: 293, gameId: 'sudoku', score: 99999, timeSeconds: 10, stars: 3, _seal: 'forged' }
+  }));
+  assert.strictEqual(Object.keys(engagementCtx.ArcadeDaily.getHistory()).length, 0);
+
+  // 5. Completing 3 consecutive sealed Daily Runs unlocks daily_3star and streak_3
   const mission = engagementCtx.ArcadeDaily.getTodayMission('2026-10-23');
   assert.ok(mission.launchUrl.includes('/www/game.html?'), 'daily mission launches game.html directly');
   assert.ok(mission.launchUrl.includes('daily=2026-10-23'));
+  engagementCtx.ArcadeDaily.recordCompletion(3800, 115, 3, '2026-10-21');
+  engagementCtx.ArcadeDaily.recordCompletion(3900, 112, 3, '2026-10-22');
   engagementCtx.ArcadeDaily.recordCompletion(4100, 110, 3, '2026-10-23');
+  assert.strictEqual(engagementCtx.ArcadeDaily.getDailyStreak(), 3);
   assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('daily_3star'), true);
-
-  // 4. Unified streak key unlocks streak_3 when arcade_daily_streak >= 3
-  engagementStorage.setItem('arcade_daily_streak', '3');
-  engagementCtx.ArcadePassport.recordWin('sudoku', 150, 3200, false, 3);
   assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('streak_3'), true);
 
-  // 5. Share card replaces capacitor://localhost with canonical URL and uses custom brand name
+  // 6. Tampering with XP or achievements in localStorage is scrubbed by sanitizeState / getPlayerLevel
+  engagementCtx.ArcadePassport.state.xp = 999999;
+  assert.strictEqual(engagementCtx.ArcadePassport.getPlayerLevel().level < 5, true);
+  assert.strictEqual(engagementCtx.ArcadePassport.state.xp, 400); // first_coin(50) + speedrun_120(100) + daily_3star(100) + streak_3(150)
+
+  const tamperedRaw = JSON.parse(engagementStorage.getItem('arcade_passport_state'));
+  tamperedRaw.xp = 999999;
+  tamperedRaw.achievements.grandmaster = { unlocked: true, unlockedAt: '2026-10-23T00:00:00Z', _seal: 'forged' };
+  engagementStorage.setItem('arcade_passport_state', JSON.stringify(tamperedRaw));
+  const reloadedState = engagementCtx.ArcadePassport.loadLocalBackup();
+  assert.strictEqual(reloadedState.xp, 0);
+  assert.strictEqual(!!reloadedState.achievements.grandmaster, false);
+
+  // 7. Share card replaces capacitor://localhost with canonical URL and uses custom brand name
   engagementStorage.setItem('arcade_brand_name', 'ACME');
   const shareCard = engagementCtx.ArcadeDaily.generateShareCard('2026-10-23');
   assert.ok(shareCard.includes('ACME ARCADE'));

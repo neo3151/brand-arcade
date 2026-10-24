@@ -27,6 +27,45 @@
     return Math.abs(hash);
   }
 
+  // Keyed FNV-1a integrity seal to prevent localStorage tampering of daily runs & streaks
+  const DAILY_SEAL_SALT = 'ba_daily_v1_9f4e2c7a';
+  function computeDailySeal(payload) {
+    const str = DAILY_SEAL_SALT + '|' + String(payload);
+    let h1 = 0x811c9dc5;
+    let h2 = 0x811c9dc5 ^ 0x5bd1e995;
+    for (let i = 0; i < str.length; i++) {
+      const c = str.charCodeAt(i);
+      h1 ^= c;
+      h1 = Math.imul(h1, 0x01000193);
+      h2 ^= (c + i);
+      h2 = Math.imul(h2, 0x01000193);
+    }
+    return ((h1 >>> 0).toString(16).padStart(8, '0')) + ((h2 >>> 0).toString(16).padStart(8, '0'));
+  }
+
+  function signRunRecord(rec) {
+    if (!rec || typeof rec !== 'object') return '';
+    return computeDailySeal([
+      rec.date,
+      rec.dayNumber,
+      rec.gameId,
+      Number(rec.score) || 0,
+      Number(rec.timeSeconds) || 0,
+      Number(rec.stars) || 0
+    ].join(':'));
+  }
+
+  function isValidRunRecord(dateKey, rec) {
+    if (!rec || typeof rec !== 'object') return false;
+    if (rec.date !== dateKey || !/^\d{4}-\d{2}-\d{2}$/.test(String(dateKey))) return false;
+    if (typeof rec._seal !== 'string' || !rec._seal) return false;
+    const seconds = Number(rec.timeSeconds);
+    const stars = Number(rec.stars);
+    if (!Number.isFinite(seconds) || seconds < 3 || seconds > 86400) return false;
+    if (!Number.isFinite(stars) || stars < 1 || stars > 3) return false;
+    return rec._seal === signRunRecord(rec);
+  }
+
   // Reference base date (Day 1: Jan 1, 2026)
   const BASE_DATE = new Date('2026-01-01T00:00:00Z');
 
@@ -213,41 +252,59 @@
       };
     }
 
-    // Load user's daily run history
+    // Load user's daily run history (strips any unsealed or tampered entries)
     getHistory() {
       try {
-        return JSON.parse(localStorage.getItem('arcade_daily_history') || '{}');
+        const raw = JSON.parse(localStorage.getItem('arcade_daily_history') || '{}');
+        if (!raw || typeof raw !== 'object') return {};
+        const verified = {};
+        let dirty = false;
+        Object.keys(raw).forEach((dateKey) => {
+          if (isValidRunRecord(dateKey, raw[dateKey])) {
+            verified[dateKey] = raw[dateKey];
+          } else {
+            dirty = true;
+          }
+        });
+        if (dirty) {
+          localStorage.setItem('arcade_daily_history', JSON.stringify(verified));
+        }
+        return verified;
       } catch (e) {
         return {};
       }
     }
 
-    // Check if today's run has been completed
+    // Check if today's run has been completed with a valid seal
     isTodayCompleted(dateStr = this.todayStr) {
       const history = this.getHistory();
       return !!history[dateStr];
     }
 
-    // Record a completed daily run
+    // Record a completed daily run with anti-tamper seal
     recordCompletion(score, timeSeconds, stars = 3, dateStr = this.todayStr) {
       const mission = this.getTodayMission(dateStr);
       const history = this.getHistory();
+      const clampedSeconds = Math.max(3, Math.min(86400, Math.round(Number(timeSeconds) || 135)));
+      const clampedScore = Math.max(0, Math.min(1000000, Math.round(Number(score) || mission.targetScore)));
+      const clampedStars = Math.max(1, Math.min(3, Math.round(Number(stars) || 3)));
 
       const runRecord = {
         date: dateStr,
         dayNumber: mission.dayNumber,
         gameId: mission.game.id,
         gameTitle: mission.game.title,
-        score: score || mission.targetScore,
-        timeSeconds: timeSeconds || 135,
-        stars: Math.max(1, Math.min(3, stars)),
+        score: clampedScore,
+        timeSeconds: clampedSeconds,
+        stars: clampedStars,
         completedAt: new Date().toISOString()
       };
+      runRecord._seal = signRunRecord(runRecord);
 
       history[dateStr] = runRecord;
       localStorage.setItem('arcade_daily_history', JSON.stringify(history));
 
-      // Update Daily Streak
+      // Update Daily Streak from verified history
       this.updateStreakOnCompletion(dateStr);
 
       // Sync completion with ArcadePassport for speedrun, daily_3star, and streak_3 trophies
@@ -258,28 +315,50 @@
       return runRecord;
     }
 
-    updateStreakOnCompletion(dateStr) {
-      let streak = parseInt(localStorage.getItem('arcade_daily_streak') || '0', 10);
-      const lastCompletedDate = localStorage.getItem('arcade_last_daily_completed');
-
-      if (!lastCompletedDate) {
-        streak = 1;
-      } else {
-        const lastDate = new Date(lastCompletedDate);
-        const currDate = new Date(dateStr);
-        const diffDays = Math.round((currDate - lastDate) / (1000 * 60 * 60 * 24));
-        if (diffDays === 1) streak += 1;
-        else if (diffDays === 0) { /* already counted */ }
-        else streak = 1;
+    // Compute consecutive-day streak strictly from sealed history records
+    computeVerifiedStreak(anchorDateStr = null) {
+      const history = this.getHistory();
+      const dates = Object.keys(history).sort();
+      if (!dates.length) return 0;
+      const latest = anchorDateStr && history[anchorDateStr] ? anchorDateStr : dates[dates.length - 1];
+      let streak = 1;
+      let cursor = new Date(`${latest}T00:00:00Z`);
+      while (true) {
+        cursor = new Date(cursor.getTime() - 86400000);
+        const prevStr = cursor.toISOString().slice(0, 10);
+        if (history[prevStr]) {
+          streak += 1;
+        } else {
+          break;
+        }
       }
+      return streak;
+    }
 
+    updateStreakOnCompletion(dateStr) {
+      const streak = Math.max(1, this.computeVerifiedStreak(dateStr));
+      const seal = computeDailySeal(`streak:${dateStr}:${streak}`);
       localStorage.setItem('arcade_last_daily_completed', dateStr);
       localStorage.setItem('arcade_daily_streak', streak.toString());
+      localStorage.setItem('arcade_daily_streak_seal', seal);
       return streak;
     }
 
     getDailyStreak() {
-      return parseInt(localStorage.getItem('arcade_daily_streak') || '1', 10);
+      const verified = this.computeVerifiedStreak();
+      if (verified > 0) {
+        const stored = parseInt(localStorage.getItem('arcade_daily_streak') || '0', 10);
+        if (stored !== verified) {
+          localStorage.setItem('arcade_daily_streak', String(verified));
+        }
+        return verified;
+      }
+      // If no verified daily history exists, reject any manually edited streak > 1
+      const raw = parseInt(localStorage.getItem('arcade_daily_streak') || '1', 10);
+      if (raw > 1) {
+        localStorage.setItem('arcade_daily_streak', '1');
+      }
+      return 1;
     }
 
     // Generate Wordle-Style Emoji Share Grid

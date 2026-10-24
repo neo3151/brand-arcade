@@ -194,6 +194,74 @@
     return !!(window.ArcadeStore && typeof window.ArcadeStore.owns === 'function');
   }
 
+  const VALID_GAMES = [
+    'blockblast', 'solitaire', 'sudoku', 'nonogram', 'minesweeper',
+    'mahjong', 'codebreaker', 'wordsearch', 'spidersolitaire', 'spades'
+  ];
+
+  // Keyed FNV-1a integrity seal to prevent localStorage / IndexedDB / console tampering
+  const PASSPORT_SEAL_SALT = 'ba_passport_v1_7c3a91e5';
+  const DAILY_SEAL_SALT = 'ba_daily_v1_9f4e2c7a';
+
+  function computeHash(salt, payload) {
+    const str = salt + '|' + String(payload);
+    let h1 = 0x811c9dc5;
+    let h2 = 0x811c9dc5 ^ 0x5bd1e995;
+    for (let i = 0; i < str.length; i++) {
+      const c = str.charCodeAt(i);
+      h1 ^= c;
+      h1 = Math.imul(h1, 0x01000193);
+      h2 ^= (c + i);
+      h2 = Math.imul(h2, 0x01000193);
+    }
+    return ((h1 >>> 0).toString(16).padStart(8, '0')) + ((h2 >>> 0).toString(16).padStart(8, '0'));
+  }
+
+  function computePassportSeal(payload) {
+    return computeHash(PASSPORT_SEAL_SALT, payload);
+  }
+
+  function computeAchievementSeal(id, unlockedAt) {
+    return computePassportSeal('ach:' + id + ':' + String(unlockedAt || ''));
+  }
+
+  function computeStateSeal(state) {
+    if (!state || typeof state !== 'object') return '';
+    const ach = state.achievements && typeof state.achievements === 'object' ? state.achievements : {};
+    const achPart = Object.keys(ach).sort().map(id => {
+      const row = ach[id] || {};
+      return id + '@' + (row.unlockedAt || '') + '#' + (row._seal || '');
+    }).join(',');
+    const played = state.playedGames && typeof state.playedGames === 'object' ? state.playedGames : {};
+    const playedPart = Object.keys(played).filter(g => VALID_GAMES.includes(g)).sort().map(g => {
+      return g + ':' + (parseInt(played[g], 10) || 0);
+    }).join(',');
+    const tri = state.triathlon && typeof state.triathlon === 'object' ? state.triathlon : {};
+    const vibes = Array.isArray(tri.vibes) ? tri.vibes.slice().sort().join(',') : '';
+    const stats = state.stats && typeof state.stats === 'object' ? state.stats : {};
+    return computePassportSeal([
+      achPart,
+      playedPart,
+      (tri.date || '') + ':' + vibes,
+      (parseInt(stats.totalSessions, 10) || 0),
+      (parseInt(stats.totalSeconds, 10) || 0),
+      (stats.bestSpeedrunSec == null ? 'null' : Number(stats.bestSpeedrunSec)),
+      state.coinInserted ? '1' : '0'
+    ].join('|'));
+  }
+
+  function computeVerifiedXP(achievements) {
+    if (!achievements || typeof achievements !== 'object') return 0;
+    let total = 0;
+    ACHIEVEMENTS.forEach(ach => {
+      const entry = achievements[ach.id];
+      if (entry && entry.unlocked === true && entry._seal === computeAchievementSeal(ach.id, entry.unlockedAt)) {
+        total += ach.xp;
+      }
+    });
+    return total;
+  }
+
   class ArcadePassportManager {
     constructor() {
       this.db = null;
@@ -210,7 +278,7 @@
 
     // Default passport state schema
     getDefaultState() {
-      return {
+      const base = {
         xp: 0,
         theme: 'default',
         achievements: {},
@@ -225,13 +293,180 @@
           bestSpeedrunSec: null
         }
       };
+      base._seal = computeStateSeal(base);
+      return base;
+    }
+
+    getVerifiedStreak() {
+      try {
+        if (window.ArcadeDaily && typeof window.ArcadeDaily.computeVerifiedStreak === 'function') {
+          const s = window.ArcadeDaily.computeVerifiedStreak();
+          if (s > 0) return s;
+        }
+        const rawStreak = parseInt(localStorage.getItem('arcade_daily_streak') || '0', 10) || 0;
+        const lastDate = localStorage.getItem('arcade_last_daily_completed') || '';
+        const streakSeal = localStorage.getItem('arcade_daily_streak_seal') || '';
+        if (rawStreak > 0 && lastDate && streakSeal === computeHash(DAILY_SEAL_SALT, `streak:${lastDate}:${rawStreak}`)) {
+          return rawStreak;
+        }
+        const visitStreak = parseInt(localStorage.getItem('arcade_streak_days') || '0', 10) || 0;
+        const visitDate = localStorage.getItem('arcade_last_visit_date') || '';
+        const visitSeal = localStorage.getItem('arcade_streak_days_seal') || '';
+        if (visitStreak > 0 && visitDate && visitSeal === computePassportSeal(`visit:${visitDate}:${visitStreak}`)) {
+          return visitStreak;
+        }
+      } catch (e) {}
+      return 0;
+    }
+
+    hasVerifiedDailyThreeStar() {
+      try {
+        if (window.ArcadeDaily && typeof window.ArcadeDaily.getHistory === 'function') {
+          const hist = window.ArcadeDaily.getHistory();
+          return Object.keys(hist).some(k => hist[k] && Number(hist[k].stars) >= 3);
+        }
+        const raw = JSON.parse(localStorage.getItem('arcade_daily_history') || '{}');
+        return Object.keys(raw).some(k => {
+          const rec = raw[k];
+          if (!rec || rec.date !== k || Number(rec.stars) < 3) return false;
+          const expected = computeHash(DAILY_SEAL_SALT, [
+            rec.date, rec.dayNumber, rec.gameId,
+            Number(rec.score) || 0, Number(rec.timeSeconds) || 0, Number(rec.stars) || 0
+          ].join(':'));
+          return rec._seal === expected;
+        });
+      } catch (e) {
+        return false;
+      }
+    }
+
+    meetsPreconditions(id, state, isRuntimeUnlock = false) {
+      const s = state || this.state;
+      if (!s || typeof s !== 'object') return false;
+      const played = s.playedGames && typeof s.playedGames === 'object' ? s.playedGames : {};
+      const validPlayed = Object.keys(played).filter(g => VALID_GAMES.includes(g) && played[g] >= 1);
+      const stats = s.stats || {};
+      const tri = s.triathlon || {};
+
+      switch (id) {
+        case 'first_coin':
+          return (stats.totalSessions >= 1) && (validPlayed.length >= 1 || !!s.coinInserted);
+        case 'speedrun_120':
+          return (!isRuntimeUnlock || !!this._activeWinProof) &&
+            Number.isFinite(stats.bestSpeedrunSec) &&
+            stats.bestSpeedrunSec >= 3 &&
+            stats.bestSpeedrunSec <= 120;
+        case 'arcade_triathlon':
+          return Array.isArray(tri.vibes) &&
+            ['blitz', 'coffee', 'deep'].every(v => tri.vibes.includes(v));
+        case 'streak_3':
+          return this.getVerifiedStreak() >= 3;
+        case 'grandmaster':
+          return validPlayed.length >= 10;
+        case 'daily_3star':
+          return (!isRuntimeUnlock || !!this._activeWinProof) && this.hasVerifiedDailyThreeStar();
+        case 'dev_inspector':
+          if (!isRuntimeUnlock) return true;
+          return !!(this._inspectorOpenedProof || (window.ArcadeInspector && window.ArcadeInspector.isOpen));
+        case 'theme_collector':
+          if (!isRuntimeUnlock) return true;
+          return !!this._themeAppliedProof;
+        default:
+          return false;
+      }
+    }
+
+    // Verify integrity seal and scrub any forged achievements, XP, or stats
+    sanitizeState(candidate) {
+      if (!candidate || typeof candidate !== 'object') {
+        return this.getDefaultState();
+      }
+      const expectedSeal = computeStateSeal(candidate);
+      const sealValid = typeof candidate._seal === 'string' && candidate._seal === expectedSeal;
+      if (!sealValid) {
+        // State was manually edited in localStorage / IndexedDB or lacks a valid seal.
+        // Preserve only theme preference and reset unverified progress/achievements.
+        const clean = this.getDefaultState();
+        if (typeof candidate.theme === 'string' && THEMES.some(t => t.id === candidate.theme)) {
+          clean.theme = candidate.theme;
+        }
+        return clean;
+      }
+
+      const verifiedAch = {};
+      const rawAch = candidate.achievements && typeof candidate.achievements === 'object' ? candidate.achievements : {};
+      Object.keys(rawAch).forEach(id => {
+        const entry = rawAch[id];
+        if (!ACHIEVEMENTS.some(a => a.id === id)) return;
+        if (!entry || entry.unlocked !== true) return;
+        if (entry._seal !== computeAchievementSeal(id, entry.unlockedAt)) return;
+        if (!this.meetsPreconditions(id, candidate, false)) return;
+        verifiedAch[id] = {
+          unlocked: true,
+          unlockedAt: entry.unlockedAt,
+          _seal: entry._seal
+        };
+      });
+
+      const cleanPlayed = {};
+      if (candidate.playedGames && typeof candidate.playedGames === 'object') {
+        Object.keys(candidate.playedGames).forEach(g => {
+          if (VALID_GAMES.includes(g) && Number(candidate.playedGames[g]) >= 1) {
+            cleanPlayed[g] = Math.floor(Number(candidate.playedGames[g]));
+          }
+        });
+      }
+
+      const next = {
+        xp: computeVerifiedXP(verifiedAch),
+        theme: typeof candidate.theme === 'string' ? candidate.theme : 'default',
+        achievements: verifiedAch,
+        playedGames: cleanPlayed,
+        coinInserted: !!candidate.coinInserted,
+        triathlon: {
+          date: (candidate.triathlon && typeof candidate.triathlon.date === 'string') ? candidate.triathlon.date : '',
+          vibes: (candidate.triathlon && Array.isArray(candidate.triathlon.vibes))
+            ? candidate.triathlon.vibes.filter(v => ['blitz', 'coffee', 'deep'].includes(v))
+            : []
+        },
+        stats: {
+          totalSessions: Math.max(0, Math.floor(Number(candidate.stats && candidate.stats.totalSessions) || 0)),
+          totalSeconds: Math.max(0, Math.floor(Number(candidate.stats && candidate.stats.totalSeconds) || 0)),
+          bestSpeedrunSec: (candidate.stats && Number.isFinite(candidate.stats.bestSpeedrunSec) && candidate.stats.bestSpeedrunSec >= 3 && candidate.stats.bestSpeedrunSec <= 120)
+            ? Number(candidate.stats.bestSpeedrunSec)
+            : null
+        }
+      };
+      next._seal = computeStateSeal(next);
+      return next;
+    }
+
+    reconcileIntegrity() {
+      const verifiedAch = {};
+      const rawAch = (this.state && this.state.achievements) || {};
+      Object.keys(rawAch).forEach(id => {
+        const entry = rawAch[id];
+        if (
+          entry &&
+          entry.unlocked === true &&
+          entry._seal === computeAchievementSeal(id, entry.unlockedAt) &&
+          this.meetsPreconditions(id, this.state, false)
+        ) {
+          verifiedAch[id] = entry;
+        }
+      });
+      this.state.achievements = verifiedAch;
+      this.state.xp = computeVerifiedXP(verifiedAch);
+      this.state._seal = computeStateSeal(this.state);
     }
 
     // Fast local backup for instant synchronous page loads
     loadLocalBackup() {
       try {
         const raw = localStorage.getItem('arcade_passport_state');
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          return this.sanitizeState(JSON.parse(raw));
+        }
       } catch (e) {
         console.warn('Passport local storage read error:', e);
       }
@@ -240,6 +475,7 @@
 
     saveLocalBackup() {
       try {
+        this.reconcileIntegrity();
         localStorage.setItem('arcade_passport_state', JSON.stringify(this.state));
         this.saveToIndexedDB();
         this.updateHeaderBadges();
@@ -290,11 +526,11 @@
         const req = store.get('primary_passport');
         req.onsuccess = () => {
           if (req.result) {
-            // Merge states, prioritizing higher XP
-            if (req.result.xp > this.state.xp) {
-              const next = Object.assign({}, req.result);
-              delete next.id;
-              this.state = next;
+            const candidate = Object.assign({}, req.result);
+            delete candidate.id;
+            const sanitized = this.sanitizeState(candidate);
+            if (sanitized.xp > this.state.xp) {
+              this.state = sanitized;
               this.saveLocalBackup();
               this.reconcileTheme();
             }
@@ -305,8 +541,9 @@
       }
     }
 
-    // Experience Points & Player Rank Computation
+    // Experience Points & Player Rank Computation (always derived from verified achievements)
     getPlayerLevel() {
+      this.reconcileIntegrity();
       const xp = this.state.xp || 0;
       if (xp >= 750) return { level: 5, title: 'Arcade Legend', nextXP: null, progress: 100 };
       if (xp >= 500) return { level: 4, title: 'High Roller', nextXP: 750, progress: Math.round(((xp - 500) / 250) * 100) };
@@ -315,69 +552,82 @@
       return { level: 1, title: 'Rookie Operator', nextXP: 150, progress: Math.round((xp / 150) * 100) };
     }
 
-    // Unlock an achievement with XP and toast notification
+    // Unlock an achievement with XP and toast notification (requires verified preconditions)
     unlockAchievement(id) {
-      if (this.state.achievements[id]) return; // Already unlocked
+      this.reconcileIntegrity();
+      if (this.state.achievements[id]) return false; // Already unlocked
 
       const ach = ACHIEVEMENTS.find(a => a.id === id);
-      if (!ach) return;
+      if (!ach) return false;
+      if (!this.meetsPreconditions(id, this.state, true)) {
+        return false;
+      }
 
+      const unlockedAt = new Date().toISOString();
       this.state.achievements[id] = {
         unlocked: true,
-        unlockedAt: new Date().toISOString()
+        unlockedAt: unlockedAt,
+        _seal: computeAchievementSeal(id, unlockedAt)
       };
 
-      this.state.xp = (this.state.xp || 0) + ach.xp;
       this.saveLocalBackup();
       this.updateHeaderBadges();
 
       const modal = document.getElementById('modal-passport');
-      if (modal && modal.classList.contains('active')) {
+      if (modal && modal.classList && modal.classList.contains('active')) {
         this.renderModalContent();
       }
 
       this.showUnlockToast(ach);
       this.playUnlockSound();
+      return true;
     }
 
     isUnlocked(id) {
-      return !!this.state.achievements[id];
+      const entry = this.state.achievements && this.state.achievements[id];
+      if (!entry || entry.unlocked !== true) return false;
+      if (entry._seal !== computeAchievementSeal(id, entry.unlockedAt)) return false;
+      return this.meetsPreconditions(id, this.state, false);
     }
 
     getUnlockedCount() {
+      this.reconcileIntegrity();
       return Object.keys(this.state.achievements).length;
     }
 
     // Record game sessions and automatically evaluate achievements
     recordPlay(gameId, durationSec = 0, score = 0, isDaily = false, vibe = null, completed = false) {
+      if (!VALID_GAMES.includes(gameId)) return;
       this.state.stats.totalSessions += 1;
       if (durationSec > 0) {
-        this.state.stats.totalSeconds += durationSec;
+        this.state.stats.totalSeconds += Math.floor(Number(durationSec) || 0);
       }
 
       // Track played cabinets
-      if (gameId) {
-        this.state.playedGames[gameId] = (this.state.playedGames[gameId] || 0) + 1;
-      }
+      this.state.playedGames[gameId] = (this.state.playedGames[gameId] || 0) + 1;
 
       // Achievement: First coin / play
       this.unlockAchievement('first_coin');
 
-      // Achievement: Sub-2m Speedrun (120s) — only when a round is actually completed
-      if (completed && durationSec > 0 && durationSec <= 120) {
+      // Achievement: Sub-2m Speedrun (120s) — only when a round is actually completed in >= 3s
+      if (completed && durationSec >= 3 && durationSec <= 120) {
+        this._activeWinProof = true;
         if (!this.state.stats.bestSpeedrunSec || durationSec < this.state.stats.bestSpeedrunSec) {
-          this.state.stats.bestSpeedrunSec = durationSec;
+          this.state.stats.bestSpeedrunSec = Math.round(durationSec);
         }
         this.unlockAchievement('speedrun_120');
+        this._activeWinProof = false;
       }
 
       // Achievement: Daily 3-Star Flawless Mission
       if (completed && isDaily) {
+        this._activeWinProof = true;
         this.unlockAchievement('daily_3star');
+        this._activeWinProof = false;
       }
 
       // Achievement: Grandmaster (all 10 cabinets played)
-      const uniquePlayed = Object.keys(this.state.playedGames).length;
+      const uniquePlayed = Object.keys(this.state.playedGames).filter(g => VALID_GAMES.includes(g)).length;
       if (uniquePlayed >= 10) {
         this.unlockAchievement('grandmaster');
       }
@@ -387,7 +637,7 @@
       if (this.state.triathlon.date !== todayStr) {
         this.state.triathlon = { date: todayStr, vibes: [] };
       }
-      if (vibe && !this.state.triathlon.vibes.includes(vibe)) {
+      if (vibe && ['blitz', 'coffee', 'deep'].includes(vibe) && !this.state.triathlon.vibes.includes(vibe)) {
         this.state.triathlon.vibes.push(vibe);
       }
       if (
@@ -398,13 +648,8 @@
         this.unlockAchievement('arcade_triathlon');
       }
 
-      // Achievement: Streak (check daily streak, hub visit streak, and legacy key)
-      const streak = Math.max(
-        parseInt(localStorage.getItem('arcade_daily_streak') || '0', 10) || 0,
-        parseInt(localStorage.getItem('arcade_streak_days') || '0', 10) || 0,
-        parseInt(localStorage.getItem('arcade_streak') || '0', 10) || 0
-      );
-      if (streak >= 3) {
+      // Achievement: Streak (requires verified streak >= 3)
+      if (this.getVerifiedStreak() >= 3) {
         this.unlockAchievement('streak_3');
       }
 
@@ -413,25 +658,47 @@
 
     // Record a completed game win for speedrun, daily 3-star, and streak trophies
     recordWin(gameId, durationSec = 60, score = 0, isDaily = false, stars = 3) {
-      const elapsed = Math.max(1, Number(durationSec) || 60);
+      if (gameId && !VALID_GAMES.includes(gameId)) return;
+      const elapsed = Math.round(Number(durationSec) || 0);
+      if (elapsed < 3) return; // Reject impossible <3s console-triggered wins
       this.state.stats.totalSeconds += elapsed;
-      if (elapsed <= 120) {
-        if (!this.state.stats.bestSpeedrunSec || elapsed < this.state.stats.bestSpeedrunSec) {
-          this.state.stats.bestSpeedrunSec = elapsed;
+      if (gameId) {
+        this.state.stats.totalSessions = Math.max(1, this.state.stats.totalSessions || 0);
+        this.state.playedGames[gameId] = Math.max(1, this.state.playedGames[gameId] || 0);
+      }
+      this._activeWinProof = true;
+      try {
+        if (elapsed <= 120) {
+          if (!this.state.stats.bestSpeedrunSec || elapsed < this.state.stats.bestSpeedrunSec) {
+            this.state.stats.bestSpeedrunSec = elapsed;
+          }
+          this.unlockAchievement('speedrun_120');
         }
-        this.unlockAchievement('speedrun_120');
+        if (isDaily && stars >= 3) {
+          this.unlockAchievement('daily_3star');
+        }
+        if (this.getVerifiedStreak() >= 3) {
+          this.unlockAchievement('streak_3');
+        }
+      } finally {
+        this._activeWinProof = false;
       }
-      if (isDaily && stars >= 3) {
-        this.unlockAchievement('daily_3star');
+      this.saveLocalBackup();
+    }
+
+    notifyInspectorOpened() {
+      this._inspectorOpenedProof = true;
+      try {
+        this.unlockAchievement('dev_inspector');
+      } finally {
+        this._inspectorOpenedProof = false;
       }
-      const streak = Math.max(
-        parseInt(localStorage.getItem('arcade_daily_streak') || '0', 10) || 0,
-        parseInt(localStorage.getItem('arcade_streak_days') || '0', 10) || 0,
-        parseInt(localStorage.getItem('arcade_streak') || '0', 10) || 0
-      );
-      if (streak >= 3) {
-        this.unlockAchievement('streak_3');
-      }
+    }
+
+    notifyCoinInserted() {
+      this.state.stats.totalSessions = Math.max(1, (this.state.stats.totalSessions || 0) + 1);
+      this.state.coinInserted = true;
+      this.unlockAchievement('first_coin');
       this.saveLocalBackup();
     }
 
@@ -513,7 +780,12 @@
       this.paintTheme(theme);
 
       if (notify) {
-        this.unlockAchievement('theme_collector');
+        this._themeAppliedProof = true;
+        try {
+          this.unlockAchievement('theme_collector');
+        } finally {
+          this._themeAppliedProof = false;
+        }
         this.playClickSound();
       }
       return true;
@@ -778,9 +1050,6 @@
             <button type="button" id="btn-export-passport" class="btn-push-play" style="flex: 1; justify-content: center; font-size: 0.82rem;">
               <span>💾</span> BACKUP PASSPORT TO CLIPBOARD
             </button>
-            <button type="button" id="btn-test-unlock-trophy" class="btn-push-sub" style="flex: 1; justify-content: center; font-size: 0.82rem; ${/[?&](debug|demo)=/i.test((window.location && window.location.search) || '') ? '' : 'display: none;'}" title="Simulate unlocking a trophy for demo">
-              <span>⚡</span> DEMO UNLOCK (+1)
-            </button>
             <button type="button" id="btn-reset-passport" class="btn-push-sub" style="flex: 1; justify-content: center; font-size: 0.82rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);" title="Reset all achievements back to 0/8">
               <span>🔄</span> RESET (0/8)
             </button>
@@ -820,21 +1089,6 @@
           navigator.clipboard.writeText(exportStr).then(() => {
             alert('Arcade Passport data copied to clipboard!');
           });
-        });
-      }
-
-      // Bind demo unlock button
-      const demoBtn = modal.querySelector('#btn-test-unlock-trophy');
-      if (demoBtn) {
-        demoBtn.addEventListener('click', () => {
-          // Unlock next locked trophy
-          const next = ACHIEVEMENTS.find(a => !this.isUnlocked(a.id));
-          if (next) {
-            this.unlockAchievement(next.id);
-            this.renderModalContent();
-          } else {
-            alert('All trophies already unlocked! You are an Arcade Legend.');
-          }
         });
       }
 
@@ -1024,6 +1278,14 @@
       this._watchingGame = true;
       const startMs = Date.now();
       let recorded = false;
+      let interactions = 0;
+
+      const onInteract = () => { interactions += 1; };
+      if (typeof document.addEventListener === 'function') {
+        ['pointerdown', 'keydown', 'touchstart', 'click'].forEach(evt => {
+          document.addEventListener(evt, onInteract, { passive: true });
+        });
+      }
 
       const isShown = (id) => {
         const el = document.getElementById && document.getElementById(id);
@@ -1053,8 +1315,11 @@
         }
 
         if (won) {
+          const elapsedSec = Math.round((Date.now() - startMs) / 1000);
+          // Require real player input and at least 3 seconds of actual play
+          // so toggling .active on #victory-modal in DevTools cannot fake a win.
+          if (interactions < 1 || elapsedSec < 3) return;
           recorded = true;
-          const elapsedSec = Math.max(1, Math.round((Date.now() - startMs) / 1000));
           if (isDaily) {
             this.recordDailyCompletionFromGame(gameId, score, elapsedSec, 3);
           }
@@ -1076,28 +1341,40 @@
         const dateStr = (rawDaily && /^\d{4}-\d{2}-\d{2}$/.test(rawDaily))
           ? rawDaily
           : new Date().toISOString().slice(0, 10);
-        const history = JSON.parse(localStorage.getItem('arcade_daily_history') || '{}');
-        history[dateStr] = {
+        const clampedSec = Math.max(3, Math.min(86400, Math.round(Number(elapsedSec) || 120)));
+        const clampedScore = Math.max(0, Math.min(1000000, Math.round(Number(score) || 3500)));
+        const clampedStars = Math.max(1, Math.min(3, Math.round(Number(stars) || 3)));
+        const baseDate = new Date('2026-01-01T00:00:00Z');
+        const dayNumber = Math.max(1, Math.floor((new Date(`${dateStr}T00:00:00Z`) - baseDate) / 86400000) + 1);
+
+        const rec = {
           date: dateStr,
+          dayNumber: dayNumber,
           gameId: gameId,
-          score: score || 3500,
-          timeSeconds: elapsedSec || 120,
-          stars: stars,
+          score: clampedScore,
+          timeSeconds: clampedSec,
+          stars: clampedStars,
           completedAt: new Date().toISOString()
         };
+        rec._seal = computeHash(DAILY_SEAL_SALT, [
+          rec.date, rec.dayNumber, rec.gameId, rec.score, rec.timeSeconds, rec.stars
+        ].join(':'));
+
+        const history = JSON.parse(localStorage.getItem('arcade_daily_history') || '{}');
+        history[dateStr] = rec;
         localStorage.setItem('arcade_daily_history', JSON.stringify(history));
 
-        let streak = parseInt(localStorage.getItem('arcade_daily_streak') || '0', 10) || 0;
-        const lastCompleted = localStorage.getItem('arcade_last_daily_completed');
-        if (!lastCompleted) {
-          streak = 1;
-        } else {
-          const diffDays = Math.round((new Date(dateStr) - new Date(lastCompleted)) / (1000 * 60 * 60 * 24));
-          if (diffDays === 1) streak += 1;
-          else if (diffDays !== 0) streak = 1;
+        let streak = 1;
+        let cursor = new Date(`${dateStr}T00:00:00Z`);
+        while (true) {
+          cursor = new Date(cursor.getTime() - 86400000);
+          const prevStr = cursor.toISOString().slice(0, 10);
+          if (history[prevStr] && history[prevStr]._seal) streak += 1;
+          else break;
         }
         localStorage.setItem('arcade_last_daily_completed', dateStr);
         localStorage.setItem('arcade_daily_streak', String(streak));
+        localStorage.setItem('arcade_daily_streak_seal', computeHash(DAILY_SEAL_SALT, `streak:${dateStr}:${streak}`));
       } catch (e) {}
     }
   }
@@ -1125,12 +1402,6 @@
 
     const checkTriggers = () => {
       const params = new URLSearchParams(window.location.search);
-      if (params.has('demo')) {
-        window.ArcadePassport.unlockAchievement('first_coin');
-        window.ArcadePassport.unlockAchievement('speedrun_120');
-        window.ArcadePassport.unlockAchievement('dev_inspector');
-        window.ArcadePassport.unlockAchievement('theme_collector');
-      }
       if ((window.location.hash === '#passport' || params.has('passport')) && modal) {
         window.ArcadePassport.renderModalContent();
         modal.showModal();
