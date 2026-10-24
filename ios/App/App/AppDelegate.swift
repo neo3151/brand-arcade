@@ -1,3 +1,4 @@
+import ArcadeIslandKit
 import UIKit
 import Capacitor
 
@@ -7,7 +8,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        ArcadeIslandInbox.onPending = { ArcadeIslandRouter.flushIntent() }
+        ArcadeIslandInbox.start()
         return true
     }
 
@@ -43,6 +45,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        if url.scheme == "benchmarkarcade" {
+            ArcadeIslandRouter.handle(url)
+        }
         // Called when the app was launched with a url. Feel free to add additional processing here,
         // but if you want the App API to support tracking app url opens, make sure to keep this call
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
@@ -63,10 +68,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let _ = (scene as? UIWindowScene) else { return }
+        if let url = connectionOptions.urlContexts.first?.url {
+            ArcadeIslandRouter.handle(url)
+        }
+    }
+
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        ArcadeIslandRouter.flush()
+        ArcadeIslandRouter.flushIntent()
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         if let url = URLContexts.first?.url {
+            ArcadeIslandRouter.handle(url)
             _ = ApplicationDelegateProxy.shared.application(UIApplication.shared, open: url, options: [:])
         }
     }

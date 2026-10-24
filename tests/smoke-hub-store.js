@@ -137,6 +137,8 @@ async function main() {
             hasCoffee: text.includes('Coffee'),
             hasRestore: text.includes('Restore purchases'),
             hasUnavailable: text.includes('Unavailable'),
+            devUnlock: window.ARCADE_DEV_UNLOCK_ALL === true,
+            hasDevUnlock: text.includes('DEV UNLOCK'),
             hasBuy: text.includes('btn-buy-patron') || text.includes('· Buy'),
             priceText: (text.match(/\\$\\d+\\.\\d{2}/) || [])[0] || '',
             hub: hub
@@ -156,13 +158,19 @@ async function main() {
         if (!value.hasComplete || !value.hasCoffee || !value.hasRestore || !value.hasUnavailable) {
           problems.push('shop copy missing ' + JSON.stringify(value));
         }
+        if (value.devUnlock && !value.hasDevUnlock) problems.push('shop missing DEV UNLOCK');
         if (value.priceText) problems.push('price text ' + value.priceText);
       } else {
         if (!value.store) problems.push('ArcadeStore missing');
         if (!value.native) problems.push('Capacitor bridge did not load');
         if (value.price !== null) problems.push('web price ' + value.price);
-        if (value.refused !== false) problems.push('locked theme applied');
-        if (value.theme !== 'default') problems.push('theme ' + value.theme);
+        if (value.devUnlock) {
+          if (value.refused !== true) problems.push('dev unlock refused vectrex');
+          if (value.theme !== 'vectrex') problems.push('theme ' + value.theme);
+        } else {
+          if (value.refused !== false) problems.push('locked theme applied');
+          if (value.theme !== 'default') problems.push('theme ' + value.theme);
+        }
         if (!value.hasPatron || !value.hasVectrex || !value.hasShop) {
           problems.push('passport copy missing ' + JSON.stringify(value));
         }

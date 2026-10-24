@@ -25,3 +25,11 @@ Complete Collection (`com.gamingempire.benchmarkarcade.bundle.complete`, $14.99,
 The tip jar is three consumables: Coffee $1.99, Lunch $4.99, Dinner $9.99. Each tip adds a Passport supporter stamp that upgrades with the tip count (Supporter, Regular, House Favorite), shows a thank-you, and grants 0 XP. Tips do not change gameplay. The count is stored locally and filled in from RevenueCat `nonSubscriptionTransactions` on restore when that history is present.
 
 `shop.html` is the only screen with buy buttons, tip buttons, and restore. It lists Patron, Complete Collection, the bundles, the tip jar, and a link to each game's shelf. Passport and the game shelves do not sell.
+
+## Dynamic Island
+
+Each of the 10 hub games can show an iPhone Live Activity while a round is in progress. On iOS 17 the expanded Island can press the same hint, power-up, or board control the game already uses, and that spends the daily supply once. iOS 16.2 stays read-only. A win or a new Block Blast best plays an alert. Web, Android, and iPhones without a Dynamic Island leave it idle. Setup is in `docs/dynamic-island.md`.
+
+Solitaire's stock and waste piles use the same column width as the tableau. The cards are taken out of flow, so a percentage width had collapsed the deck to its border. Spider's deal pile keeps a fixed tap size when the foundation row is tight.
+
+On an iPhone the web view stays edge to edge (`ios.contentInset` is `never`) and the page pads itself with the safe-area inset. The return-to-arcade control is a 44pt target under the Dynamic Island on every game, the DEV HUD sits in that bar instead of over the home indicator, and menus can scroll when the screen is short.

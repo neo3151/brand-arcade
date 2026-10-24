@@ -61,6 +61,7 @@ function loadHub(storage) {
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-store-config.js'), 'utf8'), sandbox);
+  sandbox.ARCADE_DEV_UNLOCK_ALL = false;
   vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-store.js'), 'utf8'), sandbox);
   vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-content.js'), 'utf8'), sandbox);
   sandbox.shelf = shelf;

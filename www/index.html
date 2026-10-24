@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="stylesheet" href="assets/arcade-safe.css">
+  <script src="assets/arcade-safe.js"></script>
   <meta name="description" content="Retro Arcade Hub — 10 Classic Casual Games with Free Play, Zero Ads, and Quick Sessions.">
   <meta name="theme-color" content="#050811">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -72,7 +74,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      padding: calc(var(--safe-top, env(safe-area-inset-top, 0px)) + 12px) max(16px, var(--safe-right, env(safe-area-inset-right, 0px))) max(40px, var(--safe-bottom, env(safe-area-inset-bottom, 0px))) max(16px, var(--safe-left, env(safe-area-inset-left, 0px)));
       overflow-x: hidden;
       line-height: 1.4;
       transition: background-image 0.4s ease;
@@ -121,7 +123,7 @@
     /* ARCADE MARQUEE TOP HEADER */
     .arcade-header {
       width: 100%;
-      padding: max(16px, env(safe-area-inset-top)) 12px 14px 12px;
+      padding: 14px 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -275,7 +277,10 @@
       background: #162035;
       border: 1px solid #2d3f66;
       color: #cbd5e1;
-      padding: 5px 12px;
+      padding: 8px 12px;
+      min-height: 44px;
+      min-width: 44px;
+      box-sizing: border-box;
       border-radius: 4px;
       font-family: var(--font-arcade);
       font-size: 0.88rem;
@@ -295,6 +300,22 @@
       color: #ffffff;
       border-color: var(--neon-cyan);
       box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+    }
+
+    /* Phone: one row of 44px controls you can swipe, so the marquee
+       does not grow into four rows and push the cabinets off the glass. */
+    @media (max-width: 820px) {
+      .status-group:last-child {
+        flex: 1 1 100%;
+        min-width: 0;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .status-group:last-child::-webkit-scrollbar { display: none; }
+      .status-group:last-child .btn-toggle-arcade { flex-shrink: 0; }
     }
 
     /* QUICK SESSION VIBE SELECTOR BAR */
@@ -1165,14 +1186,13 @@
       border-radius: 12px;
       color: #e2e8f0;
       padding: 20px;
-      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      padding-bottom: max(24px, var(--safe-bottom, env(safe-area-inset-bottom, 0px)));
       max-width: 480px;
-      max-height: 88vh;
-      max-height: 88dvh;
+      max-height: calc(100dvh - var(--safe-top, env(safe-area-inset-top, 0px)) - var(--safe-bottom, env(safe-area-inset-bottom, 0px)) - 24px);
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       width: 90%;
-      margin: auto;
+      margin: calc(var(--safe-top, env(safe-area-inset-top, 0px)) + 12px) auto calc(var(--safe-bottom, env(safe-area-inset-bottom, 0px)) + 12px);
       box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(6, 182, 212, 0.4);
     }
 

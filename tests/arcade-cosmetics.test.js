@@ -44,6 +44,7 @@ function loadPage(storage, location) {
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-store-config.js'), 'utf8'), sandbox, { filename: 'arcade-store-config.js' });
+  sandbox.ARCADE_DEV_UNLOCK_ALL = false;
   vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-store.js'), 'utf8'), sandbox, { filename: 'arcade-store.js' });
   vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-cosmetics.js'), 'utf8'), sandbox, { filename: 'arcade-cosmetics.js' });
   vm.runInContext(fs.readFileSync(path.join(root, 'blockblast/js/progress.js'), 'utf8'), sandbox, { filename: 'progress.js' });

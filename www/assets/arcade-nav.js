@@ -1,266 +1,216 @@
 /**
  * arcade-nav.js — Universal Return to Arcade Hub Bar & Daily Mode Indicator
- * Injected across individual games to provide a seamless way for players
- * to return to the centralized Benchmark Arcade cabinet selection screen.
+ * Injected across individual games. On a phone the bar is a full-width
+ * strip under the status bar / Dynamic Island. Each control is at least
+ * 44pt and the strip itself does not take taps in the island band.
  */
 (function() {
-  // Only inject if not inside an iframe
   if (window.self !== window.top) return;
 
-  function getHubUrl(hash = '') {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isDaily = urlParams.has('daily');
-    const targetHash = hash || (isDaily ? 'daily' : '');
+  var PHONE_QUERY = '(max-width: 820px)';
 
-    // Check pathname depth relative to root index.html
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const inWwwSubdir = window.location.pathname.includes('/www/');
-    
-    // In Capacitor or web server, each game lives at <game>/www/
-    let prefix = '../../index.html';
+  function assetPrefix() {
+    var inWww = window.location.pathname.includes('/www/');
+    return inWww ? '../../assets/' : '../assets/';
+  }
+
+  function readInsets() {
+    var probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = [
+      'position:fixed', 'top:0', 'left:0', 'visibility:hidden', 'pointer-events:none',
+      'padding-top:env(safe-area-inset-top,0px)',
+      'padding-right:env(safe-area-inset-right,0px)',
+      'padding-bottom:env(safe-area-inset-bottom,0px)',
+      'padding-left:env(safe-area-inset-left,0px)'
+    ].join(';');
+    document.documentElement.appendChild(probe);
+    var cs = getComputedStyle(probe);
+    var insets = {
+      top: parseFloat(cs.paddingTop) || 0,
+      right: parseFloat(cs.paddingRight) || 0,
+      bottom: parseFloat(cs.paddingBottom) || 0,
+      left: parseFloat(cs.paddingLeft) || 0
+    };
+    probe.remove();
+    return insets;
+  }
+
+  function applySafeNow() {
+    if (window.ArcadeSafe && typeof window.ArcadeSafe.apply === 'function') {
+      window.ArcadeSafe.apply();
+      return;
+    }
+    var insets = readInsets();
+    var ua = navigator.userAgent || '';
+    var cap = window.Capacitor;
+    var platform = cap && typeof cap.getPlatform === 'function' ? cap.getPlatform() : '';
+    var iphone = /iPhone|iPod/.test(ua) || (platform === 'ios' && Math.min(window.innerWidth, window.innerHeight) < 500);
+    if (insets.top < 1 && insets.left < 1 && insets.right < 1 && iphone) {
+      if (window.innerHeight >= window.innerWidth) {
+        insets.top = 59;
+        if (insets.bottom < 1) insets.bottom = 34;
+      } else {
+        if (insets.left < 1) insets.left = 59;
+        if (insets.right < 1) insets.right = 59;
+        if (insets.bottom < 1) insets.bottom = 21;
+      }
+    }
+    var root = document.documentElement;
+    root.style.setProperty('--safe-top', insets.top + 'px');
+    root.style.setProperty('--safe-right', insets.right + 'px');
+    root.style.setProperty('--safe-bottom', insets.bottom + 'px');
+    root.style.setProperty('--safe-left', insets.left + 'px');
+    root.classList.add('arcade-safe');
+  }
+
+  function ensureSafe() {
+    var prefix = assetPrefix();
+    if (!document.getElementById('arcade-safe-css')) {
+      var link = document.createElement('link');
+      link.id = 'arcade-safe-css';
+      link.rel = 'stylesheet';
+      link.href = prefix + 'arcade-safe.css';
+      document.head.appendChild(link);
+    }
+    applySafeNow();
+    if (!document.getElementById('arcade-safe-script')) {
+      var script = document.createElement('script');
+      script.id = 'arcade-safe-script';
+      script.src = prefix + 'arcade-safe.js';
+      document.head.appendChild(script);
+    }
+  }
+
+  function isPhone() {
+    return window.matchMedia(PHONE_QUERY).matches;
+  }
+
+  function getHubUrl(hash) {
+    var urlParams = new URLSearchParams(window.location.search);
+    var isDaily = urlParams.has('daily');
+    var targetHash = hash || (isDaily ? 'daily' : '');
+    var pathParts = window.location.pathname.split('/').filter(Boolean);
+    var inWwwSubdir = window.location.pathname.includes('/www/');
+    var prefix = '../../index.html';
     if (!inWwwSubdir && pathParts.length <= 2) {
       prefix = '../index.html';
     }
+    return targetHash ? prefix + '#' + targetHash : prefix;
+  }
 
-    return targetHash ? `${prefix}#${targetHash}` : prefix;
+  function makeBtn(tag, className) {
+    var el = document.createElement(tag);
+    el.className = 'arcade-nav-btn' + (className ? ' ' + className : '');
+    return el;
   }
 
   function initNav() {
-    // Check if an explicit hub button already exists on the page
-    if (document.getElementById('arcade-hub-floating-btn') || 
-        document.querySelector('.arcade-hub-btn, .btn--hub-return')) {
-      // Still load inspector and passport scripts in background
+    ensureSafe();
+
+    var phone = isPhone();
+    var hasInHeaderHub = document.querySelector('.arcade-hub-btn, .btn--hub-return');
+    if (document.getElementById('arcade-hub-floating-btn')) {
+      loadSupportScripts();
+      return;
+    }
+    // Wide layout keeps an in-header hub link (Word Search). A phone
+    // replaces that small link with the bar below the island.
+    if (hasInHeaderHub && !phone) {
       loadSupportScripts();
       return;
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const isDaily = urlParams.has('daily');
-    const isMobile = window.innerWidth <= 640;
+    if (phone) document.documentElement.classList.add('arcade-bar-on');
 
-    const container = document.createElement('div');
+    var urlParams = new URLSearchParams(window.location.search);
+    var isDaily = urlParams.has('daily');
+
+    var container = document.createElement('div');
     container.id = 'arcade-nav-container';
-    
-    // Position intelligently: top-left with safe-area insets
-    Object.assign(container.style, {
-      position: 'fixed',
-      top: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-      left: 'calc(env(safe-area-inset-left, 0px) + 10px)',
-      zIndex: '999999',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '6px',
-      pointerEvents: 'auto',
-      maxWidth: 'calc(100vw - 20px)'
-    });
+    var row = document.createElement('div');
+    row.id = 'arcade-nav-row';
+    container.appendChild(row);
 
-    // 1. Primary "Arcade Hub" return button
-    const hubBtn = document.createElement('a');
+    var hubBtn = makeBtn('a');
     hubBtn.id = 'arcade-hub-floating-btn';
     hubBtn.href = getHubUrl();
-    hubBtn.title = 'Return to Benchmark Arcade Cabinets Selection Screen';
-    hubBtn.setAttribute('aria-label', 'Return to Benchmark Arcade Cabinets');
-    hubBtn.innerHTML = `
-      <span style="font-size: 14px; line-height: 1;">🕹️</span>
-      <span style="letter-spacing: 0.04em;">${isMobile ? 'Arcade' : 'Arcade Hub'}</span>
-    `;
-
-    Object.assign(hubBtn.style, {
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '6px',
-      background: 'rgba(10, 15, 29, 0.92)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      border: '1.5px solid #06b6d4',
-      borderRadius: '9999px',
-      padding: isMobile ? '6px 12px' : '7px 14px',
-      minHeight: '36px',
-      color: '#38bdf8',
-      fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-      fontSize: isMobile ? '12px' : '12.5px',
-      fontWeight: '700',
-      textDecoration: 'none',
-      boxShadow: '0 4px 14px rgba(0, 0, 0, 0.5), 0 0 10px rgba(6, 182, 212, 0.25)',
-      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-      cursor: 'pointer',
-      touchAction: 'manipulation',
-      userSelect: 'none',
-      WebkitTapHighlightColor: 'transparent'
-    });
-
-    hubBtn.addEventListener('mouseenter', () => {
-      hubBtn.style.transform = 'translateY(-1px) scale(1.04)';
-      hubBtn.style.borderColor = '#22d3ee';
-      hubBtn.style.boxShadow = '0 6px 20px rgba(6, 182, 212, 0.45)';
-    });
-
-    hubBtn.addEventListener('mouseleave', () => {
-      hubBtn.style.transform = 'none';
-      hubBtn.style.borderColor = '#06b6d4';
-      hubBtn.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.5), 0 0 10px rgba(6, 182, 212, 0.25)';
-    });
-
-    hubBtn.addEventListener('click', (e) => {
-      // Haptic feedback if supported
-      if (window.navigator && window.navigator.vibrate) {
-        window.navigator.vibrate(20);
-      }
+    hubBtn.title = 'Return to Benchmark Arcade';
+    hubBtn.setAttribute('aria-label', 'Return to Benchmark Arcade');
+    hubBtn.innerHTML = '<span aria-hidden="true">🕹️</span><span>Arcade</span>';
+    hubBtn.addEventListener('click', function () {
+      if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
       window.location.href = getHubUrl();
     });
+    row.appendChild(hubBtn);
 
-    container.appendChild(hubBtn);
-
-    // 2. If launched in Daily Challenge mode, show prominent daily badge
     if (isDaily) {
-      const dailyPill = document.createElement('a');
+      var dailyPill = makeBtn('a', 'arcade-nav-daily');
       dailyPill.href = getHubUrl('daily');
-      dailyPill.innerHTML = `
-        <span style="color: #facc15; font-size: 11px;">★</span>
-        <span>DAILY</span>
-      `;
-      Object.assign(dailyPill.style, {
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '4px',
-        background: 'rgba(234, 179, 8, 0.18)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        border: '1px solid #facc15',
-        borderRadius: '9999px',
-        padding: '6px 10px',
-        minHeight: '36px',
-        color: '#facc15',
-        fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-        fontSize: '11px',
-        fontWeight: '800',
-        textDecoration: 'none',
-        letterSpacing: '0.05em',
-        boxShadow: '0 0 12px rgba(250, 204, 21, 0.3)',
-        cursor: 'pointer',
-        touchAction: 'manipulation'
-      });
-      container.appendChild(dailyPill);
+      dailyPill.innerHTML = '<span aria-hidden="true">★</span><span>DAILY</span>';
+      row.appendChild(dailyPill);
     }
 
-    // 3. On Desktop (width > 640px), show Dev HUD and Passport triggers
-    if (!isMobile) {
-      // Dev Inspector HUD trigger
-      const devBtn = document.createElement('button');
-      devBtn.type = 'button';
-      devBtn.id = 'arcade-nav-dev-btn';
-      devBtn.title = 'Open "Behind the Build" Developer Telemetry HUD (Hotkey: ~)';
-      devBtn.innerHTML = `
-        <span style="font-size: 13px;">🛠️</span>
-        <span>Dev HUD</span>
-      `;
-      Object.assign(devBtn.style, {
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '5px',
-        background: 'rgba(6, 182, 212, 0.15)',
-        border: '1px solid #06b6d4',
-        borderRadius: '9999px',
-        padding: '6px 12px',
-        minHeight: '36px',
-        color: '#38bdf8',
-        fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-        fontSize: '11px',
-        fontWeight: '700',
-        letterSpacing: '0.04em',
-        boxShadow: '0 0 10px rgba(6, 182, 212, 0.25)',
-        cursor: 'pointer',
-        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-      });
+    var devBtn = makeBtn('button');
+    devBtn.type = 'button';
+    devBtn.id = 'arcade-nav-dev-btn';
+    devBtn.title = 'Open the developer HUD';
+    devBtn.setAttribute('aria-label', 'Open the developer HUD');
+    devBtn.innerHTML = '<span aria-hidden="true">🛠️</span><span>Dev HUD</span>';
+    devBtn.addEventListener('click', function () {
+      if (window.ArcadeInspector) window.ArcadeInspector.toggle();
+    });
 
-      devBtn.addEventListener('mouseenter', () => {
-        devBtn.style.transform = 'translateY(-1px) scale(1.04)';
-        devBtn.style.boxShadow = '0 0 16px rgba(6, 182, 212, 0.45)';
-      });
+    var soundBtn = document.getElementById('sound-toggle-btn');
+    if (phone && soundBtn) {
+      soundBtn.classList.add('arcade-nav-sound');
+      row.appendChild(soundBtn);
+    }
 
-      devBtn.addEventListener('mouseleave', () => {
-        devBtn.style.transform = 'none';
-        devBtn.style.boxShadow = '0 0 10px rgba(6, 182, 212, 0.25)';
-      });
-
-      devBtn.addEventListener('click', () => {
-        if (window.ArcadeInspector) {
-          window.ArcadeInspector.toggle();
-        }
-      });
-
-      container.appendChild(devBtn);
-
-      // Passport Trophy Room button
-      const passportBtn = document.createElement('a');
+    if (!phone) {
+      var passportBtn = makeBtn('a');
       passportBtn.id = 'arcade-nav-passport-btn';
       passportBtn.href = getHubUrl('passport');
-      passportBtn.title = 'Open Arcade Passport & Trophy Room';
-      passportBtn.innerHTML = `
-        <span style="font-size: 13px;">🏆</span>
-        <span>Passport</span>
-      `;
-      Object.assign(passportBtn.style, {
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '5px',
-        background: 'rgba(250, 204, 21, 0.15)',
-        border: '1px solid #facc15',
-        borderRadius: '9999px',
-        padding: '6px 12px',
-        minHeight: '36px',
-        color: '#facc15',
-        fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-        fontSize: '11px',
-        fontWeight: '700',
-        letterSpacing: '0.04em',
-        textDecoration: 'none',
-        boxShadow: '0 0 10px rgba(250, 204, 21, 0.25)',
-        cursor: 'pointer',
-        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-      });
+      passportBtn.title = 'Open Arcade Passport';
+      passportBtn.innerHTML = '<span aria-hidden="true">🏆</span><span>Passport</span>';
+      row.appendChild(passportBtn);
+    }
 
-      passportBtn.addEventListener('mouseenter', () => {
-        passportBtn.style.transform = 'translateY(-1px) scale(1.04)';
-        passportBtn.style.boxShadow = '0 0 16px rgba(250, 204, 21, 0.45)';
-      });
-
-      passportBtn.addEventListener('mouseleave', () => {
-        passportBtn.style.transform = 'none';
-        passportBtn.style.boxShadow = '0 0 10px rgba(250, 204, 21, 0.25)';
-      });
-
-      container.appendChild(passportBtn);
+    row.appendChild(devBtn);
+    if (phone) {
+      var anchor = soundBtn || devBtn;
+      anchor.style.marginLeft = 'auto';
     }
 
     document.body.appendChild(container);
-
     loadSupportScripts();
   }
 
   function loadSupportScripts() {
-    const inWww = window.location.pathname.includes('/www/');
-    const assetPrefix = inWww ? '../../assets/' : '../assets/';
-
-    // Dynamically inject arcade-inspector.js and arcade-passport.js if not already present
+    var prefix = assetPrefix();
     if (!window.ArcadeInspector && !document.getElementById('arcade-inspector-script')) {
-      const script = document.createElement('script');
+      var script = document.createElement('script');
       script.id = 'arcade-inspector-script';
-      script.src = `${assetPrefix}arcade-inspector.js`;
+      script.src = prefix + 'arcade-inspector.js';
       document.body.appendChild(script);
     }
-
     if (!window.ArcadePassport && !document.getElementById('arcade-passport-script')) {
-      const pScript = document.createElement('script');
+      var pScript = document.createElement('script');
       pScript.id = 'arcade-passport-script';
-      pScript.src = `${assetPrefix}arcade-passport.js`;
+      pScript.src = prefix + 'arcade-passport.js';
       document.body.appendChild(pScript);
     }
   }
 
+  ensureSafe();
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initNav);
   } else {
     initNav();
   }
+
+  window.addEventListener('resize', function () {
+    var bar = document.getElementById('arcade-nav-container');
+    document.documentElement.classList.toggle('arcade-bar-on', !!(bar && isPhone()));
+  });
 })();

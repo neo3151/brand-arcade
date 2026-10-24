@@ -602,6 +602,13 @@
       }, 4500);
     }
 
+    devUnlockBadge() {
+      const on = window.ARCADE_DEV_UNLOCK_ALL === true ||
+        (hasArcadeStore() && typeof window.ArcadeStore.devUnlockAll === 'function' && window.ArcadeStore.devUnlockAll());
+      if (!on) return '';
+      return '<span data-dev-unlock="1" style="display:inline-block;margin-left:8px;padding:2px 7px;border-radius:999px;background:#7f1d1d;color:#fecaca;font-family:var(--font-arcade);font-size:0.62rem;letter-spacing:0.08em;vertical-align:middle;">DEV UNLOCK</span>';
+    }
+
     updateHeaderBadges() {
       const badge = document.getElementById('passport-trophy-count');
       if (badge) {
@@ -622,7 +629,7 @@
       const html = `
         <div class="modal-head-retro">
           <div class="modal-title-retro">
-            <span>🎖️</span> <span>ARCADE PASSPORT & TROPHY ROOM</span>
+            <span>🎖️</span> <span>ARCADE PASSPORT & TROPHY ROOM</span>${this.devUnlockBadge()}
           </div>
           <button class="modal-close-retro" type="button" data-close="modal-passport">✕</button>
         </div>
