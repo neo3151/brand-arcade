@@ -28,7 +28,7 @@ function copyRecursive(src, dest) {
 }
 
 // 1. Copy Core Hub Web Assets
-const coreFiles = ['index.html', 'manifest.json', 'sw.js'];
+const coreFiles = ['index.html', 'shop.html', 'manifest.json', 'sw.js'];
 coreFiles.forEach(file => {
   const s = path.join(rootDir, file);
   const d = path.join(destDir, file);
@@ -37,7 +37,13 @@ coreFiles.forEach(file => {
   }
 });
 
-// 2. Copy Shared Assets Folder (CSS, Icons, Scripts, Telemetry HUD, Passport)
+// 2. Copy Shared Assets Folder (CSS, Icons, Scripts, Telemetry HUD, Passport, hub store)
+['arcade-store.js', 'arcade-cosmetics.js', 'arcade-cosmetics.css', 'arcade-content.js', 'arcade-content.css', 'arcade-shop.js', 'arcade-shop.css'].forEach(file => {
+  const entry = path.join(rootDir, 'assets', file);
+  if (!fs.existsSync(entry)) {
+    throw new Error('assets/' + file + ' is required for the hub store');
+  }
+});
 copyRecursive(path.join(rootDir, 'assets'), path.join(destDir, 'assets'));
 
 // 3. Copy 10 Arcade Game Web Runtime Bundles

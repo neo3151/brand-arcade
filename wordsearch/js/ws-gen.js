@@ -48,6 +48,7 @@ const CATEGORY_SEEDS = {
   geography: 500, movies: 600, music: 700, history: 800,
   space: 900, nature: 1000, holidays: 1100, health: 1200,
   jobs: 1300, technology: 1400, colors: 1500,
+  mythology: 1600, cooking: 1700, parks: 1800, ocean: 1900, kids: 2000, brand: 2100,
 };
 
 const DIFF_SEEDS = { beginner: 0, easy: 10000, medium: 20000, hard: 30000, master: 40000 };

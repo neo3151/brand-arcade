@@ -2,6 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+<script id="arcade-cosmetics-loader">
+(function () {
+  var parts = location.pathname.split('/').filter(Boolean);
+  if (parts.length && /\.[a-z0-9]+$/i.test(parts[parts.length - 1])) parts.pop();
+  if (parts.length < 1) return;
+  var prefix = '';
+  for (var i = 0; i < parts.length; i++) prefix += '../';
+  document.write(
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-cosmetics.css">' +
+    '<script src="' + prefix + 'assets/arcade-store-config.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-store.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-store-boot.js"><\/script>' +
+    '<script src="' + prefix + 'assets/arcade-cosmetics.js"><\/script>' +
+    '<link rel="stylesheet" href="' + prefix + 'assets/arcade-content.css">' +
+    '<script src="' + prefix + 'assets/arcade-content.js"><\/script>'
+  );
+})();
+</script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Curious Solitaire — A Whimsical Card Journey</title>
   <link rel="stylesheet" href="css/main.css">
@@ -62,6 +81,7 @@
         <button id="btn-select-deal" class="btn btn--outline" type="button">
           <span>📜</span> Choose Deal (1 – 1,000)
         </button>
+<div id="content-pack-shelf" data-content-shelf data-game="solitaire"></div>
 
         <a href="store.html" class="btn btn--crimson">
           <span>🗝️</span> Daily Supply <span id="menu-powerups-badge" class="badge badge--pill">0</span>
@@ -313,5 +333,6 @@
 
   <script src="js/mobile-shell.js"></script>
   <script src="../../assets/arcade-nav.js" onerror="this.onerror=null;this.src='../assets/arcade-nav.js';"></script>
+  <script src="js/curated-deals.js"></script>
 </body>
 </html>

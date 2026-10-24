@@ -474,3 +474,115 @@
   50%  { background-position: 60% 40%, 40% 60%, 80% 60%, 0 0; }
   100% { background-position: 100% 80%, 0% 90%, 20% 20%, 0 0; }
 }
+
+/* Block Blast cabinets. Coin themes stay on their own data-theme values. */
+body[data-theme="marble"],
+html[data-paid-skin="marble"] {
+  --timber-deep: #d9e2dc;
+  --timber-bg: #eef3ef;
+  --timber-surface: #f7f8f6;
+  --timber-surface-light: #ffffff;
+  --timber-border: rgba(120, 116, 110, 0.45);
+  --board-bg: #c5d0ca;
+  --board-border: #8d8680;
+  --amber-gold: #7d756c;
+  --amber-light: #2c2825;
+  --amber-glow: rgba(125, 117, 108, 0.35);
+  --text-main: #2a2622;
+  --text-muted: #5e584f;
+  --text-dim: #8a8178;
+  --cell-bg: #e7eeea;
+  --frame-bg: #f7f4ef;
+  --frame-border: #c8bfb4;
+  --panel-bg: rgba(247, 244, 239, 0.94);
+  --screen-bg:
+    radial-gradient(ellipse at 18% 8%, rgba(255,255,255,0.95), transparent 42%),
+    radial-gradient(ellipse at 88% 92%, rgba(150, 166, 160, 0.55), transparent 48%),
+    repeating-linear-gradient(118deg, rgba(255,255,255,0.28) 0 2px, transparent 2px 9px),
+    linear-gradient(165deg, #f7f5f1 0%, #d5ded8 48%, #b7c3bc 100%);
+  --wrapper-bg: #cfc8c0;
+  --modal-card-bg: linear-gradient(180deg, #f7f5f1, #e4e0d8);
+}
+body[data-theme="marble"] .piece-tile,
+body[data-theme="marble"] .grid-cell.filled,
+html[data-paid-skin="marble"] .piece-tile,
+html[data-paid-skin="marble"] .grid-cell.filled {
+  background-image: linear-gradient(125deg, rgba(255,255,255,0.62), rgba(255,255,255,0) 42%, rgba(90, 104, 112, 0.22));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.75), inset 0 -6px 8px rgba(80, 96, 104, 0.2);
+}
+
+body[data-theme="walnut"],
+html[data-paid-skin="walnut"] {
+  --timber-deep: #1a0e08;
+  --timber-bg: #2a160e;
+  --timber-surface: #3b2416;
+  --timber-surface-light: #5a3822;
+  --timber-border: rgba(230, 194, 122, 0.45);
+  --board-bg: #2c1810;
+  --board-border: #e6c27a;
+  --amber-gold: #e6c27a;
+  --amber-light: #f6e3bc;
+  --amber-glow: rgba(230, 194, 122, 0.4);
+  --text-main: #f6e7c8;
+  --text-muted: #d7b98a;
+  --text-dim: #a88455;
+  --cell-bg: #4a2e1c;
+  --frame-bg: #3a2416;
+  --frame-border: #8a6234;
+  --panel-bg: rgba(36, 20, 12, 0.92);
+  --screen-bg:
+    repeating-linear-gradient(90deg, rgba(255, 206, 140, 0.06) 0 1px, transparent 1px 13px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.2) 0 2px, transparent 2px 6px),
+    radial-gradient(ellipse at 28% 12%, rgba(176, 112, 58, 0.45), transparent 46%),
+    linear-gradient(180deg, #5a341c, #2a160d 58%, #140b07);
+  --wrapper-bg: #140c08;
+  --modal-card-bg: linear-gradient(180deg, #4a2e1c, #24150e);
+}
+body[data-theme="walnut"] .piece-tile,
+body[data-theme="walnut"] .grid-cell.filled,
+html[data-paid-skin="walnut"] .piece-tile,
+html[data-paid-skin="walnut"] .grid-cell.filled {
+  background-image: linear-gradient(rgba(92, 48, 16, 0.28), rgba(40, 18, 8, 0.18));
+  box-shadow: inset 0 0 0 1px rgba(230, 194, 122, 0.75), inset 0 1px 0 rgba(255, 226, 170, 0.35);
+}
+
+body[data-theme="stainedglass"],
+html[data-paid-skin="stainedglass"] {
+  --timber-deep: #100910;
+  --timber-bg: #1a1020;
+  --timber-surface: #241428;
+  --timber-surface-light: #321c38;
+  --timber-border: rgba(246, 217, 138, 0.35);
+  --board-bg: #120c10;
+  --board-border: #1a120c;
+  --amber-gold: #f6d98a;
+  --amber-light: #fff4d2;
+  --amber-glow: rgba(246, 217, 138, 0.35);
+  --text-main: #fff6e0;
+  --text-muted: #f0c98a;
+  --text-dim: #c084fc;
+  --cell-bg: #1a1216;
+  --frame-bg: #1c1218;
+  --frame-border: #3a2a22;
+  --panel-bg: rgba(16, 10, 16, 0.9);
+  --screen-bg:
+    radial-gradient(circle at 18% 18%, rgba(225, 29, 72, 0.55), transparent 26%),
+    radial-gradient(circle at 78% 24%, rgba(37, 99, 235, 0.5), transparent 24%),
+    radial-gradient(circle at 40% 78%, rgba(245, 158, 11, 0.42), transparent 22%),
+    radial-gradient(circle at 82% 80%, rgba(16, 185, 129, 0.36), transparent 20%),
+    linear-gradient(#140c18, #0c0810);
+  --wrapper-bg: #07060a;
+  --modal-card-bg: linear-gradient(180deg, #2a1830, #120c14);
+}
+body[data-theme="stainedglass"] .grid-cell,
+html[data-paid-skin="stainedglass"] .grid-cell {
+  box-shadow: inset 0 0 0 2px #1a120c;
+}
+body[data-theme="stainedglass"] .piece-tile,
+body[data-theme="stainedglass"] .grid-cell.filled,
+html[data-paid-skin="stainedglass"] .piece-tile,
+html[data-paid-skin="stainedglass"] .grid-cell.filled {
+  background-image: linear-gradient(160deg, rgba(255,255,255,0.5), transparent 46%, rgba(0,0,0,0.28));
+  box-shadow: inset 0 0 0 2px #1a120c, 0 0 12px rgba(255, 255, 255, 0.16);
+}
+

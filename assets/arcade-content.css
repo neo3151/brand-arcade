@@ -1,0 +1,167 @@
+/* Paid content packs. Layout of the game boards themselves is unchanged. */
+
+.content-shelf {
+  margin: 0.85rem 0 1rem;
+  padding: 0.85rem;
+  border-radius: 18px;
+  color: #f6efe2;
+  background:
+    radial-gradient(circle at 100% 0, rgba(120, 180, 160, 0.16), transparent 42%),
+    linear-gradient(180deg, rgba(14, 22, 20, 0.96), rgba(8, 10, 12, 0.96));
+  border: 1px solid rgba(150, 196, 170, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  font-family: Georgia, "Iowan Old Style", Palatino, serif;
+}
+
+.content-shelf h2,
+.content-shelf h3,
+.content-shelf p { margin: 0; }
+
+.content-shelf__lead h2 {
+  font-size: 1.12rem;
+  letter-spacing: 0.03em;
+}
+
+.content-shelf__lead p,
+.content-pack__bar p,
+.content-note,
+.content-more,
+.content-sample small {
+  margin-top: 0.28rem;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #d5ddd8;
+}
+
+.content-pack {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(150, 196, 170, 0.28);
+}
+
+.content-pack__bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.content-pack__bar h3 { font-size: 0.98rem; }
+
+.content-samples {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+}
+
+.content-sample {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.content-sample strong {
+  display: block;
+  font-size: 0.86rem;
+}
+
+.content-sample em {
+  font-style: normal;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b7f3cf;
+}
+
+.content-sample--locked { opacity: 0.85; }
+
+.content-lock {
+  display: inline-block;
+  margin-right: 0.35rem;
+  padding: 0.08rem 0.4rem;
+  border-radius: 999px;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #2a2418;
+  background: #e6c56a;
+}
+
+.content-more { margin-top: 0.45rem; }
+
+.pack-thumb {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  gap: 1px;
+  padding: 2px;
+  border-radius: 6px;
+  background: #10221c;
+}
+
+.pack-thumb i {
+  display: block;
+  background: #1c3330;
+  border-radius: 1px;
+}
+
+.pack-thumb i.on { background: #7dcea0; }
+
+#content-lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  background: rgba(6, 10, 12, 0.82);
+}
+
+.content-lock-card {
+  width: min(420px, 100%);
+  padding: 1.1rem 1rem 1rem;
+  border-radius: 18px;
+  color: #f6efe2;
+  background: #14211e;
+  border: 1px solid rgba(150, 196, 170, 0.5);
+  font-family: Georgia, "Iowan Old Style", Palatino, serif;
+}
+
+.content-lock-card h2 { margin: 0 0 0.4rem; font-size: 1.25rem; }
+.content-lock-card p {
+  margin: 0 0 0.7rem;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #d5ddd8;
+}
+
+.content-back {
+  display: inline-block;
+  margin-top: 0.8rem;
+  color: #d7ffe8;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.85rem;
+}
+
+#content-lock-fallback {
+  margin: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: #14211e;
+  color: #f6efe2;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
