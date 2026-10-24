@@ -7,6 +7,14 @@
 'use strict';
 
 const { spawn } = require('child_process');
+const fs = require('fs');
+
+function chromeBin() {
+  const mac = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  if (process.env.CHROME_BIN) return process.env.CHROME_BIN;
+  if (process.platform === 'darwin' && fs.existsSync(mac)) return mac;
+  return 'google-chrome';
+}
 
 const base = process.argv[2] || 'http://127.0.0.1:8765';
 const pages = [
@@ -49,7 +57,7 @@ function ignore(text) {
 }
 
 async function main() {
-  const chrome = spawn('google-chrome', [
+  const chrome = spawn(chromeBin(), [
     '--headless=new',
     '--no-sandbox',
     '--disable-dev-shm-usage',

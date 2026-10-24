@@ -349,9 +349,11 @@
     }
 
     // Record game sessions and automatically evaluate achievements
-    recordPlay(gameId, durationSec = 60, score = 0, isDaily = false, vibe = null) {
+    recordPlay(gameId, durationSec = 0, score = 0, isDaily = false, vibe = null, completed = false) {
       this.state.stats.totalSessions += 1;
-      this.state.stats.totalSeconds += durationSec;
+      if (durationSec > 0) {
+        this.state.stats.totalSeconds += durationSec;
+      }
 
       // Track played cabinets
       if (gameId) {
@@ -361,12 +363,17 @@
       // Achievement: First coin / play
       this.unlockAchievement('first_coin');
 
-      // Achievement: Sub-2m Speedrun (120s)
-      if (durationSec > 0 && durationSec <= 120) {
+      // Achievement: Sub-2m Speedrun (120s) — only when a round is actually completed
+      if (completed && durationSec > 0 && durationSec <= 120) {
         if (!this.state.stats.bestSpeedrunSec || durationSec < this.state.stats.bestSpeedrunSec) {
           this.state.stats.bestSpeedrunSec = durationSec;
         }
         this.unlockAchievement('speedrun_120');
+      }
+
+      // Achievement: Daily 3-Star Flawless Mission
+      if (completed && isDaily) {
+        this.unlockAchievement('daily_3star');
       }
 
       // Achievement: Grandmaster (all 10 cabinets played)
@@ -391,12 +398,40 @@
         this.unlockAchievement('arcade_triathlon');
       }
 
-      // Achievement: Streak
-      const streak = parseInt(localStorage.getItem('arcade_streak') || '0', 10);
+      // Achievement: Streak (check daily streak, hub visit streak, and legacy key)
+      const streak = Math.max(
+        parseInt(localStorage.getItem('arcade_daily_streak') || '0', 10) || 0,
+        parseInt(localStorage.getItem('arcade_streak_days') || '0', 10) || 0,
+        parseInt(localStorage.getItem('arcade_streak') || '0', 10) || 0
+      );
       if (streak >= 3) {
         this.unlockAchievement('streak_3');
       }
 
+      this.saveLocalBackup();
+    }
+
+    // Record a completed game win for speedrun, daily 3-star, and streak trophies
+    recordWin(gameId, durationSec = 60, score = 0, isDaily = false, stars = 3) {
+      const elapsed = Math.max(1, Number(durationSec) || 60);
+      this.state.stats.totalSeconds += elapsed;
+      if (elapsed <= 120) {
+        if (!this.state.stats.bestSpeedrunSec || elapsed < this.state.stats.bestSpeedrunSec) {
+          this.state.stats.bestSpeedrunSec = elapsed;
+        }
+        this.unlockAchievement('speedrun_120');
+      }
+      if (isDaily && stars >= 3) {
+        this.unlockAchievement('daily_3star');
+      }
+      const streak = Math.max(
+        parseInt(localStorage.getItem('arcade_daily_streak') || '0', 10) || 0,
+        parseInt(localStorage.getItem('arcade_streak_days') || '0', 10) || 0,
+        parseInt(localStorage.getItem('arcade_streak') || '0', 10) || 0
+      );
+      if (streak >= 3) {
+        this.unlockAchievement('streak_3');
+      }
       this.saveLocalBackup();
     }
 
@@ -743,7 +778,7 @@
             <button type="button" id="btn-export-passport" class="btn-push-play" style="flex: 1; justify-content: center; font-size: 0.82rem;">
               <span>💾</span> BACKUP PASSPORT TO CLIPBOARD
             </button>
-            <button type="button" id="btn-test-unlock-trophy" class="btn-push-sub" style="flex: 1; justify-content: center; font-size: 0.82rem;" title="Simulate unlocking a trophy for demo">
+            <button type="button" id="btn-test-unlock-trophy" class="btn-push-sub" style="flex: 1; justify-content: center; font-size: 0.82rem; ${/[?&](debug|demo)=/i.test((window.location && window.location.search) || '') ? '' : 'display: none;'}" title="Simulate unlocking a trophy for demo">
               <span>⚡</span> DEMO UNLOCK (+1)
             </button>
             <button type="button" id="btn-reset-passport" class="btn-push-sub" style="flex: 1; justify-content: center; font-size: 0.82rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);" title="Reset all achievements back to 0/8">
@@ -822,7 +857,7 @@
         return `
           <div style="background: #090e1a; border: 1.5px dashed #334155; border-radius: 8px; padding: 12px;">
             <div style="font-family: var(--font-arcade); font-size: 0.78rem; color: #94a3b8;">SUPPORTER STAMP</div>
-            <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.4; margin-top: 4px;">Tips add a thank-you stamp here. The stamp grants 0 XP and does not change gameplay. The tip jar is on the <a href="shop.html">Arcade Shop</a>.</div>
+            <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.4; margin-top: 4px;">Tips add a thank-you stamp here. The stamp grants 0 XP and does not change gameplay. The tip jar is on the <a href="shop.html#shop-tips">Arcade Shop</a>.</div>
           </div>
         `;
       }
@@ -859,7 +894,7 @@
       return `
         <div style="background: #090e1a; border: 1.5px solid #1e293b; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: var(--font-arcade); font-size: 0.9rem; font-weight: 800; color: #e6b325;">ARCADE PATRON</div>
-          <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.4;">A one-time thank-you. It adds this badge and a gold cabinet bezel. It grants 0 XP and does not unlock trophies. Buy it on the <a href="shop.html">Arcade Shop</a>.</div>
+          <div style="font-size: 0.75rem; color: #94a3b8; line-height: 1.4;">A one-time thank-you. It adds this badge and a gold cabinet bezel. It grants 0 XP and does not unlock trophies. Buy it on the <a href="shop.html#shop-patron">Arcade Shop</a>.</div>
         </div>
       `;
     }
@@ -873,7 +908,7 @@
         ? `<button type="button" class="btn-select-crt-theme btn-push-sub" data-theme="${theme.id}" style="justify-content: center; font-size: 0.75rem;">${active ? 'EQUIPPED' : 'USE THIS PHOSPHOR'}</button>`
         : `<div style="display: flex; gap: 6px;">
             <button type="button" class="btn-preview-crt btn-push-sub" data-theme="${theme.id}" style="flex: 1; justify-content: center; font-size: 0.75rem;">PREVIEW</button>
-            <a href="shop.html" style="flex: 1; text-align: center; font-size: 0.75rem; color: #e6b325; align-self: center;">Arcade Shop</a>
+            <a href="shop.html#shop-${escapeHtml(theme.id)}" style="flex: 1; text-align: center; font-size: 0.75rem; color: #e6b325; align-self: center;">Arcade Shop</a>
           </div>`;
       const badge = active
         ? '<span style="color: var(--neon-cyan); font-size: 0.72rem; font-weight: 700;">ACTIVE</span>'
@@ -945,7 +980,8 @@
     }
 
     checkInGameContext() {
-      const path = window.location.pathname;
+      const path = (window.location && window.location.pathname) || '';
+      const search = (window.location && window.location.search) || '';
       const gameMatches = [
         'blockblast', 'solitaire', 'sudoku', 'nonogram', 'minesweeper',
         'mahjong', 'codebreaker', 'wordsearch', 'spidersolitaire', 'spades'
@@ -955,11 +991,114 @@
           let vibe = 'blitz';
           if (['solitaire', 'wordsearch', 'minesweeper'].includes(g)) vibe = 'coffee';
           if (['sudoku', 'nonogram', 'mahjong', 'spidersolitaire', 'spades'].includes(g)) vibe = 'deep';
-          
-          this.recordPlay(g, 60, 0, window.location.search.includes('daily'), vibe);
+
+          const isPlayPage = /(?:^|\/)game\.html$/i.test(path.split('?')[0]);
+          const isStorePage = /(?:^|\/)store\.html$/i.test(path.split('?')[0]);
+          const isDaily = search.includes('daily');
+
+          // Only record a play session on game.html (or once per cabinet visit on menu)
+          // and never pass a fake 60s completed duration on page load.
+          if (!isStorePage) {
+            let alreadyCounted = false;
+            try {
+              if (window.sessionStorage && !isPlayPage) {
+                alreadyCounted = window.sessionStorage.getItem('arcade_visited_' + g) === '1';
+                window.sessionStorage.setItem('arcade_visited_' + g, '1');
+              }
+            } catch (e) {}
+            if (!alreadyCounted) {
+              this.recordPlay(g, 0, 0, isDaily, vibe, false);
+            }
+          }
+
+          if (isPlayPage) {
+            this.watchGameCompletion(g, isDaily);
+          }
           break;
         }
       }
+    }
+
+    watchGameCompletion(gameId, isDaily) {
+      if (this._watchingGame || typeof document === 'undefined') return;
+      this._watchingGame = true;
+      const startMs = Date.now();
+      let recorded = false;
+
+      const isShown = (id) => {
+        const el = document.getElementById && document.getElementById(id);
+        if (!el) return false;
+        const cls = String(el.className || '');
+        return /(?:^|\s)(?:active|is-active)(?:\s|$)/.test(cls) || cls.indexOf('--show') !== -1;
+      };
+
+      const checkWin = () => {
+        if (recorded) return;
+        let won = false;
+        let score = 0;
+        if (gameId === 'solitaire') {
+          won = isShown('victory-overlay');
+        } else if (gameId === 'spades') {
+          const over = isShown('gameover-modal');
+          const titleEl = document.getElementById && document.getElementById('gameover-title');
+          const title = titleEl ? String(titleEl.textContent || '').toLowerCase() : '';
+          won = over && title.indexOf('defeat') === -1;
+        } else if (gameId === 'blockblast') {
+          const over = isShown('gameover-modal');
+          const scoreEl = document.getElementById && document.getElementById('hud-score');
+          score = scoreEl ? (parseInt(String(scoreEl.textContent || '').replace(/[^0-9]/g, ''), 10) || 0) : 0;
+          won = over && score >= (isDaily ? 3500 : 1000);
+        } else {
+          won = isShown('victory-modal');
+        }
+
+        if (won) {
+          recorded = true;
+          const elapsedSec = Math.max(1, Math.round((Date.now() - startMs) / 1000));
+          if (isDaily) {
+            this.recordDailyCompletionFromGame(gameId, score, elapsedSec, 3);
+          }
+          this.recordWin(gameId, elapsedSec, score, isDaily, 3);
+        }
+      };
+
+      this._winTimer = setInterval(checkWin, 1000);
+    }
+
+    recordDailyCompletionFromGame(gameId, score, elapsedSec, stars = 3) {
+      try {
+        if (window.ArcadeDaily && typeof window.ArcadeDaily.recordCompletion === 'function') {
+          window.ArcadeDaily.recordCompletion(score, elapsedSec, stars);
+          return;
+        }
+        const params = new URLSearchParams((window.location && window.location.search) || '');
+        const rawDaily = params.get('daily');
+        const dateStr = (rawDaily && /^\d{4}-\d{2}-\d{2}$/.test(rawDaily))
+          ? rawDaily
+          : new Date().toISOString().slice(0, 10);
+        const history = JSON.parse(localStorage.getItem('arcade_daily_history') || '{}');
+        history[dateStr] = {
+          date: dateStr,
+          gameId: gameId,
+          score: score || 3500,
+          timeSeconds: elapsedSec || 120,
+          stars: stars,
+          completedAt: new Date().toISOString()
+        };
+        localStorage.setItem('arcade_daily_history', JSON.stringify(history));
+
+        let streak = parseInt(localStorage.getItem('arcade_daily_streak') || '0', 10) || 0;
+        const lastCompleted = localStorage.getItem('arcade_last_daily_completed');
+        if (!lastCompleted) {
+          streak = 1;
+        } else {
+          const diffDays = Math.round((new Date(dateStr) - new Date(lastCompleted)) / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) streak += 1;
+          else if (diffDays !== 0) streak = 1;
+        }
+        localStorage.setItem('arcade_last_daily_completed', dateStr);
+        localStorage.setItem('arcade_daily_streak', String(streak));
+      } catch (e) {}
     }
   }
 

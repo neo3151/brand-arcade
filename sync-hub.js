@@ -52,7 +52,15 @@ const games = [
   'mahjong', 'codebreaker', 'wordsearch', 'spidersolitaire', 'spades'
 ];
 
+const { execFileSync } = require('child_process');
+
 games.forEach(game => {
+  const gameSyncScript = path.join(rootDir, game, 'sync-www.js');
+  if (fs.existsSync(gameSyncScript)) {
+    try {
+      execFileSync(process.execPath, [gameSyncScript], { cwd: path.join(rootDir, game), stdio: 'ignore' });
+    } catch (e) {}
+  }
   const gameWww = path.join(rootDir, game, 'www');
   const targetGameWww = path.join(destDir, game, 'www');
   if (fs.existsSync(gameWww)) {

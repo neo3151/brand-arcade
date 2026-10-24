@@ -254,6 +254,64 @@ async function main() {
   assert.ok(changelog.includes('unlocked all levels 1–1,000'));
   assert.strictEqual(changelog.includes('1,000 coins'), false);
 
+  // Verify deep-link shopHref, return-to-game banner, and Passport/Daily engagement fixes
+  assert.strictEqual(ctx.ArcadeStore.shopHref(), 'shop.html');
+  assert.strictEqual(ctx.ArcadeStore.shopHref('marble', 'blockblast'), 'shop.html?from=blockblast#shop-marble');
+
+  const engagementStorage = createMemoryStorage();
+  const engagementCtx = {
+    localStorage: engagementStorage,
+    console,
+    setTimeout,
+    clearTimeout,
+    setInterval() { return 1; },
+    clearInterval() {},
+    URLSearchParams,
+    location: { origin: 'capacitor://localhost', pathname: '/index.html', search: '', hash: '' },
+    document: {
+      readyState: 'complete',
+      documentElement: { style: { setProperty() {} }, setAttribute() {}, removeAttribute() {}, dataset: {} },
+      body: { setAttribute() {}, appendChild() {}, style: {} },
+      getElementById() { return null; },
+      querySelectorAll() { return []; },
+      createElement() { return { style: {}, setAttribute() {} }; },
+      addEventListener() {}
+    },
+    addEventListener() {}
+  };
+  engagementCtx.window = engagementCtx;
+  engagementCtx.globalThis = engagementCtx;
+  vm.createContext(engagementCtx);
+  vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-passport.js'), 'utf8'), engagementCtx);
+  vm.runInContext(fs.readFileSync(path.join(root, 'assets/arcade-daily.js'), 'utf8'), engagementCtx);
+
+  // 1. Page-load recordPlay (completed=false) does NOT prematurely unlock speedrun_120
+  engagementCtx.ArcadePassport.recordPlay('sudoku', 0, 0, false, 'deep', false);
+  assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('first_coin'), true);
+  assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('speedrun_120'), false);
+
+  // 2. Completing a round in <=120s unlocks speedrun_120
+  engagementCtx.ArcadePassport.recordWin('sudoku', 95, 3200, false, 3);
+  assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('speedrun_120'), true);
+
+  // 3. Completing a Daily Run unlocks daily_3star and updates streak
+  const mission = engagementCtx.ArcadeDaily.getTodayMission('2026-10-23');
+  assert.ok(mission.launchUrl.includes('/www/game.html?'), 'daily mission launches game.html directly');
+  assert.ok(mission.launchUrl.includes('daily=2026-10-23'));
+  engagementCtx.ArcadeDaily.recordCompletion(4100, 110, 3, '2026-10-23');
+  assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('daily_3star'), true);
+
+  // 4. Unified streak key unlocks streak_3 when arcade_daily_streak >= 3
+  engagementStorage.setItem('arcade_daily_streak', '3');
+  engagementCtx.ArcadePassport.recordWin('sudoku', 150, 3200, false, 3);
+  assert.strictEqual(engagementCtx.ArcadePassport.isUnlocked('streak_3'), true);
+
+  // 5. Share card replaces capacitor://localhost with canonical URL and uses custom brand name
+  engagementStorage.setItem('arcade_brand_name', 'ACME');
+  const shareCard = engagementCtx.ArcadeDaily.generateShareCard('2026-10-23');
+  assert.ok(shareCard.includes('ACME ARCADE'));
+  assert.strictEqual(shareCard.includes('localhost'), false);
+
   console.log('arcade-shop: 28 products, grants, tips, and shop copy passed');
 }
 

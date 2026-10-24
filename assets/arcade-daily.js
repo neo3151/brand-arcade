@@ -35,7 +35,7 @@
       id: 'blockblast',
       title: 'Timber Block Blast',
       icon: '🧱',
-      path: 'blockblast/www/index.html',
+      path: 'blockblast/www/game.html',
       targetDesc: 'Clear 6 double-lines & reach 3,500+ pts',
       targetScore: 3500,
       parTime: '2m 30s'
@@ -44,7 +44,8 @@
       id: 'minesweeper',
       title: 'Inferno Sweeper',
       icon: '💣',
-      path: 'minesweeper/www/index.html',
+      path: 'minesweeper/www/game.html',
+      params: 'diff=recruit',
       targetDesc: 'Disarm 15 plasma mines on Phobos sector',
       targetScore: 2400,
       parTime: '3m 15s'
@@ -53,7 +54,8 @@
       id: 'codebreaker',
       title: 'Black Vault',
       icon: '🔐',
-      path: 'codebreaker/www/index.html',
+      path: 'codebreaker/www/game.html',
+      params: 'diff=rookie',
       targetDesc: 'Crack the 4-digit cipher in ≤ 5 attempts',
       targetScore: 4000,
       parTime: '2m 45s'
@@ -62,7 +64,9 @@
       id: 'wordsearch',
       title: 'Word Search Classic',
       icon: '🔤',
-      path: 'wordsearch/www/index.html',
+      path: 'wordsearch/www/game.html',
+      params: 'category=animals&difficulty=easy',
+      seededLevelMax: 50,
       targetDesc: 'Find all 12 literature terms without hints',
       targetScore: 1800,
       parTime: '3m 50s'
@@ -71,7 +75,9 @@
       id: 'solitaire',
       title: 'Curious Solitaire',
       icon: '🃏',
-      path: 'solitaire/www/index.html',
+      path: 'solitaire/www/game.html',
+      params: 'mode=1',
+      seededDealMax: 1000,
       targetDesc: 'Win the Queen of Hearts Royal Deal #Daily',
       targetScore: 5200,
       parTime: '6m 10s'
@@ -80,7 +86,9 @@
       id: 'sudoku',
       title: 'Classic Sudoku',
       icon: '🔢',
-      path: 'sudoku/www/index.html',
+      path: 'sudoku/www/game.html',
+      params: 'difficulty=easy',
+      seededLevelMax: 1000,
       targetDesc: 'Solve Japanese Master Grid with 0 mistakes',
       targetScore: 3200,
       parTime: '7m 30s'
@@ -89,7 +97,9 @@
       id: 'nonogram',
       title: 'Zen Nonogram',
       icon: '🖼️',
-      path: 'nonogram/www/index.html',
+      path: 'nonogram/www/game.html',
+      params: 'difficulty=beginner',
+      seededLevelMax: 1000,
       targetDesc: 'Reveal the 15×15 Pixel Tapestry without errors',
       targetScore: 2800,
       parTime: '6m 45s'
@@ -98,7 +108,9 @@
       id: 'spidersolitaire',
       title: 'Spider Solitaire',
       icon: '🕷️',
-      path: 'spidersolitaire/www/index.html',
+      path: 'spidersolitaire/www/game.html',
+      params: 'difficulty=1suit',
+      seededLevelMax: 1000,
       targetDesc: 'Assemble 4 descending royal flushes',
       targetScore: 4500,
       parTime: '9m 20s'
@@ -107,7 +119,8 @@
       id: 'spades',
       title: 'Royal Spades',
       icon: '♠️',
-      path: 'spades/www/index.html',
+      path: 'spades/www/game.html',
+      params: 'mode=twos_wild&target=200',
       targetDesc: 'Make partner nil bid & win the trick match',
       targetScore: 3800,
       parTime: '12m 00s'
@@ -116,7 +129,8 @@
       id: 'mahjong',
       title: 'Celestial Jade',
       icon: '🀄',
-      path: 'mahjong/www/index.html',
+      path: 'mahjong/www/game.html',
+      params: 'layout=turtle',
       targetDesc: 'Match all imperial dragon suites in order',
       targetScore: 3600,
       parTime: '8m 15s'
@@ -155,6 +169,18 @@
       ];
       const modifierIndex = Math.floor(rand() * modifiers.length);
 
+      const extraParams = [];
+      if (game.params) extraParams.push(game.params);
+      if (game.seededDealMax) {
+        const deal = (seed % game.seededDealMax) + 1;
+        extraParams.push(`deal=${deal}`);
+      }
+      if (game.seededLevelMax) {
+        const level = (seed % game.seededLevelMax) + 1;
+        extraParams.push(`level=${level}`);
+      }
+      extraParams.push(`daily=${dateStr}`, `seed=${seed}`);
+
       return {
         dateStr,
         dayNumber: dayNum,
@@ -165,7 +191,7 @@
         targetScore: game.targetScore,
         targetDesc: game.targetDesc,
         parTime: game.parTime,
-        launchUrl: `${game.path}?daily=${dateStr}&seed=${seed}`
+        launchUrl: `${game.path}?${extraParams.join('&')}`
       };
     }
 
@@ -224,6 +250,11 @@
       // Update Daily Streak
       this.updateStreakOnCompletion(dateStr);
 
+      // Sync completion with ArcadePassport for speedrun, daily_3star, and streak_3 trophies
+      if (window.ArcadePassport && typeof window.ArcadePassport.recordWin === 'function') {
+        window.ArcadePassport.recordWin(mission.game.id, runRecord.timeSeconds, runRecord.score, true, runRecord.stars);
+      }
+
       return runRecord;
     }
 
@@ -276,13 +307,35 @@
 
       const starIcons = '★'.repeat(record.stars) + '☆'.repeat(3 - record.stars);
 
+      let brandName = 'RETRO ARCADE';
+      try {
+        const storedBrand = localStorage.getItem('arcade_brand_name');
+        if (storedBrand && storedBrand.trim() && storedBrand.trim().toUpperCase() !== 'BRAND') {
+          brandName = `${storedBrand.trim().toUpperCase()} ARCADE`;
+        }
+      } catch (e) {}
+
+      let shareUrl = 'https://brandarcade.games';
+      try {
+        if (window.ARCADE_SHARE_URL) {
+          shareUrl = window.ARCADE_SHARE_URL;
+        } else if (
+          window.location &&
+          window.location.origin &&
+          !/^(capacitor|file):/i.test(window.location.origin) &&
+          !/\/\/(localhost|127\.0\.0\.1)(:|\/|$)/i.test(window.location.origin)
+        ) {
+          shareUrl = `${window.location.origin}${window.location.pathname}`;
+        }
+      } catch (e) {}
+
       const shareText = [
-        `🕹️ RETRO ARCADE — DAILY RUN #${mission.dayNumber}`,
+        `🕹️ ${brandName} — DAILY RUN #${mission.dayNumber}`,
         `${mission.game.icon} ${mission.game.title} (${mission.dateStr})`,
         `⚡ Score: ${record.score.toLocaleString()} pts | ⏱ ${timeFormatted}`,
         `🏆 Rating: ${starIcons} | 🔥 Streak: ${streak} Days`,
         selectedRow,
-        `Play 100% free (No Ads): ${window.location.origin}${window.location.pathname}`
+        `Play 100% free (No Ads): ${shareUrl}`
       ].join('\n');
 
       return shareText;

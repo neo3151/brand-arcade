@@ -283,7 +283,7 @@
     return { id: 'house', name: 'House Favorite', count: n };
   }
 
-  function shopHref() {
+  function shopHref(itemId, fromGame) {
     let path = '';
     try {
       path = (root.location && root.location.pathname) || '';
@@ -292,7 +292,10 @@
     const depth = Math.max(0, parts.length - 1);
     let prefix = '';
     for (let i = 0; i < depth; i++) prefix += '../';
-    return prefix + 'shop.html';
+    let url = prefix + 'shop.html';
+    if (fromGame) url += '?from=' + encodeURIComponent(String(fromGame));
+    if (itemId) url += '#shop-' + encodeURIComponent(String(itemId));
+    return url;
   }
 
   function emptyTips() {

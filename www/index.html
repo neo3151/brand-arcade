@@ -1542,12 +1542,12 @@
         </div>
       </div>
 
-      <!-- Actions Strip -->
+        <!-- Actions Strip -->
       <div style="display: flex; gap: 10px;">
-        <a id="btn-launch-daily" href="blockblast/www/index.html?daily=1" class="btn-push-play" style="flex: 1.5; justify-content: center; font-size: 0.92rem;">
+        <a id="btn-launch-daily" href="blockblast/www/game.html?daily=1" class="btn-push-play" style="flex: 1.5; justify-content: center; font-size: 0.92rem;">
           <span>🕹️</span> LAUNCH MISSION
         </a>
-        <button type="button" id="btn-simulate-daily" class="btn-push-sub" style="flex: 1; font-size: 0.85rem; justify-content: center; white-space: nowrap;" title="Simulate completion to test the Wordle share card">
+        <button type="button" id="btn-simulate-daily" class="btn-push-sub" style="flex: 1; font-size: 0.85rem; justify-content: center; white-space: nowrap; display: none;" title="Simulate completion to test the Wordle share card">
           <span>⚡</span> SIMULATE RUN
         </button>
       </div>
@@ -2118,7 +2118,7 @@
         localStorage.setItem('arcade_play_count', STATE.sessions.toString());
         if (window.ArcadePassport) {
           const gameObj = ARCADE_GAMES.find(g => g.id === gameId);
-          window.ArcadePassport.recordPlay(gameId, 60, 0, false, gameObj ? gameObj.vibe : null);
+          window.ArcadePassport.recordPlay(gameId, 0, 0, false, gameObj ? gameObj.vibe : null, false);
         }
         updateStats();
       }
@@ -2560,6 +2560,11 @@
         document.getElementById('daily-par-time').textContent = mission.parTime;
         document.getElementById('daily-streak-count').textContent = `🔥 ${streak} DAY${streak === 1 ? '' : 'S'}`;
         
+        const simBtn = document.getElementById('btn-simulate-daily');
+        if (simBtn) {
+          const showSim = /[?&](debug|demo)=/i.test((window.location && window.location.search) || '');
+          simBtn.style.display = showSim ? 'inline-flex' : 'none';
+        }
         const launchBtn = document.getElementById('btn-launch-daily');
         launchBtn.href = mission.launchUrl;
         launchBtn.onclick = () => {

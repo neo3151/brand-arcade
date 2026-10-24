@@ -386,9 +386,9 @@
     }[ch]));
   }
 
-  function shopLink(productId) {
+  function shopLink(productId, itemId, gameId) {
     const href = (root.ArcadeStore && typeof root.ArcadeStore.shopHref === 'function')
-      ? root.ArcadeStore.shopHref()
+      ? root.ArcadeStore.shopHref(itemId, gameId)
       : 'shop.html';
     const id = productId ? ' data-product-id="' + esc(productId) + '"' : '';
     return '<a class="paid-shop-link"' + id + ' href="' + esc(href) + '">Arcade Shop</a>';
@@ -440,7 +440,7 @@
       html += '<article class="paid-pack">' +
         '<header class="paid-pack__bar"><div><h3>' + esc(item.name) + '</h3><p>' +
         esc(product(item.packId).blurb) + '</p></div>' +
-        (owned ? '<span class="paid-owned">Owned</span>' : shopLink(item.productId)) +
+        (owned ? '<span class="paid-owned">Owned</span>' : shopLink(item.productId, item.packId, game)) +
         '</header>' + skinCard(item, owned) + '</article>';
     });
     packs.forEach(pack => {
@@ -448,7 +448,7 @@
       const skins = SKINS.filter(item => item.game === game && item.packId === pack.id);
       html += '<article class="paid-pack' + (pack.id === 'cardroom' ? ' paid-pack--bundle' : '') + '">' +
         '<header class="paid-pack__bar"><div><h3>' + esc(pack.name) + '</h3><p>' + esc(pack.blurb) + '</p></div>' +
-        (owned ? '<span class="paid-owned">Owned</span>' : shopLink(pack.productId)) +
+        (owned ? '<span class="paid-owned">Owned</span>' : shopLink(pack.productId, pack.id, game)) +
         '</header>';
       if (skins.length) {
         html += '<div class="paid-skin-row">';

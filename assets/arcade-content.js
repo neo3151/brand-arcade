@@ -109,17 +109,17 @@
       .replace(/"/g, '&quot;');
   }
 
-  function shopLink() {
+  function shopLink(packId, gameId) {
     const href = (root.ArcadeStore && typeof root.ArcadeStore.shopHref === 'function')
-      ? root.ArcadeStore.shopHref()
+      ? root.ArcadeStore.shopHref(packId, gameId)
       : 'shop.html';
     return '<a class="paid-shop-link" href="' + esc(href) + '">Arcade Shop</a>';
   }
 
-  function buyButton(productId, owned) {
+  function buyButton(productId, owned, packId, gameId) {
     const id = ' data-product-id="' + esc(productId) + '"';
     if (owned) return '<span class="paid-owned"' + id + '>Owned</span>';
-    return shopLink();
+    return shopLink(packId, gameId);
   }
 
   function allowsWord(category, level, difficulty) {
@@ -303,18 +303,18 @@
     const owned = ownsPack(pack);
     return '<section class="content-pack" data-pack="' + esc(pack.id) + '" data-product-id="' + esc(pack.productId) + '">' +
       '<div class="content-pack__bar"><div><h3>' + esc(pack.name) + '</h3><p>' + esc(pack.blurb) + '</p></div>' +
-      buyButton(pack.productId, owned) + '</div>' +
+      buyButton(pack.productId, owned, pack.id, pack.game) + '</div>' +
       '<p class="content-note">' + esc(pack.note) + '</p>' +
       renderItems(pack, owned) +
       '</section>';
   }
 
-  function renderPuzzler() {
+  function renderPuzzler(gameId) {
     const pack = PACKS.puzzler;
     const owned = ownsEntitlement(pack.entitlementId);
     return '<section class="content-pack content-pack--bundle" data-pack="puzzler" data-product-id="' + esc(pack.productId) + '">' +
       '<div class="content-pack__bar"><div><h3>' + esc(pack.name) + '</h3><p>' + esc(pack.blurb) + '</p></div>' +
-      buyButton(pack.productId, owned) + '</div>' +
+      buyButton(pack.productId, owned, pack.id, gameId) + '</div>' +
       '<p class="content-note">' + esc(pack.note) + '</p></section>';
   }
 
@@ -327,7 +327,7 @@
     let html = '<div class="content-shelf"><div class="content-shelf__lead"><h2>Content packs</h2>' +
       '<p>Optional extra puzzles. Everything already in the game stays free and unlocked. Packs do not add hints, scores, or easier rules. Buying stays on the Arcade Shop.</p></div>';
     packs.forEach(function (pack) { html += renderPack(pack); });
-    if (PACKS.puzzler.games.indexOf(game) !== -1) html += renderPuzzler();
+    if (PACKS.puzzler.games.indexOf(game) !== -1) html += renderPuzzler(game);
     html += '</div>';
     return html;
   }
@@ -372,7 +372,7 @@
     overlay.id = 'content-lock-overlay';
     overlay.innerHTML = '<div class="content-lock-card"><h2>' + esc(pack.name) + '</h2><p>' + esc(pack.blurb) +
       '</p><p>This puzzle is locked. Free boards are still open from the menu.</p>' +
-      buyButton(pack.productId, ownsPack(pack)) +
+      buyButton(pack.productId, ownsPack(pack), pack.id, pack.game) +
       '<a class="content-back" href="index.html">Back to the menu</a></div>';
     root.document.body.appendChild(overlay);
     bindBuys(overlay);

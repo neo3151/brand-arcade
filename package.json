@@ -5,6 +5,7 @@
   "scripts": {
     "start": "npx serve -l 3000 .",
     "serve": "npx serve -l 3000 .",
+    "test": "for f in tests/*.test.js; do node \"$f\" || exit 1; done",
     "build": "node sync-hub.js",
     "sync": "node sync-hub.js",
     "bundle:store": "esbuild scripts/arcade-purchases-entry.js --bundle --format=esm --platform=browser --outfile=assets/vendor/arcade-purchases.js",

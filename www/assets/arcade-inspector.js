@@ -648,7 +648,7 @@
                 <span style="color: #64748b;">SEED:</span> <span id="ai-seed-val" style="color: #38bdf8;">#${(window.ArcadeDaily && window.ArcadeDaily.getTodayMission) ? window.ArcadeDaily.getTodayMission().seed : '116255'}</span>
               </div>
               <div style="background: #090e1a; padding: 6px 8px; border-radius: 4px; border: 1px solid #1e293b;">
-                <span style="color: #64748b;">STREAK:</span> <span style="color: #facc15;">${localStorage.getItem('arcade_streak') || (window.ArcadeDaily ? window.ArcadeDaily.getDailyStreak() : '1')} DAYS</span>
+                <span style="color: #64748b;">STREAK:</span> <span style="color: #facc15;">${localStorage.getItem('arcade_daily_streak') || localStorage.getItem('arcade_streak_days') || (window.ArcadeDaily ? window.ArcadeDaily.getDailyStreak() : '1')} DAYS</span>
               </div>
             </div>
           </div>

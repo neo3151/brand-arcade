@@ -10,7 +10,14 @@ const path = require('path');
 const curated = require('../solitaire/js/curated-deals');
 
 const base = process.argv[2] || 'http://127.0.0.1:8765';
-const outDir = '/opt/cursor/artifacts/screenshots';
+let outDir = process.env.SCREENSHOT_DIR || '/opt/cursor/artifacts/screenshots';
+
+function chromeBin() {
+  const mac = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  if (process.env.CHROME_BIN) return process.env.CHROME_BIN;
+  if (process.platform === 'darwin' && fs.existsSync(mac)) return mac;
+  return 'google-chrome';
+}
 const sampleDeal = curated.deals[0];
 const lockedDeal = curated.deals[2];
 
@@ -39,12 +46,17 @@ function ignore(text) {
 }
 
 async function main() {
-  fs.mkdirSync(outDir, { recursive: true });
+  try {
+    fs.mkdirSync(outDir, { recursive: true });
+  } catch (e) {
+    outDir = '/tmp/arcade-screenshots';
+    fs.mkdirSync(outDir, { recursive: true });
+  }
   const standalone = spawn('python3', ['-m', 'http.server', '8766', '--bind', '127.0.0.1'], {
     cwd: path.join(__dirname, '..', 'wordsearch', 'www'),
     stdio: 'ignore'
   });
-  const chrome = spawn('google-chrome', [
+  const chrome = spawn(chromeBin(), [
     '--headless=new',
     '--no-sandbox',
     '--disable-dev-shm-usage',

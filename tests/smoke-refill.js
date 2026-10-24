@@ -5,10 +5,18 @@
 'use strict';
 
 const { spawn } = require('child_process');
+const fs = require('fs');
 const base = process.argv[2] || 'http://127.0.0.1:8765';
 
+function chromeBin() {
+  const mac = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  if (process.env.CHROME_BIN) return process.env.CHROME_BIN;
+  if (process.platform === 'darwin' && fs.existsSync(mac)) return mac;
+  return 'google-chrome';
+}
+
 async function main() {
-  const chrome = spawn('google-chrome', [
+  const chrome = spawn(chromeBin(), [
     '--headless=new', '--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu',
     '--remote-debugging-port=9334', '--user-data-dir=/tmp/fair-play-chrome-refill', 'about:blank'
   ], { stdio: 'ignore' });
